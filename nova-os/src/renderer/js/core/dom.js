@@ -2,7 +2,7 @@
 
 // Sicherheitsnetz: append()/prepend() ignorieren null/false/undefined, damit bedingte
 // Kinder (cond ? el : null) nie als Text „null“ im Fenster landen.
-for (const proto of [Element.prototype, DocumentFragment.prototype]) {
+for (const proto of typeof Element === 'undefined' ? [] : [Element.prototype, DocumentFragment.prototype]) {
   for (const name of ['append', 'prepend']) {
     const orig = proto[name];
     proto[name] = function (...nodes) { return orig.apply(this, nodes.filter((n) => n != null && n !== false)); };

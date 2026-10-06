@@ -6,24 +6,7 @@ import { api } from '../core/api.js';
 import { store } from '../core/store.js';
 import { openApp } from '../core/wm.js';
 import { toast } from '../core/ui.js';
-
-// ANSI-Farbcodes in HTML umwandeln (Grundfarben + fett)
-const ANSI = { 30: '#6b7280', 31: '#f87171', 32: '#4ade80', 33: '#facc15', 34: '#60a5fa', 35: '#e879f9', 36: '#22d3ee', 37: '#e5e7eb', 90: '#9ca3af', 91: '#fca5a5', 92: '#86efac', 93: '#fde047', 94: '#93c5fd', 95: '#f0abfc', 96: '#67e8f9', 97: '#ffffff' };
-function ansiToHtml(text) {
-  let out = '';
-  let open = 0;
-  const parts = text.split(/\x1b\[([\d;]*)m/);
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 === 0) { out += esc(parts[i]); continue; }
-    const codes = parts[i].split(';').map(Number);
-    for (const c of codes) {
-      if (c === 0 || isNaN(c)) { out += '</span>'.repeat(open); open = 0; }
-      else if (c === 1) { out += '<span style="font-weight:700">'; open++; }
-      else if (ANSI[c]) { out += `<span style="color:${ANSI[c]}">`; open++; }
-    }
-  }
-  return out + '</span>'.repeat(open);
-}
+import { ansiToHtml, applyCarriageReturns } from '../core/ansi.js';
 
 const SHELLS = { powershell: 'PowerShell', cmd: 'CMD', bash: 'Bash' };
 
@@ -111,7 +94,18 @@ export default {
     }
 
     function print(t, text, cls = '') {
+      // Fortschrittsbalken (\r) überschreiben die zuletzt ausgegebene Zeile
+      if (text.includes('\r') && t.out.lastChild && !text.startsWith('\n')) {
+        const prev = t.out.lastChild;
+        if (prev.dataset && prev.dataset.raw != null && !prev.dataset.raw.endsWith('\n')) {
+          text = prev.dataset.raw + text;
+          prev.remove();
+        }
+      }
+      const raw = text;
+      text = applyCarriageReturns(text);
       const span = h('span', { class: cls, html: ansiToHtml(text) });
+      span.dataset.raw = raw;
       t.out.append(span);
       // Ausgabe begrenzen, damit sehr lange Läufe flüssig bleiben
       while (t.out.childNodes.length > 4000) t.out.firstChild.remove();

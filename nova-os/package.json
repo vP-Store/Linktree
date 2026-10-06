@@ -11,9 +11,10 @@
     "dev": "electron . --dev",
     "check": "node scripts/check.js",
     "preview": "node scripts/serve.js",
-    "test": "node scripts/check.js && playwright test",
+    "test": "node scripts/check.js && node --test tests/unit.test.mjs && playwright test",
     "dist": "electron-builder --win nsis portable",
-    "dist:dir": "electron-builder --dir"
+    "dist:dir": "electron-builder --dir",
+    "test:unit": "node --test tests/unit.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

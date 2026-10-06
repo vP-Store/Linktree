@@ -20,6 +20,8 @@ jobs:
           node-version: 22
       - name: Syntax-Prüfung
         run: node scripts/check.js
+      - name: Unit-Tests
+        run: node --test tests/unit.test.mjs
       - name: Abhängigkeiten installieren
         run: npm install --no-audit --no-fund
         env:
