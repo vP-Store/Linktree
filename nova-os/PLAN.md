@@ -78,7 +78,12 @@ dem Backlog.
 | R12 | Fensterübersicht (Alt+W), sparsame Netzwerkmessung unter Windows | ✅ |
 | R13 | Windows-Fenster nach vorne holen, Bildschirmfoto, Datei-Vorschau | ✅ |
 | R14 | Dock-Vergrößerung, heiße Ecke, Doppel-Esc, Desktop-Drag & Drop | ✅ |
-| R15+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R15 | KI-Assistent „Nova KI“ (Claude, verschlüsselter Schlüssel, Streaming, Dateien als Kontext) | ✅ |
+| R16 | Widgets einzeln wählbar, Leistungsmodus | ✅ |
+| R17 | Globale Schnellsuche (Alt+Umschalt+Leertaste), Sitzungs-Test | ✅ |
+| R18 | Systematischer Code-Review: 10 Fehler + 7 Restpunkte behoben | ✅ |
+| R19 | PDF-Vorschau, Screenreader-Beschriftungen | ✅ |
+| R20+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
@@ -100,7 +105,6 @@ Erledigt: ~~Mehrere Arbeitsflächen mit Übersicht~~ · ~~Drag & Drop zwischen D
 Offen:
 - Widgets frei positionierbar / ein- und ausschaltbar je Widget
 - KI-Assistent (optional, API-Schlüssel in Einstellungen)
-- PDF-Vorschau im Dateimanager
 - Mehrere Monitore gleichzeitig
 - Lautstärke/Helligkeit (benötigt native Windows-APIs)
 
@@ -116,6 +120,8 @@ Offen:
 | R11 | Erste Tasten in Palette gingen verloren | Fokus sofort statt verzögert |
 | R13 | Leerer Ordner zerbrach Raster, doppelte Favoriten | Layout + Deduplizierung |
 | R13 | Programme öffneten sich hinter dem Overlay | NovaOS tritt nach dem Öffnen automatisch zur Seite |
+| R16 | Heiße Ecke löste aus, wenn der Zeiger schon in der Ecke lag (CI) | Nur Hineinfahren zählt |
+| R18 | Umbenennen überschrieb Dateien, „Speichern unter“ ohne Rückfrage, `cd -` legte Terminal lahm, u. v. m. | siehe Commit „10 Fehler aus dem Code-Review“ |
 
 ## 8. Bedienung (Kurzreferenz)
 

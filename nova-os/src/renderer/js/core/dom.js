@@ -41,6 +41,8 @@ export function h(tag, props, ...children) {
       else el.setAttribute(k, v === true ? '' : v);
     }
   }
+  // Icon-Knöpfe ohne Text bekommen den Tooltip als Screenreader-Beschriftung
+  if (el.tagName === 'BUTTON' && el.title && !el.hasAttribute('aria-label')) el.setAttribute('aria-label', el.title);
   append(el, children);
   return el;
 }

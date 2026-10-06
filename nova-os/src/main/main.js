@@ -72,6 +72,7 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
       webviewTag: true,
+      plugins: true, // eingebauter PDF-Betrachter für die Datei-Vorschau
       spellcheck: false,
       backgroundThrottling: false,
     },

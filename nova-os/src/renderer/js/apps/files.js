@@ -122,6 +122,7 @@ export default {
           preview.append(h('pre.fm-pv-text', txt.slice(0, 3000) + (txt.length > 3000 ? '\n…' : '')));
         } catch (_) {}
       }
+      if (kind === 'pdf' && fileUrl(e.path)) preview.append(h('iframe.fm-pv-pdf', { src: fileUrl(e.path) + '#toolbar=0&view=FitH', title: e.name }));
       if (kind === 'audio' && fileUrl(e.path)) preview.append(h('audio.fm-pv-audio', { controls: true, src: fileUrl(e.path) }));
       if (kind === 'video' && fileUrl(e.path)) preview.append(h('video.fm-pv-video', { controls: true, src: fileUrl(e.path) }));
       preview.append(h('div.fm-pv-actions',
