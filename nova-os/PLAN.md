@@ -83,7 +83,13 @@ dem Backlog.
 | R17 | Globale Schnellsuche (Alt+Umschalt+Leertaste), Sitzungs-Test | ✅ |
 | R18 | Systematischer Code-Review: 10 Fehler + 7 Restpunkte behoben | ✅ |
 | R19 | PDF-Vorschau, Screenreader-Beschriftungen | ✅ |
-| R20+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R20 | Helles Design geprüft: lesbare Desktop-Beschriftungen, Kontraste | ✅ |
+| R21 | Browser-Downloads ohne Dialog, sichere Webseiten-Berechtigungen | ✅ |
+| R22 | ZIP packen/entpacken, PDF-Export | ✅ |
+| R23 | **Echter Rauchtest der EXE auf Windows in der CI** | ✅ |
+| R24 | Terminal: 256 Farben/Truecolor/Fortschrittszeilen; Unit-Tests | ✅ |
+| R25 | Kalender-Icon mit Datum, Dock-Badges | ✅ |
+| R26+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
@@ -123,7 +129,17 @@ Offen:
 | R16 | Heiße Ecke löste aus, wenn der Zeiger schon in der Ecke lag (CI) | Nur Hineinfahren zählt |
 | R18 | Umbenennen überschrieb Dateien, „Speichern unter“ ohne Rückfrage, `cd -` legte Terminal lahm, u. v. m. | siehe Commit „10 Fehler aus dem Code-Review“ |
 
-## 8. Bedienung (Kurzreferenz)
+## 8. Prüfstand (jede Runde)
+
+| Prüfung | Umfang | Wo |
+|---|---|---|
+| Syntax | alle 57 JS-Dateien | lokal + CI |
+| Unit-Tests | Rechner, ANSI, Highlighting, Markdown (inkl. HTML-Injektion), Pfade | lokal + CI |
+| Oberflächen-Tests | 33 Playwright-Tests: alle Apps, Palette, Fenster, Dateien, Notizen, Terminal, KI, Sitzung … | lokal + CI |
+| Electron-Rauchtest | echte App unter Xvfb (Linux) | lokal |
+| **Windows-Rauchtest** | gebaute `NovaOS.exe` auf `windows-latest`: 142 Programme gefunden, Fensterliste, 149 Prozesse, Laufwerke C:/D:, Netzwerkrate, PowerShell-Terminal | CI |
+
+## 9. Bedienung (Kurzreferenz)
 
 | Taste | Aktion |
 |---|---|
