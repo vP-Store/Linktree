@@ -157,6 +157,11 @@ function createMock() {
       onChange: (cb) => { listeners.clip.add(cb); return () => listeners.clip.delete(cb); },
     },
     power: { action: async (a) => { console.info('[mock] Energie', a); return true; } },
+    tools: {
+      zip: async (paths, name) => { const d = parent([].concat(paths)[0]); const p = unique(`${d === '/' ? '' : d}/${name || base([].concat(paths)[0]).replace(/\.[^.]+$/, '')}.zip`); add(p, 'ZIP'); return p; },
+      unzip: async (file) => { const p = unique(file.replace(/\.zip$/i, '')); add(p, null); add(p + '/inhalt.txt', 'entpackt'); return p; },
+      pdf: async (html, dest) => { const p = unique(dest); add(p, 'PDF'); return p; },
+    },
     ai: (() => {
       const deltas = new Set(), dones = new Set();
       let key = null;

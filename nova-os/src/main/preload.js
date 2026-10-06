@@ -88,6 +88,11 @@ contextBridge.exposeInMainWorld('nova', {
     focus: call('win:focus'),
     screenshot: call('win:screenshot'),
   },
+  tools: {
+    zip: call('tools:zip'),
+    unzip: call('tools:unzip'),
+    pdf: call('tools:pdf'),
+  },
   ai: {
     hasKey: call('ai:hasKey'),
     setKey: call('ai:setKey'),

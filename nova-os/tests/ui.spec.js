@@ -177,3 +177,13 @@ test('Dateien: Umbenennen auf vorhandenen Namen wird abgelehnt', async ({ page }
   await expect(page.locator('.toast')).toContainText(/existiert/i);
   await expect(page.locator('.fm-item', { hasText: 'Einkauf.txt' })).toHaveCount(1);
 });
+
+test('Dateien: als ZIP komprimieren und entpacken', async ({ page }) => {
+  await open(page, 'files', { path: '/home/nova/Desktop' });
+  await page.locator('.fm-item', { hasText: 'Einkauf.txt' }).click({ button: 'right' });
+  await page.locator('.ctx-item', { hasText: 'Als ZIP komprimieren' }).click();
+  await expect(page.locator('.fm-item', { hasText: 'Einkauf.zip' })).toHaveCount(1);
+  await page.locator('.fm-item', { hasText: 'Einkauf.zip' }).click({ button: 'right' });
+  await page.locator('.ctx-item', { hasText: 'Hier entpacken' }).click();
+  await expect(page.locator('.fm-name').filter({ hasText: /^Einkauf$/ })).toHaveCount(1);
+});

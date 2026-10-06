@@ -490,6 +490,8 @@ export default {
         one && one.dir && fileClip.paths.length ? { label: 'Hier hinein einfügen', icon: 'paste', action: () => paste(one.path) } : null,
         { label: 'Pfad kopieren', icon: 'link', action: copyPaths },
         '-',
+        st.path !== ':recent' ? { label: sel.length > 1 ? `${sel.length} Elemente als ZIP` : 'Als ZIP komprimieren', icon: 'archive', action: () => zipSelected(sel) } : null,
+        one && one.ext === 'zip' && st.path !== ':recent' ? { label: 'Hier entpacken', icon: 'archive', action: () => unzipFile(one) } : null,
         one && st.path !== ':recent' ? { label: 'Umbenennen', icon: 'edit', key: 'F2', action: rename } : null,
         { label: 'Im Explorer zeigen', icon: 'folder', action: () => api.fs.reveal(sel[0].path) },
         one ? { label: 'Eigenschaften', icon: 'info', action: () => properties(one) } : null,
@@ -526,6 +528,16 @@ export default {
       } catch (err) { info = String(err.message); }
       const { alertDialog } = await import('../core/ui.js');
       alertDialog({ title: e.name, message: info });
+    }
+
+    async function zipSelected(sel) {
+      toast('Wird komprimiert …', `${sel.length} Element(e)`, { icon: 'archive', duration: 1800 });
+      try { const p = await api.tools.zip(sel.map((e) => e.path)); await load(); selectPath(p); toast('ZIP erstellt', pathx.base(p), { icon: 'archive', kind: 'ok' }); } catch (e) { showError(e, 'Komprimieren fehlgeschlagen'); }
+    }
+
+    async function unzipFile(e) {
+      toast('Wird entpackt …', e.name, { icon: 'archive', duration: 1800 });
+      try { const p = await api.tools.unzip(e.path); await load(); selectPath(p); toast('Entpackt', pathx.base(p), { icon: 'archive', kind: 'ok' }); } catch (err) { showError(err, 'Entpacken fehlgeschlagen'); }
     }
 
     function selectAll() {

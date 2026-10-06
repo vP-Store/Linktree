@@ -44,6 +44,7 @@ export default {
         tb('zoomOut', 'Kleiner (Strg+-)', () => setFont(fontSize - 1)),
         tb('zoomIn', 'Größer (Strg++)', () => setFont(fontSize + 1)),
         tb('eye', 'Markdown-Vorschau (Strg+Umschalt+V)', () => togglePreview(), 'prevBtn'),
+        tb('download', 'Als PDF exportieren', () => exportPdf()),
         h('div.grow'),
         tb('terminal', 'Terminal im Ordner der Datei', () => cur && openApp('terminal', { cwd: cur.path ? pathx.dir(cur.path) : places.home })),
       ),
@@ -235,6 +236,18 @@ export default {
       const a = e.target.closest('a[data-ext]');
       if (a) { e.preventDefault(); openApp('browser', { url: a.getAttribute('href') }); }
     });
+
+    async function exportPdf() {
+      if (!cur) return;
+      const title = cur.name.replace(/\.[^.]+$/, '');
+      const html = cur.lang === 'md' ? renderMarkdown(ta.value) : `<h2>${esc(cur.name)}</h2><pre><code>${highlight(ta.value, cur.lang)}</code></pre>`;
+      const dir = cur.path ? pathx.dir(cur.path) : (places.documents || places.home);
+      try {
+        const p = await api.tools.pdf(html, pathx.join(dir, title + '.pdf'), title);
+        const { notify } = await import('../core/ui.js');
+        notify('PDF gespeichert', p, { icon: 'download', kind: 'ok', onClick: () => api.fs.open(p) });
+      } catch (e) { showError(e, 'PDF-Export fehlgeschlagen'); }
+    }
 
     // ---------- Suchen & Ersetzen ----------
     const fIn = h('input.input', { placeholder: 'Suchen', spellcheck: false });

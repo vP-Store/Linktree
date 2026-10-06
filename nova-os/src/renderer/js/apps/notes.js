@@ -45,6 +45,7 @@ export default {
     const main = h('div.app-main',
       h('div.app-toolbar', modeBar, h('div.grow'), meta,
         h('button.icon-btn', { title: 'Notiz anheften', html: icon('pin'), onclick: () => cur && togglePin(cur) }),
+        h('button.icon-btn', { title: 'Als PDF exportieren', html: icon('download'), onclick: () => cur && exportPdf(cur) }),
         h('button.icon-btn', { title: 'Als Datei im Editor öffnen', html: icon('code'), onclick: () => cur && openApp('editor', { path: cur.path }) }),
         h('button.icon-btn', { title: 'Löschen', html: icon('trash'), onclick: () => cur && remove(cur) })),
       editorArea, emptyState);
@@ -204,6 +205,16 @@ export default {
         notes = notes.filter((x) => x !== n);
         if (cur === n) { cur = null; select(notes[0] || null); } else renderList();
       } catch (e) { showError(e); }
+    }
+
+    async function exportPdf(n) {
+      flush();
+      const title = safeName(titleOf(n.text));
+      try {
+        const p = await api.tools.pdf(renderMarkdown(n.text), pathx.join(places.documents || places.home, title + '.pdf'), title);
+        const { notify } = await import('../core/ui.js');
+        notify('PDF gespeichert', p, { icon: 'download', kind: 'ok', onClick: () => api.fs.open(p) });
+      } catch (e) { showError(e, 'PDF-Export fehlgeschlagen'); }
     }
 
     function togglePin(n) {
