@@ -19,6 +19,16 @@ module.exports = `(async () => {
     const off2 = n.term.onExit((d) => { if (d.id === 'smoke') { off(); off2(); res(out.trim().slice(0, 80)); } });
     n.term.run('smoke', 'echo NovaOS-OK', null, n.platform === 'win32' ? 'powershell' : 'bash');
   }));
+  const places = await n.fs.places();
+  const tmp = places.documents + (n.platform === 'win32' ? String.fromCharCode(92) : '/') + 'NovaOS-Rauchtest';
+  const sep = n.platform === 'win32' ? String.fromCharCode(92) : '/';
+  await t('schreiben', async () => { await n.fs.writeText(tmp + sep + 'probe.txt', 'Hallo'); return n.fs.readText(tmp + sep + 'probe.txt'); });
+  await t('zip', async () => { const z = await n.tools.zip([tmp + sep + 'probe.txt']); const d = await n.tools.unzip(z); return (await n.fs.list(d)).map((f) => f.name); });
+  await t('pdf', async () => { const p = await n.tools.pdf('<h1>Test</h1>', tmp + sep + 'test.pdf', 'Test'); return (await n.fs.stat(p)).size > 1000; });
+  await t('appIcon', async () => { const a = (await n.apps.list())[0]; return a ? !!(await n.apps.icon(a.path)) : 'keine Apps'; });
+  await t('screenshot', async () => { const p = await n.win.screenshot(); const st = await n.fs.stat(p); await n.fs.trash(p); return st.size > 10000; });
+  await t('aiKey', () => n.ai.hasKey());
+  await t('aufraeumen', async () => { await n.fs.trash(tmp); return true; });
   const m = await import('./js/core/wm.js');
   for (const id of ['files', 'monitor', 'launcher']) await m.openApp(id);
   await new Promise((res) => setTimeout(res, 2500));

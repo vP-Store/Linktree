@@ -58,7 +58,9 @@ jobs:
           if (-not $p.WaitForExit(120000)) { Stop-Process -Id $p.Id -Force; throw "NovaOS hat sich nicht beendet" }
           Get-Content smoke.log
           if (-not (Test-Path smoke.png)) { throw "Kein Screenshot erzeugt" }
-          if ((Get-Content smoke.log -Raw) -match '\[smoke\] Fehler') { throw "Rauchtest fehlgeschlagen" }
+          $log = Get-Content smoke.log -Raw
+          if ($log -match '\[smoke\] Fehler') { throw "Rauchtest fehlgeschlagen" }
+          if ($log -match 'FEHLER:') { throw "Mindestens eine Prüfung im Rauchtest ist fehlgeschlagen" }
       - name: Artefakte hochladen
         uses: actions/upload-artifact@v4
         with:
