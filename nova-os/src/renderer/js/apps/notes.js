@@ -227,9 +227,13 @@ export default {
     setMode(mode);
     await load();
     if (args.action === 'new') create(args.text || '');
+    if (args.open) { const n = notes.find((x) => x.path === args.open); if (n) select(n); }
 
     return {
-      onArgs(a) { if (a.action === 'new') create(a.text || ''); },
+      onArgs(a) {
+        if (a.action === 'new') create(a.text || '');
+        if (a.open) { const n = notes.find((x) => x.path === a.open); if (n) { search.value = ''; select(n); } else load().then(() => { const m = notes.find((x) => x.path === a.open); if (m) select(m); }); }
+      },
       onFocus() { if (cur && mode !== 'view') setTimeout(() => ta.focus(), 10); },
       onClose() { flush(); return true; },
       destroy() { flush(); },

@@ -58,10 +58,10 @@ export function startReminders(notify) {
 }
 
 export default {
-  mount(root, win) {
+  mount(root, win, args = {}) {
     let view = store.get('calView', 'month');
-    let cursor = new Date();
-    let selected = isoDate();
+    let cursor = args.date ? new Date(args.date + 'T00:00') : new Date();
+    let selected = args.date || isoDate();
 
     const title = h('h2.cal-title');
     const seg = h('div.seg',
@@ -209,6 +209,9 @@ export default {
     const off = bus.on('calendar', render);
     const off2 = bus.on('tasks', render);
     render();
-    return { destroy() { off(); off2(); } };
+    return {
+      onArgs(a) { if (a.date) { selected = a.date; cursor = new Date(a.date + 'T00:00'); render(); } },
+      destroy() { off(); off2(); },
+    };
   },
 };

@@ -187,3 +187,21 @@ test('Dateien: als ZIP komprimieren und entpacken', async ({ page }) => {
   await page.locator('.ctx-item', { hasText: 'Hier entpacken' }).click();
   await expect(page.locator('.fm-name').filter({ hasText: /^Einkauf$/ })).toHaveCount(1);
 });
+
+test('Palette findet Aufgaben und Termine', async ({ page }) => {
+  await page.evaluate(async () => {
+    const t = await import('/js/core/tasks.js');
+    t.addTask('Steuererklärung abgeben');
+    const { store } = await import('/js/core/store.js');
+    store.set('calendarEvents', [{ id: 'e1', title: 'Zahnarzt Termin', date: '2026-10-20', time: '09:30' }]);
+  });
+  await page.keyboard.press('Control+k');
+  await page.keyboard.type('steuer');
+  await expect(page.locator('.pal-group', { hasText: 'Aufgaben' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Control+k');
+  await page.keyboard.type('zahnarzt');
+  await expect(page.locator('.pal-item', { hasText: 'Zahnarzt Termin' })).toBeVisible();
+  await page.locator('.pal-item', { hasText: 'Zahnarzt Termin' }).click();
+  await expect(page.locator('.cal-ag-title')).toHaveText('Zahnarzt Termin');
+});
