@@ -99,5 +99,8 @@ contextBridge.exposeInMainWorld('nova', {
   },
   browser: {
     onNewWindow: on('browser:new-window'),
+    onDownload: on('browser:download'),
+    onPermission: on('browser:permission'),
+    answerPermission: call('browser:permission:answer'),
   },
 });

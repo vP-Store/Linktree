@@ -16,6 +16,7 @@ import { initKeys } from './shell/keys.js';
 import { loadSysInfo } from './shell/state.js';
 import { initClipboardHistory } from './apps/clipboard.js';
 import { startReminders } from './apps/calendar.js';
+import { initBrowserHooks } from './shell/browserhooks.js';
 
 async function boot() {
   const bootEl = document.getElementById('boot');
@@ -33,6 +34,7 @@ async function boot() {
   initKeys();
   initClipboardHistory();
   startReminders(notify);
+  initBrowserHooks();
   await initDesktop();
 
   api.overlay.onVisibility((visible) => {

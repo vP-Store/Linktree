@@ -17,6 +17,7 @@ const registerClip = require('./ipc/clip');
 const registerPower = require('./ipc/power');
 const registerWin = require('./ipc/win');
 const registerAi = require('./ipc/ai');
+const registerBrowser = require('./ipc/browser');
 
 const isDev = process.argv.includes('--dev');
 const startHidden = process.argv.includes('--hidden');
@@ -245,6 +246,7 @@ app.whenReady().then(() => {
   registerPower(ipcMain, quit);
   registerWin(ipcMain, () => win);
   registerAi(ipcMain, () => win);
+  registerBrowser(ipcMain, () => win);
   store.register(ipcMain);
 
   createWindow();
