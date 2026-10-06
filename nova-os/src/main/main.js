@@ -97,6 +97,27 @@ function createWindow() {
   });
 
   if (isDev) win.webContents.openDevTools({ mode: 'detach' });
+
+  // Automatischer Rauchtest (CI): Konsole mitschreiben, Screenshot speichern, beenden.
+  if (process.env.NOVA_SMOKE) {
+    win.webContents.on('console-message', (_e, level, message) => console.log(`[renderer:${level}] ${message}`));
+    win.webContents.on('render-process-gone', (_e, d) => { console.error('[renderer] abgestürzt', d); app.exit(2); });
+    win.webContents.once('did-finish-load', () => {
+      setTimeout(async () => {
+        try {
+          if (process.env.NOVA_SMOKE_JS) await win.webContents.executeJavaScript(process.env.NOVA_SMOKE_JS);
+          await new Promise((r) => setTimeout(r, 1500));
+          const img = await win.webContents.capturePage();
+          require('fs').writeFileSync(process.env.NOVA_SMOKE, img.toPNG());
+          console.log('[smoke] Screenshot gespeichert:', process.env.NOVA_SMOKE);
+        } catch (err) {
+          console.error('[smoke] Fehler:', err);
+          app.exit(1);
+        }
+        quit();
+      }, 2500);
+    });
+  }
 }
 
 function showOverlay() {

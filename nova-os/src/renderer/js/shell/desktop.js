@@ -60,7 +60,10 @@ async function renderIcons() {
   }
   if (!places || !places.desktop) return;
   let files = [];
-  try { files = await api.fs.list(places.desktop); } catch (_) { return; }
+  try {
+    if (!(await api.fs.exists(places.desktop))) return;
+    files = await api.fs.list(places.desktop);
+  } catch (_) { return; }
   files.sort((a, b) => (b.dir - a.dir) || a.name.localeCompare(b.name, 'de'));
   for (const f of files.filter((x) => !/^desktop\.ini$/i.test(x.name))) {
     const label = f.ext === 'lnk' || f.ext === 'url' ? f.name.replace(/\.(lnk|url)$/i, '') : f.name;

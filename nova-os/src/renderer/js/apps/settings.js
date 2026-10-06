@@ -222,6 +222,6 @@ export default {
 
     renderSide();
     render();
-    return { onArgs(a) { if (a.page) go(a.page); } };
+    return { onArgs(a) { if (a.page) go(a.page); }, getState() { return { page }; } };
   },
 };

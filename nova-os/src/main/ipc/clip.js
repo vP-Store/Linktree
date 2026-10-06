@@ -1,26 +1,44 @@
 'use strict';
 // Zwischenablage lesen/schreiben und Verlauf beobachten.
+// Hinweis: Neuere Electron-Versionen liefern bei clipboard.readText() ein Promise,
+// ältere einen String – mit await funktioniert beides.
 
 const { clipboard } = require('electron');
 
-module.exports = function register(ipcMain, getWin) {
-  let last = '';
-  try { last = clipboard.readText(); } catch (_) {}
+async function readText() {
+  try {
+    const v = await clipboard.readText();
+    return typeof v === 'string' ? v : '';
+  } catch (_) {
+    return '';
+  }
+}
 
-  setInterval(() => {
-    let txt = '';
-    try { txt = clipboard.readText(); } catch (_) { return; }
-    if (txt && txt !== last) {
-      last = txt;
-      const w = getWin();
-      if (w && !w.isDestroyed()) w.webContents.send('clip:changed', txt);
+module.exports = function register(ipcMain, getWin) {
+  let last = null;
+  let busy = false;
+
+  readText().then((t) => { last = t; });
+
+  setInterval(async () => {
+    if (busy || last === null) return;
+    busy = true;
+    try {
+      const txt = await readText();
+      if (txt && txt !== last) {
+        last = txt;
+        const w = getWin();
+        if (w && !w.isDestroyed()) w.webContents.send('clip:changed', txt);
+      }
+    } finally {
+      busy = false;
     }
   }, 1000).unref();
 
-  ipcMain.handle('clip:read', () => clipboard.readText());
-  ipcMain.handle('clip:write', (_e, txt) => {
+  ipcMain.handle('clip:read', () => readText());
+  ipcMain.handle('clip:write', async (_e, txt) => {
     last = String(txt);
-    clipboard.writeText(last);
+    await clipboard.writeText(last);
     return true;
   });
 };

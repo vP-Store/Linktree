@@ -1,0 +1,47 @@
+name: NovaOS – Windows-Build
+
+on:
+  push:
+    paths:
+      - 'nova-os/**'
+      - '.github/workflows/novaos-windows.yml'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nova-os
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax-Prüfung
+        run: node scripts/check.js
+
+  build-windows:
+    needs: check
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: nova-os
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Abhängigkeiten installieren
+        run: npm install --no-audit --no-fund
+      - name: Installer + portable EXE bauen
+        run: npx electron-builder --win nsis portable --publish never
+      - name: Artefakte hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovaOS-Windows
+          path: |
+            nova-os/dist/*.exe
+          if-no-files-found: error
