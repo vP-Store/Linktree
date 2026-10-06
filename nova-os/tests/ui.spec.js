@@ -138,3 +138,12 @@ test('Nova KI: Schlüssel-Einrichtung und Antwort-Streaming', async ({ page }) =
   await expect(page.locator('.ai-msg.bot .ai-md')).toContainText('Punkt zwei', { timeout: 10000 });
   await expect(page.locator('.ai-chat-item')).toHaveCount(1);
 });
+
+test('Heiße Ecke: nur beim Hineinfahren, nicht beim Draufliegen', async ({ page }) => {
+  await page.mouse.move(1, 1);
+  await page.mouse.move(2, 1);
+  await expect(page.locator('#overview')).toHaveCount(0);
+  await page.mouse.move(200, 200);
+  await page.mouse.move(1, 1, { steps: 4 });
+  await expect(page.locator('#overview')).toHaveCount(1);
+});

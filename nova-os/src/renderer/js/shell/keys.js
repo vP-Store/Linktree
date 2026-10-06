@@ -18,17 +18,18 @@ function isTyping(e) {
 }
 
 export function initKeys() {
-  // Heiße Ecke oben links → Fensterübersicht
-  const corner = document.createElement('div');
-  corner.id = 'hot-corner';
-  document.getElementById('os').append(corner);
+  // Heiße Ecke oben links → Fensterübersicht. Löst nur aus, wenn die Maus von außen
+  // hineinfährt – nicht, wenn der Zeiger beim Einblenden bereits dort liegt.
+  let wasOutside = false;
   let cornerT = 0;
-  corner.addEventListener('pointerenter', () => {
-    if (!store.get('hotCorner') || Date.now() - cornerT < 800) return;
-    cornerT = Date.now();
-    toggleOverview();
-  });
-
+  addEventListener('pointermove', (e) => {
+    const inCorner = e.clientX <= 2 && e.clientY <= 2;
+    if (inCorner && wasOutside && store.get('hotCorner') && Date.now() - cornerT > 800 && !e.buttons) {
+      cornerT = Date.now();
+      toggleOverview();
+    }
+    wasOutside = !inCorner;
+  }, true);
   addEventListener('keydown', onKey, true);
   addEventListener('keyup', (e) => {
     if (sw && (e.key === 'Control' || !e.ctrlKey)) commitSwitcher();

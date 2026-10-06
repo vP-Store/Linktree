@@ -378,7 +378,6 @@ body.overview-open #windows .win { pointer-events: none; }
 .dock-pop .list-row .app-icon, .dock-pop .list-row .file-glyph { width: 28px; height: 28px; }
 #dock.pop-open .dock-tip { display: none; }
 
-#hot-corner { position: absolute; left: 0; top: 0; width: 4px; height: 4px; z-index: 1100; }
 .dock-item:hover { margin: 0 9px; }
 .dock-item:has(+ .dock-item:hover), .dock-item:hover + .dock-item { margin: 0 3px; }
 :root[data-reduce-motion="true"] .dock-item { margin: 0 !important; }
