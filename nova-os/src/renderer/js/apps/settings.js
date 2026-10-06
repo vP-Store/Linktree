@@ -28,6 +28,7 @@ const SHORTCUTS = [
   ['Maximieren / Wiederherstellen', 'Alt + ↑'],
   ['Minimieren', 'Alt + ↓'],
   ['Links / rechts einrasten', 'Alt + ← / →'],
+  ['Fensterübersicht', 'Alt + W'],
   ['Alle Fenster minimieren', 'Alt + D'],
   ['Terminal öffnen', 'Alt + T'],
   ['Dateien öffnen', 'Alt + E'],

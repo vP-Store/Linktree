@@ -27,6 +27,7 @@ function commands() {
     c('Fokus-Modus umschalten', 'focus', () => store.set('focusMode', !store.get('focusMode')), '', 'focus konzentration'),
     c('Nicht stören umschalten', 'bellOff', () => store.set('dnd', !store.get('dnd')), '', 'dnd mitteilungen'),
     c('Alle Fenster minimieren / zeigen', 'layers', () => minimizeAll(), 'Alt+D', 'desktop zeigen'),
+    c('Fensterübersicht', 'layers', () => import('./overview.js').then((m) => m.openOverview()), 'Alt+W', 'expose mission control alle fenster'),
     c('NovaOS ausblenden', 'eyeOff', () => overlayHide(), 'Alt+Leer', 'hide verstecken'),
     c('Neue Notiz', 'stickyNote', () => openApp('notes', { action: 'new' }), '', 'notiz erstellen'),
     c('Neue Aufgabe …', 'listChecks', () => openApp('tasks', { action: 'focusInput' }), '', 'todo hinzufügen'),

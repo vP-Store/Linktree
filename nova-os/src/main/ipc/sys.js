@@ -7,6 +7,7 @@ const { execFile } = require('child_process');
 
 let lastCpu = os.cpus();
 let lastNet = null;
+let lastRate = null;
 
 function cpuUsage() {
   const now = os.cpus();
@@ -60,14 +61,37 @@ async function processes() {
   }).filter(Boolean);
 }
 
+// Unter Windows liefert ein einziger, dauerhaft laufender PowerShell-Prozess alle
+// 2 Sekunden die Netzwerk-Summen (statt jedes Mal einen neuen Prozess zu starten).
+let winNet = { proc: null, latest: null };
+function ensureWinNetWatcher() {
+  if (winNet.proc) return;
+  const { spawn } = require('child_process');
+  const script = 'while ($true) { try { $s = Get-NetAdapterStatistics | Measure-Object -Property ReceivedBytes,SentBytes -Sum; ' +
+    '[Console]::Out.WriteLine(($s | ForEach-Object { $_.Sum }) -join ","); [Console]::Out.Flush() } catch { } ; Start-Sleep -Seconds 2 }';
+  const proc = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { windowsHide: true });
+  winNet.proc = proc;
+  let buf = '';
+  proc.stdout.on('data', (d) => {
+    buf += d.toString();
+    const lines = buf.split(/\r?\n/);
+    buf = lines.pop();
+    const last = lines.filter(Boolean).pop();
+    if (last) {
+      const [rx, tx] = last.trim().split(',').map(Number);
+      winNet.latest = { rx: rx || 0, tx: tx || 0, t: Date.now() };
+    }
+  });
+  proc.on('exit', () => { winNet.proc = null; });
+  proc.on('error', () => { winNet.proc = null; });
+}
+
 async function netTotals() {
   // Gesamt-Bytes über alle Adapter (für Up/Down-Rate in der Statusleiste).
   try {
     if (process.platform === 'win32') {
-      const out = await run('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
-        '(Get-NetAdapterStatistics | Measure-Object -Property ReceivedBytes,SentBytes -Sum | ForEach-Object { $_.Sum }) -join ","']);
-      const [rx, tx] = out.trim().split(',').map(Number);
-      return { rx: rx || 0, tx: tx || 0 };
+      ensureWinNetWatcher();
+      return winNet.latest;
     }
     const txt = await fsp.readFile('/proc/net/dev', 'utf8');
     let rx = 0, tx = 0;
@@ -83,7 +107,12 @@ async function netTotals() {
   }
 }
 
+function stopWatchers() {
+  if (winNet.proc) { try { winNet.proc.kill(); } catch (_) {} winNet.proc = null; }
+}
+
 module.exports = function register(ipcMain) {
+  require('electron').app.on('will-quit', stopWatchers);
   ipcMain.handle('sys:info', () => {
     const cpus = os.cpus();
     return {
@@ -111,13 +140,16 @@ module.exports = function register(ipcMain) {
   });
   ipcMain.handle('sys:net', async () => {
     const now = await netTotals();
-    const t = Date.now();
-    let rate = null;
-    if (now && lastNet) {
-      const dt = (t - lastNet.t) / 1000;
-      if (dt > 0) rate = { down: Math.max(0, (now.rx - lastNet.rx) / dt), up: Math.max(0, (now.tx - lastNet.tx) / dt) };
+    const t = (now && now.t) || Date.now();
+    let rate = lastRate;
+    if (now && (!lastNet || t !== lastNet.t)) {
+      if (lastNet) {
+        const dt = (t - lastNet.t) / 1000;
+        if (dt > 0) rate = { down: Math.max(0, (now.rx - lastNet.rx) / dt), up: Math.max(0, (now.tx - lastNet.tx) / dt) };
+      }
+      lastNet = { ...now, t };
+      lastRate = rate;
     }
-    if (now) lastNet = { ...now, t };
     const ifaces = Object.entries(os.networkInterfaces())
       .flatMap(([name, list]) => list.filter((a) => !a.internal && a.family === 'IPv4').map((a) => ({ name, address: a.address })));
     return { rate, ifaces };

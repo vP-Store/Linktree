@@ -116,3 +116,13 @@ test('Einstellungen: Akzentfarbe und Thema wechseln', async ({ page }) => {
   const accent = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
   expect(accent).toBe('#10b981');
 });
+
+test('Übersicht zeigt alle Fenster und fokussiert per Klick', async ({ page }) => {
+  await open(page, 'files');
+  await open(page, 'calc');
+  await page.keyboard.press('Alt+w');
+  await expect(page.locator('#overview .ov-hit')).toHaveCount(2);
+  await page.locator('#overview .ov-hit').first().click();
+  await expect(page.locator('#overview')).toHaveCount(0);
+  await expect(page.locator('.win[data-app="files"]')).not.toHaveClass(/inactive/);
+});

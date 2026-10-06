@@ -340,3 +340,32 @@ body.focus-mode #widgets, body.focus-mode #desk-icons { opacity: 0; pointer-even
 #modal-root, #ctx-root { position: absolute; inset: 0; pointer-events: none; }
 #modal-root > *, #ctx-root > * { pointer-events: auto; }
 .layer-popover { position: absolute; }
+
+/* ---------- Übersicht ---------- */
+#overview { position: absolute; inset: 0; z-index: 2500; background: rgba(4, 6, 14, .45); backdrop-filter: blur(18px) saturate(140%); animation: fadeIn .2s; }
+body.overview-open #windows { z-index: 2600; pointer-events: none; }
+body.overview-open #windows .win { pointer-events: none; }
+.win.ov-item { transition: transform .32s var(--ease); box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.ov-hit { position: absolute; z-index: 2700; border-radius: 12px; cursor: pointer; transition: box-shadow .15s; }
+.ov-hit:hover { box-shadow: 0 0 0 3px var(--accent); }
+.ov-hit.dragging { opacity: .4; }
+.ov-label { position: absolute; z-index: 2700; display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.6); pointer-events: none; }
+.ov-label .app-icon { width: 18px; height: 18px; flex: none; }
+.ov-label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ov-label em { font-style: normal; font-weight: 500; font-size: 11px; color: var(--text-3); }
+.ov-close { position: absolute; z-index: 2800; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--glass-strong); color: var(--text); display: grid; place-items: center; font-size: 13px; opacity: 0; transition: opacity .15s; }
+.ov-close:hover { background: #e5484d; color: #fff; }
+#overview:has(.ov-hit:hover) .ov-close, .ov-close:hover { opacity: 1; }
+.ov-strip { position: absolute; top: calc(var(--topbar-h) + 16px); left: 0; right: 0; display: flex; justify-content: center; gap: 14px; z-index: 2800; }
+.ov-ws { width: 168px; display: flex; flex-direction: column; gap: 6px; align-items: center; border: 0; background: transparent; color: var(--text-2); font-size: 12px; font-weight: 600; }
+.ov-ws-prev { width: 100%; height: 76px; border-radius: 12px; border: 2px solid var(--border-strong); background: rgba(255,255,255,.06); display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 6px; padding: 8px; transition: all .15s; }
+.ov-ws-prev .app-icon { width: 22px; height: 22px; }
+.ov-ws:hover .ov-ws-prev { border-color: var(--text-3); }
+.ov-ws.on .ov-ws-prev { border-color: var(--accent); background: rgba(var(--accent-rgb), .14); }
+.ov-ws.on { color: var(--text); }
+.ov-ws.drop .ov-ws-prev { border-color: var(--accent); background: rgba(var(--accent-rgb), .3); transform: scale(1.05); }
+.ov-ghost { position: absolute; z-index: 2900; width: 56px; height: 56px; pointer-events: none; filter: drop-shadow(0 8px 18px rgba(0,0,0,.5)); }
+.ov-ghost .app-icon { width: 100%; height: 100%; }
+.ov-empty { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; color: var(--text-2); pointer-events: none; }
+.ov-empty .icon { font-size: 40px; margin: 0 auto 6px; opacity: .6; }
+.ov-empty b { color: var(--text); font-size: 15px; }

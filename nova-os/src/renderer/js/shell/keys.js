@@ -7,6 +7,7 @@ import { store } from '../core/store.js';
 import { openPalette, isPaletteOpen, closePalette } from './palette.js';
 import { toggleStart, isStartOpen, closeStart } from './start.js';
 import { closePop } from './topbar.js';
+import { toggleOverview, isOverviewOpen } from './overview.js';
 
 let sw = null; // { list, idx, el }
 
@@ -66,6 +67,7 @@ function onKey(e) {
     if (lower === 't') { e.preventDefault(); openApp('terminal'); return; }
     if (lower === 'e') { e.preventDefault(); openApp('files'); return; }
     if (lower === 'd') { e.preventDefault(); minimizeAll(); return; }
+    if (lower === 'w') { e.preventDefault(); toggleOverview(); return; }
     if (/^[1-9]$/.test(k) && +k <= store.get('workspaces')) { e.preventDefault(); switchWorkspace(+k - 1); return; }
   }
   if (isTyping(e)) return;

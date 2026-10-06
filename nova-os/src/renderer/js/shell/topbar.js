@@ -24,6 +24,7 @@ export function initTopbar() {
   const logo = item('.tb-logo', `${logoSvg(18)}<span>Nova</span>`, 'Startmenü (Strg+Leertaste)', () => toggleStart());
   appNameEl = h('span.tb-item.tb-app-name.ellipsis', 'Schreibtisch');
   wsEl = h('div.ws-dots');
+  const ovBtn = item('', icon('layers'), 'Übersicht aller Fenster (Alt+W)', () => import('./overview.js').then((m) => m.toggleOverview()));
 
   clockEl = item('.tb-clock', '', 'Kalender & Termine', (e) => togglePop('cal', e.currentTarget));
 
@@ -45,7 +46,7 @@ export function initTopbar() {
   const power = item('', icon('power'), 'Energie', (e) => powerMenu(e.currentTarget));
 
   bar.append(
-    h('div.tb-section.tb-left', logo, h('div.tb-sep'), appNameEl, wsEl),
+    h('div.tb-section.tb-left', logo, h('div.tb-sep'), ovBtn, appNameEl, wsEl),
     h('div.tb-section.tb-center', clockEl),
     h('div.tb-section.tb-right', timerEl, cpuEl, memEl, netEl, batEl, h('div.tb-sep'), search, clip, bellEl, qs, hide, power),
   );
