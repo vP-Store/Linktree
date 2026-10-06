@@ -48,6 +48,21 @@ function friendlyError(err) {
   return String((err && err.message) || err);
 }
 
+/** Gültige Abfolge herstellen: nur user/assistant, keine leeren Texte, gleiche Rollen
+ *  hintereinander zusammenführen, mit einer Nutzer-Nachricht beginnen und enden. */
+function normalize(messages) {
+  const out = [];
+  for (const m of messages || []) {
+    if ((m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string' || !m.content.trim()) continue;
+    const last = out[out.length - 1];
+    if (last && last.role === m.role) last.content += '\n\n' + m.content;
+    else out.push({ role: m.role, content: m.content });
+  }
+  while (out.length && out[0].role !== 'user') out.shift();
+  while (out.length && out[out.length - 1].role !== 'user') out.pop();
+  return out;
+}
+
 module.exports = function register(ipcMain, getWin) {
   const send = (ch, payload) => {
     const w = getWin();
@@ -63,6 +78,7 @@ module.exports = function register(ipcMain, getWin) {
    * Antwort wird über 'ai:delta' gestreamt, Abschluss über 'ai:done'.
    */
   ipcMain.handle('ai:chat', async (_e, id, messages, opts = {}) => {
+    if (!normalize(messages).length) { send('ai:done', { id, error: 'Keine Nachricht zum Senden.' }); return false; }
     let c;
     try { c = client(); } catch (err) { send('ai:done', { id, error: err.message }); return false; }
     const effort = ['low', 'medium', 'high', 'xhigh', 'max'].includes(opts.effort) ? opts.effort : 'medium';
@@ -76,9 +92,7 @@ module.exports = function register(ipcMain, getWin) {
         // Lehnt ein Sicherheitsfilter ab, übernimmt serverseitig ein passendes Ersatzmodell.
         betas: ['server-side-fallback-2026-07-01'],
         fallbacks: 'default',
-        messages: messages
-          .filter((m) => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-          .map((m) => ({ role: m.role, content: m.content })),
+        messages: normalize(messages),
       });
       active.set(id, stream);
       stream.on('text', (text) => send('ai:delta', { id, text }));
