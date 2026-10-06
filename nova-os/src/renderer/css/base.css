@@ -18,7 +18,7 @@
   --text-2: #b4bccd;
   --text-3: #7d869b;
   --glass: rgba(22, 25, 38, 0.66);
-  --glass-strong: rgba(26, 29, 44, 0.86);
+  --glass-strong: rgba(24, 27, 40, 0.93);
   --glass-soft: rgba(255, 255, 255, 0.05);
   --surface: rgba(255, 255, 255, 0.045);
   --surface-2: rgba(255, 255, 255, 0.08);
@@ -61,7 +61,7 @@
   --text-2: #475069;
   --text-3: #7c859b;
   --glass: rgba(250, 251, 255, 0.70);
-  --glass-strong: rgba(252, 253, 255, 0.90);
+  --glass-strong: rgba(250, 251, 254, 0.95);
   --glass-soft: rgba(0, 0, 0, 0.03);
   --surface: rgba(20, 30, 60, 0.04);
   --surface-2: rgba(20, 30, 60, 0.07);
@@ -218,7 +218,7 @@ input[type="range"].range::-webkit-slider-thumb { -webkit-appearance: none; widt
 .kbd { display: inline-flex; align-items: center; height: 20px; min-width: 20px; padding: 0 6px; border-radius: 5px; font: 600 11px var(--font); color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; }
 
 .empty {
-  display: grid; place-items: center; text-align: center; gap: 6px; padding: 32px 16px; color: var(--text-3);
+  display: grid; place-items: center; align-content: center; text-align: center; gap: 6px; padding: 32px 16px; color: var(--text-3);
 }
 .empty .icon { font-size: 34px; opacity: .6; margin-bottom: 4px; }
 .empty b { color: var(--text-2); font-weight: 600; font-size: 14px; }

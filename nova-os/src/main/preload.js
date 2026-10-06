@@ -82,4 +82,7 @@ contextBridge.exposeInMainWorld('nova', {
   power: {
     action: call('power:action'),
   },
+  browser: {
+    onNewWindow: on('browser:new-window'),
+  },
 });

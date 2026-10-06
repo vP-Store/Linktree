@@ -131,10 +131,10 @@
 /* ---------- Desktop ---------- */
 #desk-icons {
   position: absolute; top: 14px; left: 14px; bottom: var(--dock-reserve);
-  display: grid; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 96px); grid-auto-columns: 88px; gap: 4px; align-content: start;
+  display: grid; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 104px); grid-auto-columns: 92px; gap: 4px; align-content: start;
 }
 .desk-icon {
-  width: 88px; height: 92px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px 4px;
+  width: 92px; height: 100px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px 4px;
   border-radius: 12px; border: 1px solid transparent; background: transparent; color: #fff;
   text-shadow: 0 1px 3px rgba(0,0,0,.7), 0 0 12px rgba(0,0,0,.4);
 }
@@ -145,7 +145,7 @@
 #desk-select { position: absolute; border: 1px solid rgba(var(--accent-rgb), .8); background: rgba(var(--accent-rgb), .15); border-radius: 4px; pointer-events: none; z-index: 5; }
 
 /* ---------- Widgets ---------- */
-#widgets { position: absolute; top: 14px; right: 14px; width: 300px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100% - var(--dock-reserve) - 14px); overflow: hidden; transition: opacity .3s, transform .3s var(--ease); }
+#widgets { position: absolute; top: 14px; right: 14px; width: 300px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100% - var(--dock-reserve) - 14px); overflow-y: auto; scrollbar-width: none; padding-bottom: 4px; transition: opacity .3s, transform .3s var(--ease); }
 #widgets.hide { opacity: 0; transform: translateX(20px); pointer-events: none; }
 .widget { border-radius: var(--radius-xl); padding: 16px; position: relative; overflow: hidden; }
 .widget h4 { margin: 0 0 10px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); font-weight: 700; display: flex; align-items: center; gap: 6px; }
@@ -156,8 +156,8 @@
 .w-clock .greet { margin-top: 12px; font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
 .w-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .ring { position: relative; width: 100%; aspect-ratio: 1; display: grid; place-items: center; }
-.ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-.ring circle { fill: none; stroke-width: 7; stroke-linecap: round; }
+.ring > svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring > svg circle { fill: none; stroke-width: 7; stroke-linecap: round; }
 .ring .track { stroke: var(--surface-3); }
 .ring .bar { stroke: var(--accent); transition: stroke-dashoffset .8s var(--ease); }
 .ring b { font: 600 15px var(--font-display); font-variant-numeric: tabular-nums; }

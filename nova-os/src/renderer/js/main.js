@@ -15,6 +15,7 @@ import { initPalette } from './shell/palette.js';
 import { initKeys } from './shell/keys.js';
 import { loadSysInfo } from './shell/state.js';
 import { initClipboardHistory } from './apps/clipboard.js';
+import { startReminders } from './apps/calendar.js';
 
 async function boot() {
   const bootEl = document.getElementById('boot');
@@ -31,6 +32,7 @@ async function boot() {
   initPalette();
   initKeys();
   initClipboardHistory();
+  startReminders(notify);
   await initDesktop();
 
   api.overlay.onVisibility((visible) => {

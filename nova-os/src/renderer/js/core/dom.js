@@ -1,5 +1,14 @@
 // Kleine DOM-Helfer, damit Apps ohne Framework übersichtlich bleiben.
 
+// Sicherheitsnetz: append()/prepend() ignorieren null/false/undefined, damit bedingte
+// Kinder (cond ? el : null) nie als Text „null“ im Fenster landen.
+for (const proto of [Element.prototype, DocumentFragment.prototype]) {
+  for (const name of ['append', 'prepend']) {
+    const orig = proto[name];
+    proto[name] = function (...nodes) { return orig.apply(this, nodes.filter((n) => n != null && n !== false)); };
+  }
+}
+
 /**
  * h('div.card#main', { onclick, style: {...}, dataset: {...} }, 'Text', child)
  */
@@ -19,7 +28,11 @@ export function h(tag, props, ...children) {
   if (props) {
     for (const [k, v] of Object.entries(props)) {
       if (v == null || v === false) continue;
-      if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+      if (k === 'style' && typeof v === 'object') {
+        for (const [sk, sv] of Object.entries(v)) {
+          if (sk.startsWith('--')) el.style.setProperty(sk, sv); else el.style[sk] = sv;
+        }
+      }
       else if (k === 'dataset') Object.assign(el.dataset, v);
       else if (k === 'class') el.className += ' ' + v;
       else if (k === 'html') el.innerHTML = v;
@@ -149,3 +162,8 @@ export class Emitter {
 }
 
 export const bus = new Emitter();
+
+/** Lokales Datum als JJJJ-MM-TT (ohne UTC-Verschiebung) */
+export function isoDate(d = new Date()) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}

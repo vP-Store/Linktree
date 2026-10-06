@@ -31,6 +31,12 @@ export function initTopbar() {
   memEl = item('.tb-meter', '', 'Arbeitsspeicher – klicken für Systemmonitor', () => openApp('monitor'));
   netEl = item('.tb-meter', '', 'Netzwerk');
   batEl = item('.tb-meter.hidden', '', 'Akku');
+  const timerEl = item('.tb-timer.hidden', '', 'Fokus-Timer', () => openApp('timer'));
+  bus.on('timer:tick', (st) => {
+    const show = st.running || (st.mode !== 'stopwatch' && st.ms > 0 && st.ms < st.total);
+    timerEl.classList.toggle('hidden', !show);
+    if (show) import('../apps/timer.js').then(({ fmtMs }) => { timerEl.innerHTML = `${icon(st.mode === 'stopwatch' ? 'stopwatch' : st.phase === 'focus' || st.mode === 'timer' ? 'timer' : 'coffee')}<span>${fmtMs(st.ms)}</span>`; });
+  });
   const search = item('', icon('search'), 'Suchen (Strg+K)', () => openPalette());
   const clip = item('', icon('clipboard'), 'Zwischenablage', () => openApp('clipboard'));
   bellEl = item('.tb-dot', icon('bell'), 'Mitteilungen', (e) => togglePop('nc', e.currentTarget));
@@ -41,7 +47,7 @@ export function initTopbar() {
   bar.append(
     h('div.tb-section.tb-left', logo, h('div.tb-sep'), appNameEl, wsEl),
     h('div.tb-section.tb-center', clockEl),
-    h('div.tb-section.tb-right', cpuEl, memEl, netEl, batEl, h('div.tb-sep'), search, clip, bellEl, qs, hide, power),
+    h('div.tb-section.tb-right', timerEl, cpuEl, memEl, netEl, batEl, h('div.tb-sep'), search, clip, bellEl, qs, hide, power),
   );
 
   bus.on('wm:focus', (w) => { appNameEl.textContent = w ? w.title : 'Schreibtisch'; });

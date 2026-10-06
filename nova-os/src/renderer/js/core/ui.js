@@ -94,6 +94,45 @@ export function confirmDialog({ title, message = '', ok = 'OK', danger = false }
   }).then((v) => !!v);
 }
 
+/**
+ * Formular-Dialog. fields: [{ name, label, type: 'text'|'date'|'time'|'textarea'|'select'|'color', value, options, placeholder }]
+ * Liefert ein Objekt mit den Werten oder null. extra: [{ label, danger, value }] → zusätzliche Knöpfe.
+ */
+export function formDialog({ title, fields, ok = 'Speichern', extra = [] }) {
+  return modal((box, done) => {
+    const inputs = {};
+    const form = h('div.col', { style: { gap: '12px' } });
+    for (const f of fields) {
+      let input;
+      if (f.type === 'textarea') input = h('textarea.input', { rows: f.rows || 3, value: f.value || '', placeholder: f.placeholder || '' });
+      else if (f.type === 'select') input = h('select.input', ...f.options.map((o) => h('option', { value: o.value, selected: o.value === f.value }, o.label)));
+      else if (f.type === 'color') {
+        input = h('div.accent-row');
+        input.value = f.value || f.options[0];
+        for (const c of f.options) {
+          const b = h('button.accent-swatch', { type: 'button', style: { background: c }, class: c === input.value ? 'on' : '', onclick: () => { input.value = c; input.querySelectorAll('.accent-swatch').forEach((x) => x.classList.toggle('on', x === b)); } });
+          input.append(b);
+        }
+      } else input = h('input.input', { type: f.type || 'text', value: f.value || '', placeholder: f.placeholder || '', spellcheck: false });
+      inputs[f.name] = input;
+      if (f.type !== 'textarea' && f.type !== 'color') input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+      form.append(h('label.col', { style: { gap: '5px' } }, h('span.faint', { style: { fontSize: '12px', fontWeight: 600 } }, f.label), input));
+    }
+    const submit = () => {
+      const out = {};
+      for (const [k, el] of Object.entries(inputs)) out[k] = typeof el.value === 'string' ? el.value.trim() : el.value;
+      const req = fields.find((f) => f.required && !out[f.name]);
+      if (req) { inputs[req.name].focus(); inputs[req.name].classList.add('invalid'); return; }
+      done(out);
+    };
+    box.append(h('h3', { style: { marginBottom: '14px' } }, title), form,
+      h('div.actions',
+        ...extra.map((x) => h('button.btn' + (x.danger ? '.danger' : ''), { style: { marginRight: 'auto' }, onclick: () => done({ __action: x.value }) }, x.label)),
+        h('button.btn', { onclick: () => done(null) }, 'Abbrechen'),
+        h('button.btn.primary', { onclick: submit }, ok)));
+  });
+}
+
 export function alertDialog({ title, message = '' }) {
   return modal((box, done) => {
     box.append(h('h3', title), message ? h('p', message) : null, h('div.actions', h('button.btn.primary', { onclick: () => done(true) }, 'OK')));

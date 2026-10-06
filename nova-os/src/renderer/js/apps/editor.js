@@ -22,6 +22,7 @@ export default {
     let fontSize = store.get('editorFont', 13.5);
 
     // ---------- Gerüst ----------
+    const btns = {};
     const tabsEl = h('div.ed-tabs');
     const gutter = h('div.ed-gutter');
     const hl = h('pre.ed-hl', { 'aria-hidden': 'true' });
@@ -50,7 +51,6 @@ export default {
       h('div.ed-main', editorWrap, preview),
       h('div.app-status', statusL, statusR),
     );
-    const btns = {};
     function tb(ic, title, fn, key) {
       const b = h('button.icon-btn', { title, html: icon(ic), onclick: fn });
       if (key) btns[key] = b;

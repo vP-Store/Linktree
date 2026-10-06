@@ -40,7 +40,7 @@ export async function initDesktop() {
   bus.on('tasks', debounce(renderWidgets, 100));
   bus.on('desktop:refresh', renderIcons);
   bus.on('overlay:shown', renderIcons);
-  bus.on('sys:stats', updateRings);
+  bus.on('sys:stats', (s) => { lastStats = s; updateRings(s); });
   setInterval(tickWidgetClock, 1000);
 }
 
@@ -161,7 +161,7 @@ function deskMenu(x, y) {
 // ---------------------------------------------------------------------------
 // Widgets
 // ---------------------------------------------------------------------------
-let clockW, ringEls = {};
+let clockW, ringEls = {}, lastStats = null;
 
 function greeting() {
   const hr = new Date().getHours();
@@ -221,6 +221,7 @@ async function renderWidgets() {
   widgetsEl.append(h('div.widget.glass', { style: { cursor: 'default' }, ondblclick: () => openApp('monitor') },
     h('h4', { html: `${icon('activity')} System` }),
     h('div.w-stats', ringEls.cpu.el, ringEls.mem.el, ringEls.disk.el)));
+  if (lastStats) updateRings(lastStats);
   api.fs.drives().then((ds) => {
     const d0 = ds.find((x) => x.total) || ds[0];
     if (d0 && d0.total) ringEls.disk && ringEls.disk.set((1 - d0.free / d0.total) * 100, Math.round((1 - d0.free / d0.total) * 100) + '%');

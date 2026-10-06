@@ -221,6 +221,15 @@ app.whenReady().then(() => {
   screen.on('display-removed', refit);
 });
 
+// Webviews (Browser-App): Pop-ups als neuen Tab in NovaOS öffnen, keine neuen Fenster.
+app.on('web-contents-created', (_e, wc) => {
+  if (wc.getType() !== 'webview') return;
+  wc.setWindowOpenHandler(({ url }) => {
+    if (win && !win.isDestroyed()) win.webContents.send('browser:new-window', url);
+    return { action: 'deny' };
+  });
+});
+
 app.on('before-quit', () => { quitting = true; });
 app.on('will-quit', () => globalShortcut.unregisterAll());
 app.on('window-all-closed', () => { /* Tray hält die App am Leben */ });
