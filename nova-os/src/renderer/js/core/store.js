@@ -30,6 +30,8 @@ export const DEFAULTS = {
   closeOnBlur: false,
   workspaces: 4,
   uiScale: 100,
+  hotCorner: true,
+  doubleEscHide: true,
 };
 
 const state = {};

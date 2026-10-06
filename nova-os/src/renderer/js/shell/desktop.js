@@ -28,6 +28,16 @@ export async function initDesktop() {
     e.preventDefault();
     deskMenu(e.clientX, e.clientY);
   });
+  desk.addEventListener('dragover', (e) => { if (places && places.desktop && e.dataTransfer.types.includes('application/x-nova-paths')) e.preventDefault(); });
+  desk.addEventListener('drop', async (e) => {
+    if (e.defaultPrevented || !places || !places.desktop) return;
+    const raw = e.dataTransfer.getData('application/x-nova-paths');
+    if (!raw) return;
+    e.preventDefault();
+    const paths = JSON.parse(raw).filter((p) => !p.startsWith(places.desktop));
+    if (!paths.length) return;
+    try { e.ctrlKey ? await api.fs.copy(paths, places.desktop) : await api.fs.move(paths, places.desktop); renderIcons(); toast(e.ctrlKey ? 'Auf den Desktop kopiert' : 'Auf den Desktop verschoben', `${paths.length} Element(e)`, { icon: 'monitor', duration: 2000 }); } catch (err) { showError(err); }
+  });
   desk.addEventListener('pointerdown', (e) => {
     if (e.target === desk || e.target === iconsEl) startRubber(e);
   });
@@ -86,6 +96,26 @@ function deskIcon({ key, label, html, open, file }) {
     el.classList.add('sel');
   });
   el.addEventListener('dblclick', open);
+  if (file) {
+    el.draggable = true;
+    el.addEventListener('dragstart', (ev) => {
+      const keys = selected.has(key) ? [...selected].filter((k) => k.includes('/') || k.includes('\\')) : [file.path];
+      ev.dataTransfer.setData('application/x-nova-paths', JSON.stringify(keys.length ? keys : [file.path]));
+      ev.dataTransfer.setData('text/plain', file.path);
+      ev.dataTransfer.effectAllowed = 'copyMove';
+    });
+    if (file.dir) {
+      el.addEventListener('dragover', (ev) => { if (ev.dataTransfer.types.includes('application/x-nova-paths')) { ev.preventDefault(); el.classList.add('sel'); } });
+      el.addEventListener('dragleave', () => el.classList.remove('sel'));
+      el.addEventListener('drop', async (ev) => {
+        ev.preventDefault();
+        el.classList.remove('sel');
+        const paths = JSON.parse(ev.dataTransfer.getData('application/x-nova-paths') || '[]').filter((p) => p !== file.path);
+        if (!paths.length) return;
+        try { ev.ctrlKey ? await api.fs.copy(paths, file.path) : await api.fs.move(paths, file.path); renderIcons(); } catch (e) { showError(e); }
+      });
+    }
+  }
   el.addEventListener('keydown', (e) => { if (e.key === 'Enter') open(); });
   el.addEventListener('contextmenu', (e) => {
     e.preventDefault();

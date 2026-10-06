@@ -10,6 +10,7 @@ import { closePop } from './topbar.js';
 import { toggleOverview, isOverviewOpen } from './overview.js';
 
 let sw = null; // { list, idx, el }
+let lastEsc = 0;
 
 function isTyping(e) {
   const t = e.target;
@@ -17,6 +18,17 @@ function isTyping(e) {
 }
 
 export function initKeys() {
+  // Heiße Ecke oben links → Fensterübersicht
+  const corner = document.createElement('div');
+  corner.id = 'hot-corner';
+  document.getElementById('os').append(corner);
+  let cornerT = 0;
+  corner.addEventListener('pointerenter', () => {
+    if (!store.get('hotCorner') || Date.now() - cornerT < 800) return;
+    cornerT = Date.now();
+    toggleOverview();
+  });
+
   addEventListener('keydown', onKey, true);
   addEventListener('keyup', (e) => {
     if (sw && (e.key === 'Control' || !e.ctrlKey)) commitSwitcher();
@@ -52,7 +64,14 @@ function onKey(e) {
   if (k === 'Escape') {
     if (isPaletteOpen()) { closePalette(); return; }
     if (isStartOpen()) { closeStart(); return; }
+    if (document.querySelector('.popover, .ctx, .modal-scrim, #overview')) { closePop(); lastEsc = 0; return; }
     closePop();
+    // Doppel-Esc auf leerem Desktop (kein Eingabefeld aktiv) blendet NovaOS aus
+    if (store.get('doubleEscHide') && !isTyping(e) && !activeWindow()) {
+      const now = Date.now();
+      if (now - lastEsc < 450) { lastEsc = 0; import('./state.js').then((m) => m.overlayHide()); }
+      else lastEsc = now;
+    }
     return;
   }
 

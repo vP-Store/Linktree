@@ -64,17 +64,21 @@ dem Backlog.
 
 | Runde | Ziel | Status |
 |---|---|---|
-| R1 | Gerüst: Electron-Overlay, Hotkey, Tray, Preload, IPC-Grundlagen | ⏳ |
-| R2 | Design-System: Tokens, Glas, Wallpaper, Icons, Typografie | ⏳ |
-| R3 | Shell: Boot, Statusleiste, Dock, Startmenü, Desktop-Icons | ⏳ |
-| R4 | Fenstermanager: Ziehen, Resize, Snap, Min/Max, Fokus, Tastenkürzel | ⏳ |
-| R5 | Kern-Apps: Dateien, Terminal, Editor, Notizen, Einstellungen | ⏳ |
-| R6 | Produktiv-Apps: Aufgaben, Kalender, Rechner, Browser, Systemmonitor | ⏳ |
-| R7 | Windows-Integration: App-Starter (Startmenü-Verknüpfungen + Icons), Zwischenablage, Energie | ⏳ |
-| R8 | Befehlspalette, Mitteilungen, Schnelleinstellungen, Widgets | ⏳ |
-| R9 | Medien & Extras: Musik, Bilder, Timer/Pomodoro, Wetter | ⏳ |
-| R10 | Tests + Screenshots + Windows-Build-Pipeline | ⏳ |
-| R11+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R1 | Gerüst: Electron-Overlay, Hotkey, Tray, Preload, IPC-Grundlagen | ✅ |
+| R2 | Design-System: Tokens, Glas, Wallpaper, Icons, Typografie | ✅ |
+| R3 | Shell: Boot, Statusleiste, Dock, Startmenü, Desktop-Icons | ✅ |
+| R4 | Fenstermanager: Ziehen, Resize, Snap, Min/Max, Fokus, Tastenkürzel | ✅ |
+| R5 | Kern-Apps: Dateien, Terminal, Editor, Notizen, Einstellungen | ✅ |
+| R6 | Produktiv-Apps: Aufgaben, Kalender, Rechner, Browser, Systemmonitor | ✅ |
+| R7 | Windows-Integration: App-Starter (Startmenü-Verknüpfungen + Icons), Zwischenablage, Energie | ✅ |
+| R8 | Befehlspalette, Mitteilungen, Schnelleinstellungen, Widgets | ✅ |
+| R9 | Medien & Extras: Musik, Bilder, Timer/Pomodoro, Wetter | ✅ |
+| R10 | Tests + Screenshots + Windows-Build-Pipeline | ✅ |
+| R11 | Gauntlet-Testsuite (Playwright) + CI, Ebenen-Fix (Dialoge hinter Fenstern) | ✅ |
+| R12 | Fensterübersicht (Alt+W), sparsame Netzwerkmessung unter Windows | ✅ |
+| R13 | Windows-Fenster nach vorne holen, Bildschirmfoto, Datei-Vorschau | ✅ |
+| R14 | Dock-Vergrößerung, heiße Ecke, Doppel-Esc, Desktop-Drag & Drop | ✅ |
+| R15+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
@@ -90,23 +94,41 @@ Alles unter 9/10 kommt zurück in den Backlog.
 
 ## 6. Backlog (lebendig – wird jede Runde neu priorisiert)
 
-- Mehrere Arbeitsflächen mit Übersicht
-- Drag & Drop zwischen Dateien-Fenstern
-- Datei-Vorschau (Bilder/Text/PDF) im Dateimanager
-- Themes-Galerie mit eigenen Wallpapern (Bild-Upload)
-- Widgets frei positionierbar
-- Lokale KI-Integration (optional, API-Schlüssel in Einstellungen)
-- Mehrere Monitore
+Erledigt: ~~Mehrere Arbeitsflächen mit Übersicht~~ · ~~Drag & Drop zwischen Dateien-Fenstern~~ ·
+~~Datei-Vorschau~~ · ~~Eigene Wallpaper~~ · ~~Windows-Fenster steuern~~ · ~~Bildschirmfoto~~
 
-## 7. Bedienung (Kurzreferenz)
+Offen:
+- Widgets frei positionierbar / ein- und ausschaltbar je Widget
+- KI-Assistent (optional, API-Schlüssel in Einstellungen)
+- PDF-Vorschau im Dateimanager
+- Mehrere Monitore gleichzeitig
+- Lautstärke/Helligkeit (benötigt native Windows-APIs)
+
+## 7. Gauntlet-Protokoll (Funde aus den Prüfstationen)
+
+| Runde | Fund | Behebung |
+|---|---|---|
+| R10 | Editor startete nicht (Variable vor Initialisierung genutzt) | Reihenfolge korrigiert |
+| R10 | „null“ als Text in Kalender/Aufgaben | `append()` filtert leere Kinder zentral |
+| R10 | Fokus-Ring als graues Achteck | CSS-Selektor traf auch Label-Icon → präzisiert |
+| R10 | Zwischenablage-Fehler in Electron 44 | `readText()` ist jetzt asynchron → `await` |
+| R11 | Dialoge & Kontextmenüs hinter Fenstern | Ebenen-Container positioniert |
+| R11 | Erste Tasten in Palette gingen verloren | Fokus sofort statt verzögert |
+| R13 | Leerer Ordner zerbrach Raster, doppelte Favoriten | Layout + Deduplizierung |
+| R13 | Programme öffneten sich hinter dem Overlay | NovaOS tritt nach dem Öffnen automatisch zur Seite |
+
+## 8. Bedienung (Kurzreferenz)
 
 | Taste | Aktion |
 |---|---|
 | `Alt + Leertaste` | NovaOS ein-/ausblenden (in Einstellungen änderbar) |
 | `Strg + K` | Befehlspalette / Suche |
 | `Strg + Leertaste` / Klick auf Logo | Startmenü |
+| `Alt + W` / Maus in Ecke oben links | Fensterübersicht |
 | `Alt + Q` | Aktives Fenster schließen |
 | `Alt + ↑ / ← / →` | Maximieren / links / rechts einrasten |
 | `Alt + ↓` | Minimieren |
-| `Alt + Tab` (innerhalb NovaOS: `Strg+Tab`) | Fenster wechseln |
+| `Strg + Tab` | Fenster wechseln |
+| `Alt + 1 … 4` | Arbeitsfläche wechseln |
+| `Esc Esc` (leerer Desktop) | NovaOS ausblenden |
 | `Esc` | Menüs schließen |

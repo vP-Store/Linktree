@@ -154,6 +154,8 @@ export default {
         main.append(
           section('Desktop', row('Widgets anzeigen', 'Uhr, System, Aufgaben, Wetter, Schnellnotiz', toggle('showWidgets')),
             row('Desktop-Symbole', 'Verknüpfungen und Dateien deines Windows-Desktops', toggle('showDesktopIcons')),
+            row('Heiße Ecke', 'Maus in die Ecke oben links öffnet die Fensterübersicht', toggle('hotCorner')),
+            row('Doppel-Esc blendet aus', 'Zweimal Esc auf dem leeren Desktop versteckt NovaOS', toggle('doubleEscHide')),
             row('Arbeitsflächen', 'Anzahl der virtuellen Desktops', select('workspaces', [[1, '1 (aus)'], [2, '2'], [3, '3'], [4, '4'], [6, '6'], [9, '9']]))),
           section('Dock', row('Automatisch ausblenden', 'Erscheint, wenn die Maus den unteren Rand berührt', toggle('dockAutohide')),
             row('Symbolgröße', '', slider('dockSize', 40, 72, 2, ' px')),
