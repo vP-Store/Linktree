@@ -6,7 +6,7 @@ import { store } from '../core/store.js';
 import { api } from '../core/api.js';
 import { listApps, appIconSpan } from '../core/registry.js';
 import { openApp, allWindows, focus, minimizeAll, switchWorkspace, activeWindow } from '../core/wm.js';
-import { getWinApps, loadAppIcon, launchWinApp, recentFiles } from '../core/winapps.js';
+import { getWinApps, loadAppIcon, launchWinApp, recentFiles, getOpenWindows, focusWindow, loadExeIcon, takeScreenshot } from '../core/winapps.js';
 import { openPath } from '../core/open.js';
 import { evaluate, formatNumber, looksLikeMath } from '../core/math.js';
 import { toast, notify } from '../core/ui.js';
@@ -19,6 +19,7 @@ let kb = 0;
 let fileHits = [];
 let fileQuery = '';
 let places = null;
+let openWins = [];
 
 function commands() {
   const c = (label, ic, run, hint = '', kw = '') => ({ label, ic, run, hint, kw });
@@ -28,6 +29,7 @@ function commands() {
     c('Nicht stören umschalten', 'bellOff', () => store.set('dnd', !store.get('dnd')), '', 'dnd mitteilungen'),
     c('Alle Fenster minimieren / zeigen', 'layers', () => minimizeAll(), 'Alt+D', 'desktop zeigen'),
     c('Fensterübersicht', 'layers', () => import('./overview.js').then((m) => m.openOverview()), 'Alt+W', 'expose mission control alle fenster'),
+    c('Bildschirmfoto aufnehmen', 'image', () => takeScreenshot(), '', 'screenshot foto bildschirm aufnahme'),
     c('NovaOS ausblenden', 'eyeOff', () => overlayHide(), 'Alt+Leer', 'hide verstecken'),
     c('Neue Notiz', 'stickyNote', () => openApp('notes', { action: 'new' }), '', 'notiz erstellen'),
     c('Neue Aufgabe …', 'listChecks', () => openApp('tasks', { action: 'focusInput' }), '', 'todo hinzufügen'),
@@ -88,6 +90,7 @@ export function openPalette(initial = '') {
   wrap.classList.add('open');
   input.addEventListener('input', () => { kb = 0; render(); searchFiles(); });
   input.addEventListener('keydown', onKey);
+  getOpenWindows().then((l) => { openWins = l; if (isPaletteOpen()) render(); });
   render();
   input.focus();
   input.select();
@@ -141,6 +144,8 @@ async function render() {
   if (!onlyCmds && !q.startsWith('?')) {
     // Fenster
     const wins = allWindows().map((w) => ({ w, s: score(cq, w.title + ' ' + w.app.name) })).filter((x) => cq && x.s);
+    const ext = openWins.map((w) => ({ w, s: cq ? Math.max(score(cq, w.title), score(cq, w.name)) : 0 })).filter((x) => x.s);
+    add('Windows-Programme', ext.slice(0, 5).map(({ w }) => ({ exeWin: w, label: w.title, sub: `${w.name} · in Windows nach vorne holen`, hint: 'Windows', run: () => focusWindow(w) })));
     add('Offene Fenster', wins.slice(0, 5).map(({ w }) => ({ app: w.app, label: w.title, sub: `Zu ${w.app.name} wechseln`, hint: 'Fenster', run: () => { w.min && w.unminimize(); focus(w.id); } })));
     // Apps
     const apps = listApps().map((a) => ({ a, s: Math.max(score(cq, a.name), score(cq, a.keywords) * 0.8, score(cq, a.desc) * 0.5) })).filter((x) => x.s).sort((x, y) => y.s - x.s);
@@ -174,6 +179,7 @@ async function render() {
       const ico = h('div.p-ico');
       if (e.app) ico.innerHTML = appIconSpan(e.app);
       else if (e.winApp) loadAppIcon(e.winApp, ico);
+      else if (e.exeWin) loadExeIcon(e.exeWin, ico);
       else if (e.file) ico.innerHTML = fileGlyph(e.file.ext, e.file.dir);
       else ico.innerHTML = icon(e.ic || 'circle');
       const idx = results.length;

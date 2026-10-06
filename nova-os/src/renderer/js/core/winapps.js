@@ -47,3 +47,31 @@ export function addRecentFile(path) {
 export function recentFiles() {
   return (store.get('recentFiles', []) || []).map((p) => ({ path: p, name: pathx.base(p), ext: pathx.ext(p) }));
 }
+
+// ---------------------------------------------------------------------------
+// Offene Windows-Fenster
+// ---------------------------------------------------------------------------
+export async function getOpenWindows() {
+  if (!api.win) return [];
+  try { return await api.win.list(); } catch (_) { return []; }
+}
+
+export async function focusWindow(w) {
+  try { await api.win.focus(w.pid); } catch (e) { showError(e, 'Fenster konnte nicht aktiviert werden'); }
+}
+
+/** Icon eines laufenden Programms (über den EXE-Pfad) */
+export function loadExeIcon(w, el) {
+  el.innerHTML = fileGlyph('exe');
+  if (!w.path) return;
+  loadAppIcon({ path: w.path, name: w.name }, el);
+}
+
+export async function takeScreenshot() {
+  try {
+    const file = await api.win.screenshot();
+    const { notify } = await import('./ui.js');
+    notify('Bildschirmfoto gespeichert', file, { icon: 'image', kind: 'ok', onClick: () => import('./wm.js').then((m) => m.openApp('photos', { path: file })) });
+    return file;
+  } catch (e) { showError(e, 'Bildschirmfoto fehlgeschlagen'); return null; }
+}

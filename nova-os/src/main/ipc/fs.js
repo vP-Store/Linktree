@@ -33,7 +33,9 @@ async function list(dir, showHidden) {
 }
 
 async function drives() {
-  if (process.platform !== 'win32') return [{ name: '/', path: '/' }];
+  if (process.platform !== 'win32') {
+    try { const s = await fsp.statfs('/'); return [{ name: '/', path: '/', free: s.bavail * s.bsize, total: s.blocks * s.bsize }]; } catch (_) { return [{ name: '/', path: '/' }]; }
+  }
   const letters = 'CDEFGHIJKLMNOPQRSTUVWXYZAB'.split('');
   const found = [];
   await Promise.all(letters.map(async (l) => {

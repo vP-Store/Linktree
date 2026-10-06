@@ -3,7 +3,7 @@
 import { h, clear, esc } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { store } from '../core/store.js';
-import { getWinApps, loadAppIcon, launchWinApp } from '../core/winapps.js';
+import { getWinApps, loadAppIcon, launchWinApp, getOpenWindows, focusWindow, loadExeIcon } from '../core/winapps.js';
 import { contextMenu, toast } from '../core/ui.js';
 import { api } from '../core/api.js';
 
@@ -34,6 +34,7 @@ export default {
       const folders = [...new Set(apps.map((a) => a.folder))].sort((a, b) => a.localeCompare(b, 'de'));
       const item = (id, ic, label, count) => h('button.side-item', { class: folder === id ? 'on' : '', html: `${icon(ic)}<span class="ellipsis">${esc(label)}</span><span class="count">${count}</span>`, onclick: () => { folder = id; render(); } });
       side.append(h('div.side-label', 'Bibliothek'),
+        item(':open', 'layout', 'Gerade geöffnet', ''),
         item(null, 'apps', 'Alle Programme', apps.length),
         item(':fav', 'star', 'Favoriten', favs().length),
         item(':recent', 'history', 'Zuletzt gestartet', recent().length),
@@ -41,9 +42,23 @@ export default {
       for (const f of folders) side.append(item(f, 'folder', f, apps.filter((a) => a.folder === f).length));
     }
 
+    async function renderOpen() {
+      grid.append(h('div.empty', h('div.spinner')));
+      const wins = await getOpenWindows();
+      if (folder !== ':open') return;
+      clear(grid);
+      if (!wins.length) { grid.append(h('div.empty', { html: `${icon('layout')}<b>Keine Programmfenster offen</b><span>Laufende Windows-Programme erscheinen hier – ein Klick holt sie nach vorne.</span>` })); return; }
+      for (const w of wins) {
+        const ico = h('span.lp-ico');
+        loadExeIcon(w, ico);
+        grid.append(h('button.app-tile.lp-tile', { title: w.title, onclick: () => focusWindow(w) }, ico, h('span', w.title), h('small.faint', { style: { fontSize: '11px' } }, w.name)));
+      }
+    }
+
     function render() {
       renderSide();
       clear(grid);
+      if (folder === ':open') { renderOpen(); return; }
       const q = filter.toLowerCase();
       let list = apps;
       if (folder === ':fav') list = apps.filter((a) => favs().includes(a.path));

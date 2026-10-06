@@ -7,6 +7,8 @@ import { listApps, getApp, appIconSpan } from '../core/registry.js';
 import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus } from '../core/wm.js';
 import { contextMenu } from '../core/ui.js';
 import { toggleStart } from './start.js';
+import { getOpenWindows, focusWindow, loadExeIcon } from '../core/winapps.js';
+import { esc } from '../core/dom.js';
 
 let dock, wrap;
 
@@ -83,11 +85,47 @@ function render() {
     dock.append(item(getApp(id), { running: runningIds.has(id), active: act && act.appId === id }));
   }
   const extra = [...runningIds].filter((id) => !pinned.includes(id));
+  dock.append(h('div.dock-sep'), h('button.dock-item', {
+    title: 'Laufende Windows-Programme',
+    html: `<span class="app-icon">${winIcon()}</span><span class="dock-tip">Windows-Programme</span>`,
+    onclick: (e) => toggleWinList(e.currentTarget),
+  }));
   if (extra.length) {
     dock.append(h('div.dock-sep'));
     for (const id of extra) dock.append(item(getApp(id), { running: true, active: act && act.appId === id }));
   }
 }
+
+function winIcon() {
+  return `<svg viewBox="0 0 64 64"><defs><linearGradient id="dw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+    <path d="M32 2c17 0 23.5 0 26.8 3.2S62 15 62 32s0 23.5-3.2 26.8S49 62 32 62s-23.5 0-26.8-3.2S2 49 2 32 2 8.5 5.2 5.2 15 2 32 2Z" fill="url(#dw)"/>
+    <rect x="17" y="17" width="14" height="14" rx="2" fill="#fff"/><rect x="33" y="17" width="14" height="14" rx="2" fill="#fff" opacity=".85"/>
+    <rect x="17" y="33" width="14" height="14" rx="2" fill="#fff" opacity=".85"/><rect x="33" y="33" width="14" height="14" rx="2" fill="#fff" opacity=".7"/></svg>`;
+}
+
+let winPop = null;
+function closeWinList() { if (winPop) { winPop.remove(); winPop = null; dock.classList.remove('pop-open'); } }
+async function toggleWinList(btn) {
+  if (winPop) return closeWinList();
+  const r = btn.getBoundingClientRect();
+  winPop = h('div.glass.dock-pop', { style: { left: Math.max(10, r.left + r.width / 2 - 170) + 'px', bottom: innerHeight - r.top + 14 + 'px' } },
+    h('div.section-title', 'Geöffnet in Windows'), h('div.empty', h('div.spinner')));
+  document.getElementById('os').append(winPop);
+  dock.classList.add('pop-open');
+  const pop = winPop;
+  const list = await getOpenWindows();
+  if (pop !== winPop) return;
+  pop.lastChild.remove();
+  if (!list.length) { pop.append(h('div.faint', { style: { fontSize: '12.5px', padding: '6px 4px' } }, 'Keine Programmfenster geöffnet.')); return; }
+  for (const w of list) {
+    const ico = h('span');
+    loadExeIcon(w, ico);
+    pop.append(h('button.list-row', { title: w.title, onclick: () => { closeWinList(); focusWindow(w); } }, ico,
+      h('div.meta', h('b', w.title), h('small', w.name))));
+  }
+}
+addEventListener('pointerdown', (e) => { if (winPop && !winPop.contains(e.target) && !e.target.closest('.dock-item')) closeWinList(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWinList(); });
 
 function launcherIcon() {
   return `<svg viewBox="0 0 64 64"><defs><linearGradient id="dl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent-2)"/></linearGradient></defs>

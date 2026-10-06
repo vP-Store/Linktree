@@ -497,3 +497,24 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .set-name { max-width: 320px; margin: 0 auto 14px; text-align: left; }
 .set-about h2 { font: 650 28px var(--font-display); margin: 12px 0 2px; }
 .set-about + .set-section { margin: 20px auto 0; }
+
+/* Dateien – Vorschau */
+.fm-preview { width: 270px; flex: none; border-left: 1px solid var(--border); padding: 20px 16px; overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 4px; background: var(--glass-soft); }
+.fm-pv-icon { width: 84px; height: 84px; margin: 10px 0 10px; }
+.fm-pv-icon .file-glyph { width: 84px; height: 84px; }
+.fm-pv-img { width: 100%; margin-bottom: 10px; border-radius: 12px; overflow: hidden; background: repeating-conic-gradient(var(--surface-2) 0 25%, transparent 0 50%) 0 0/16px 16px; box-shadow: var(--shadow-sm); }
+.fm-pv-img img { width: 100%; max-height: 220px; object-fit: contain; display: block; }
+.fm-pv-name { font-weight: 650; font-size: 14px; text-align: center; word-break: break-word; }
+.fm-pv-meta { font-size: 12px; color: var(--text-3); text-align: center; }
+.fm-pv-hint { font-size: 12px; color: var(--text-3); margin-top: 14px; }
+.fm-pv-rows { width: 100%; margin-top: 14px; display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--border); }
+.fm-pv-rows > div { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--border); font-size: 12px; }
+.fm-pv-rows span { color: var(--text-3); }
+.fm-pv-rows b { font-weight: 500; text-align: right; }
+.fm-pv-text { width: 100%; margin: 12px 0 0; max-height: 260px; overflow: auto; padding: 10px; border-radius: 10px; background: rgba(0,0,0,.22); border: 1px solid var(--border); font: 11px/1.5 var(--font-mono); white-space: pre-wrap; word-break: break-word; color: var(--text-2); user-select: text; }
+.fm-pv-audio, .fm-pv-video { width: 100%; margin-top: 12px; border-radius: 10px; }
+.fm-pv-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 16px; }
+.win[data-app="files"].narrow .fm-preview { display: none; }
+.win[data-app="files"].narrow .app-sidebar { width: 170px; }
+
+.fm-grid > .empty { grid-column: 1 / -1; min-height: 60%; }

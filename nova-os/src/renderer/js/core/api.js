@@ -156,6 +156,16 @@ function createMock() {
       onChange: (cb) => { listeners.clip.add(cb); return () => listeners.clip.delete(cb); },
     },
     power: { action: async (a) => { console.info('[mock] Energie', a); return true; } },
+    win: {
+      list: async () => [
+        { pid: 4120, name: 'chrome', title: 'YouTube – Google Chrome', path: null },
+        { pid: 5532, name: 'Code', title: 'main.js – NovaOS – Visual Studio Code', path: null },
+        { pid: 7710, name: 'Spotify', title: 'Spotify Premium', path: null },
+        { pid: 8120, name: 'explorer', title: 'Downloads', path: null },
+      ],
+      focus: async (pid) => { console.info('[mock] fokussiere', pid); return true; },
+      screenshot: async () => `${HOME}/Bilder/Screenshots/NovaOS Vorschau.png`,
+    },
   };
 }
 

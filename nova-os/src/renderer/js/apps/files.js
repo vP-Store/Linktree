@@ -43,6 +43,9 @@ export default {
     const crumbBox = h('div.fm-crumbbox', { onclick: (e) => { if (e.target === crumbBox || e.target === crumbs) editPath(); } }, crumbs, pathInput);
     const search = h('input.input', { placeholder: 'In Ordner suchen …', spellcheck: false });
     const viewBtn = btn(st.view === 'grid' ? 'list' : 'grid', 'Ansicht wechseln', () => setView(st.view === 'grid' ? 'list' : 'grid'));
+    let showPreview = store.get('filesPreview', true);
+    const previewBtn = btn('columns', 'Vorschau ein/aus (Alt+P)', () => togglePreview());
+    previewBtn.classList.toggle('on', showPreview);
     const toolbar = h('div.app-toolbar',
       backBtn, fwdBtn, upBtn, btn('refresh', 'Aktualisieren (F5)', () => load()),
       crumbBox,
@@ -50,12 +53,82 @@ export default {
       btn('folderPlus', 'Neuer Ordner (Strg+Umschalt+N)', () => newFolder()),
       btn('sortAsc', 'Sortieren', (e) => sortMenu(e.currentTarget)),
       viewBtn,
+      previewBtn,
       btn('moreV', 'Mehr', (e) => moreMenu(e.currentTarget)),
     );
     const sidebar = h('div.app-sidebar');
     const content = h('div.fm-content', { tabIndex: 0 });
     const status = h('div.app-status');
-    root.append(toolbar, h('div.app-split', sidebar, h('div.app-main', content, status)));
+    const preview = h('div.fm-preview');
+    root.append(toolbar, h('div.app-split', sidebar, h('div.app-main', content, status), preview));
+    preview.classList.toggle('hidden', !showPreview);
+
+    function togglePreview() {
+      showPreview = !showPreview;
+      store.set('filesPreview', showPreview);
+      previewBtn.classList.toggle('on', showPreview);
+      preview.classList.toggle('hidden', !showPreview);
+      updatePreview();
+    }
+
+    let previewToken = 0;
+    async function updatePreview() {
+      if (!showPreview) return;
+      const token = ++previewToken;
+      clear(preview);
+      const sel = selectedEntries();
+      if (sel.length !== 1) {
+        if (sel.length > 1) {
+          const size = sel.filter((e) => !e.dir).reduce((a, e) => a + (e.size || 0), 0);
+          preview.append(h('div.fm-pv-icon', { html: fileGlyph('', true) }), h('div.fm-pv-name', `${sel.length} Elemente ausgewählt`), h('div.fm-pv-meta', size ? bytes(size) : ''));
+        } else {
+          const label = st.path === ':recent' ? 'Zuletzt geöffnet' : (pathx.base(st.path) || st.path);
+          preview.append(h('div.fm-pv-icon', { html: fileGlyph('', true) }), h('div.fm-pv-name', label), h('div.fm-pv-meta', `${rendered.length} Elemente`),
+            h('div.fm-pv-hint', 'Wähle eine Datei für die Vorschau.'));
+        }
+        return;
+      }
+      const e = sel[0];
+      const kind = fileKind(e.ext, e.dir);
+      const head = h('div.fm-pv-icon', { html: fileGlyph(e.ext, e.dir) });
+      preview.append(head);
+      if (kind === 'image' && fileUrl(e.path)) {
+        head.className = 'fm-pv-img';
+        head.innerHTML = '';
+        const img = h('img', { src: fileUrl(e.path), alt: '' });
+        img.addEventListener('load', () => { dims.textContent = `${img.naturalWidth} × ${img.naturalHeight} Pixel`; });
+        head.append(img);
+      }
+      const dims = h('div.fm-pv-meta');
+      preview.append(h('div.fm-pv-name', e.name), h('div.fm-pv-meta', KIND_LABEL[kind] + (e.dir ? '' : ' · ' + bytes(e.size))), dims);
+      const rows = h('div.fm-pv-rows');
+      preview.append(rows);
+      try {
+        const s2 = await api.fs.stat(e.path);
+        if (token !== previewToken) return;
+        rows.append(h('div', h('span', 'Geändert'), h('b', dateShort(s2.mtime))), h('div', h('span', 'Erstellt'), h('b', dateShort(s2.ctime))));
+      } catch (_) {}
+      if (e.dir) {
+        try {
+          const list = await api.fs.list(e.path);
+          if (token !== previewToken) return;
+          rows.append(h('div', h('span', 'Inhalt'), h('b', `${list.filter((x) => x.dir).length} Ordner, ${list.filter((x) => !x.dir).length} Dateien`)));
+        } catch (_) {}
+      }
+      if ((kind === 'text' || kind === 'code') && e.size < 2e6) {
+        try {
+          const txt = await api.fs.readText(e.path);
+          if (token !== previewToken) return;
+          preview.append(h('pre.fm-pv-text', txt.slice(0, 3000) + (txt.length > 3000 ? '\n…' : '')));
+        } catch (_) {}
+      }
+      if (kind === 'audio' && fileUrl(e.path)) preview.append(h('audio.fm-pv-audio', { controls: true, src: fileUrl(e.path) }));
+      if (kind === 'video' && fileUrl(e.path)) preview.append(h('video.fm-pv-video', { controls: true, src: fileUrl(e.path) }));
+      preview.append(h('div.fm-pv-actions',
+        h('button.btn.sm.primary', { html: `${icon('external')} Öffnen`, onclick: () => openEntry(e) }),
+        !e.dir ? h('button.btn.sm', { html: `${icon('box')} Mit Windows`, onclick: () => openPath(e.path, { external: true }) }) : null,
+        h('button.btn.sm', { html: `${icon('copy')} Pfad`, onclick: copyPaths })));
+    }
 
     // ---------- Seitenleiste ----------
     async function renderSidebar() {
@@ -63,7 +136,7 @@ export default {
       const fav = [
         ['home', 'Persönlich', places.home], ['monitor', 'Desktop', places.desktop], ['fileText', 'Dokumente', places.documents],
         ['download', 'Downloads', places.downloads], ['image', 'Bilder', places.pictures], ['music', 'Musik', places.music], ['video', 'Videos', places.videos],
-      ].filter((x) => x[2]);
+      ].filter((x, i, arr) => x[2] && (i === 0 || (x[2] !== places.home && arr.findIndex((y) => y[2] === x[2]) === i)));
       const pinned = store.get('filesPinned', []) || [];
       sidebar.append(h('div.side-label', 'Favoriten'));
       for (const [ic, label, p] of fav) sidebar.append(sideItem(ic, label, p));
@@ -272,6 +345,7 @@ export default {
     function selectedEntries() { return rendered.filter((e) => st.selected.has(e.path)); }
 
     function updateStatus() {
+      updatePreview();
       clear(status);
       const sel = selectedEntries();
       const total = rendered.length;
@@ -537,6 +611,7 @@ export default {
       else if (ctrl && e.shiftKey && k.toLowerCase() === 'n') { e.preventDefault(); newFolder(); }
       else if (ctrl && k.toLowerCase() === 'f') { e.preventDefault(); search.focus(); }
       else if (ctrl && k.toLowerCase() === 'l') { e.preventDefault(); editPath(); }
+      else if (e.altKey && k.toLowerCase() === 'p') { e.preventDefault(); togglePreview(); }
       else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(k) && !e.altKey) {
         e.preventDefault();
         const cur = st.anchor ?? -1;
@@ -559,7 +634,10 @@ export default {
     await go(st.path, false);
     setTimeout(() => content.focus(), 50);
 
+    const fit = () => win.el.classList.toggle('narrow', win.w < 780);
+    fit();
     return {
+      onResize: fit,
       onArgs(a) { if (a.path) go(a.path); },
       onFocus() { if (st.path !== ':recent') { /* still */ } },
       getState() { return { path: st.path === ':recent' ? places.home : st.path }; },
