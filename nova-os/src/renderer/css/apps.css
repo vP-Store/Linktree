@@ -571,3 +571,4 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .md-body pre.md-code[data-lang] { position: relative; padding-top: 26px; }
 .set-dockapp .icon-tile { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: var(--surface-2); color: var(--accent); flex: none; }
 .fm-pv-pdf { width: 100%; height: 300px; margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+:root[data-theme="light"] .cal-hol { color: #047857; }

@@ -381,3 +381,5 @@ body.overview-open #windows .win { pointer-events: none; }
 .dock-item:hover { margin: 0 9px; }
 .dock-item:has(+ .dock-item:hover), .dock-item:hover + .dock-item { margin: 0 3px; }
 :root[data-reduce-motion="true"] .dock-item { margin: 0 !important; }
+:root[data-wp="light"] .desk-icon { color: #1b1f2e; text-shadow: 0 1px 2px rgba(255,255,255,.7); }
+:root[data-wp="light"] .desk-icon:hover { background: rgba(255,255,255,.35); }

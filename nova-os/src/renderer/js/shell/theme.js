@@ -71,6 +71,7 @@ export async function renderWallpaper() {
   clear(host);
   host.classList.toggle('animated', !!store.get('animatedWallpaper') && !store.get('reduceMotion') && !store.get('perfMode'));
   const opacity = store.get('overlayOpacity') / 100;
+  document.documentElement.dataset.wp = wp.light && key !== 'image' ? 'light' : 'dark';
 
   if (key === 'image' && store.get('wallpaperImage')) {
     const p = store.get('wallpaperImage');
