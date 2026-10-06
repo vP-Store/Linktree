@@ -34,6 +34,15 @@ function schedule() {
   if (!timer) timer = setTimeout(flush, 250);
 }
 
+// Werte, die die Oberfläche nie zu sehen bekommt (z. B. API-Schlüssel)
+const PRIVATE = new Set(['aiKeyEnc', 'aiKeyPlain']);
+
+function publicData() {
+  const out = {};
+  for (const [k, v] of Object.entries(data)) if (!PRIVATE.has(k)) out[k] = v;
+  return out;
+}
+
 function get(key) {
   return data[key];
 }
@@ -45,9 +54,9 @@ function set(key, value) {
 }
 
 function register(ipcMain) {
-  ipcMain.handle('store:get', (_e, key) => get(key));
-  ipcMain.handle('store:all', () => data);
-  ipcMain.handle('store:set', (_e, key, value) => set(key, value));
+  ipcMain.handle('store:get', (_e, key) => (PRIVATE.has(key) ? undefined : get(key)));
+  ipcMain.handle('store:all', () => publicData());
+  ipcMain.handle('store:set', (_e, key, value) => { if (!PRIVATE.has(key)) set(key, value); });
   process.on('exit', () => timer && flush());
 }
 

@@ -106,18 +106,21 @@ async function pollStats() {
   try {
     const s = await api.sys.stats();
     bus.emit('sys:stats', s);
-    if (!store.get('showMeters')) return;
-    cpuEl.innerHTML = meterHtml('cpu', s.cpu, Math.round(s.cpu) + '%');
-    const used = (s.totalmem - s.freemem) / s.totalmem * 100;
-    memEl.innerHTML = meterHtml('memory', used, Math.round(used) + '%');
+    if (store.get('showMeters')) {
+      cpuEl.innerHTML = meterHtml('cpu', s.cpu, Math.round(s.cpu) + '%');
+      const used = (s.totalmem - s.freemem) / s.totalmem * 100;
+      memEl.innerHTML = meterHtml('memory', used, Math.round(used) + '%');
+    }
   } catch (_) {}
+  // Netzwerk immer abfragen – der Systemmonitor hängt an 'sys:net', auch ohne Statusleisten-Anzeige.
   try {
     const n = await api.sys.net();
     bus.emit('sys:net', n);
-    if (!store.get('showMeters')) return;
-    const online = navigator.onLine;
-    netEl.innerHTML = `${icon(online ? 'wifi' : 'wifiOff')}${n.rate ? `<span>↓ ${rate(n.rate.down)}</span>` : ''}`;
-    netEl.title = online ? `Online${n.ifaces[0] ? ' · ' + n.ifaces.map((i) => `${i.name}: ${i.address}`).join(', ') : ''}` : 'Offline';
+    if (store.get('showMeters')) {
+      const online = navigator.onLine;
+      netEl.innerHTML = `${icon(online ? 'wifi' : 'wifiOff')}${n.rate ? `<span>↓ ${rate(n.rate.down)}</span>` : ''}`;
+      netEl.title = online ? `Online${n.ifaces[0] ? ' · ' + n.ifaces.map((i) => `${i.name}: ${i.address}`).join(', ') : ''}` : 'Offline';
+    }
   } catch (_) {}
 }
 

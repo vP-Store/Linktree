@@ -23,7 +23,7 @@ function inline(s) {
   return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[+i])}</code>`);
 }
 
-export function renderMarkdown(src) {
+export function renderMarkdown(src, { tasks = true } = {}) {
   const lines = String(src || '').replace(/\r\n/g, '\n').split('\n');
   let html = '';
   let i = 0;
@@ -47,7 +47,8 @@ export function renderMarkdown(src) {
     if (/^>\s?/.test(line)) {
       const buf = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
-      html += `<blockquote>${renderMarkdown(buf.join('\n'))}</blockquote>`;
+      // Aufgaben in Zitaten zählt toggleTask() nicht mit → nur anzeigen, nicht umschaltbar
+      html += `<blockquote>${renderMarkdown(buf.join('\n'), { tasks: false })}</blockquote>`;
       continue;
     }
     // Tabelle
@@ -68,7 +69,8 @@ export function renderMarkdown(src) {
         let txt = lines[i].replace(/^\s*([-*+]|\d+[.)])\s+/, '');
         const task = txt.match(/^\[( |x|X)\]\s*(.*)$/);
         if (task) {
-          items += `<li class="task"><input type="checkbox" data-task="${taskIndex++}" ${task[1] !== ' ' ? 'checked' : ''}> <span>${inline(task[2])}</span></li>`;
+          const attr = tasks ? `data-task="${taskIndex++}"` : 'disabled';
+          items += `<li class="task"><input type="checkbox" ${attr} ${task[1] !== ' ' ? 'checked' : ''}> <span>${inline(task[2])}</span></li>`;
         } else items += `<li>${inline(txt)}</li>`;
         i++;
       }
@@ -86,9 +88,15 @@ export function renderMarkdown(src) {
 
 /** Checkbox Nr. n in der Quelle umschalten */
 export function toggleTask(src, n) {
+  // Zählung wie renderMarkdown(): Zeilen in ```-Codeblöcken sind keine Aufgaben.
   let count = 0;
-  return src.replace(/^(\s*(?:[-*+]|\d+[.)])\s+)\[( |x|X)\]/gm, (m, pre, mark) => {
-    if (count++ !== n) return m;
-    return `${pre}[${mark === ' ' ? 'x' : ' '}]`;
-  });
+  let inFence = false;
+  return src.split('\n').map((line) => {
+    if (/^```/.test(line)) { inFence = !inFence; return line; }
+    if (inFence) return line;
+    return line.replace(/^(\s*(?:[-*+]|\d+[.)])\s+)\[( |x|X)\]/, (m, pre, mark) => {
+      if (count++ !== n) return m;
+      return `${pre}[${mark === ' ' ? 'x' : ' '}]`;
+    });
+  }).join('\n');
 }

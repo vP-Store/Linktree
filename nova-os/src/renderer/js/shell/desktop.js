@@ -58,7 +58,10 @@ export async function initDesktop() {
 // ---------------------------------------------------------------------------
 // Symbole
 // ---------------------------------------------------------------------------
+let iconsSeq = 0;
+
 async function renderIcons() {
+  const seq = ++iconsSeq;
   clear(iconsEl);
   selected.clear();
   if (!store.get('showDesktopIcons')) return;
@@ -75,6 +78,8 @@ async function renderIcons() {
     if (!(await api.fs.exists(places.desktop))) return;
     files = await api.fs.list(places.desktop);
   } catch (_) { return; }
+  // Ein neuerer Aufruf hat inzwischen neu begonnen → sonst doppelte Symbole
+  if (seq !== iconsSeq) return;
   files.sort((a, b) => (b.dir - a.dir) || a.name.localeCompare(b.name, 'de'));
   for (const f of files.filter((x) => !/^desktop\.ini$/i.test(x.name))) {
     const label = f.ext === 'lnk' || f.ext === 'url' ? f.name.replace(/\.(lnk|url)$/i, '') : f.name;

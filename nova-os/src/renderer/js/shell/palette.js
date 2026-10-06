@@ -101,14 +101,17 @@ const searchFiles = debounce(async () => {
   if (!q || q.length < 2 || /^[>?=]/.test(q) || !places) { fileHits = []; return; }
   fileQuery = q;
   try {
-    const hits = await api.fs.search(places.home, q, 40);
+    const hits = await api.fs.search(places.home, q, 40, 'palette');
     if (fileQuery !== q || !isPaletteOpen()) return;
     fileHits = hits;
     render();
   } catch (_) {}
 }, 250);
 
+let renderSeq = 0;
+
 async function render() {
+  const seq = ++renderSeq;
   const raw = input.value;
   const q = raw.trim();
   results = [];
@@ -158,7 +161,8 @@ async function render() {
 
   if (!onlyCmds && !q.startsWith('?') && cq) {
     const winApps = (await getWinApps()).map((a) => ({ a, s: score(cq, a.name) })).filter((x) => x.s).sort((x, y) => y.s - x.s);
-    if (input.value !== raw) return;
+    // Nur der neueste Durchlauf darf zeichnen – sonst landen zwei Ergebnislisten in `results`.
+    if (seq !== renderSeq || input.value !== raw) return;
     add('Programme', winApps.slice(0, 6).map(({ a }) => ({ winApp: a, label: a.name, sub: a.folder, hint: 'Programm', run: () => launchWinApp(a) })));
     const rec = recentFiles().filter((f) => score(cq, f.name));
     const seen = new Set(rec.map((f) => f.path));

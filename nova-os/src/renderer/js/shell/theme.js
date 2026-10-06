@@ -1,7 +1,7 @@
 // Thema, Akzentfarbe, Wallpaper.
 
 import { store } from '../core/store.js';
-import { api } from '../core/api.js';
+import { api, fileUrl } from '../core/api.js';
 import { h, clear } from '../core/dom.js';
 
 export const ACCENTS = [
@@ -76,7 +76,7 @@ export async function renderWallpaper() {
     const p = store.get('wallpaperImage');
     if (imgCache.path !== p) {
       try {
-        imgCache = { path: p, url: await api.fs.readDataUrl(p, mimeFor(p)) };
+        imgCache = { path: p, url: fileUrl(p) || await api.fs.readDataUrl(p, mimeFor(p)) };
       } catch (_) {
         imgCache = { path: null, url: null };
       }

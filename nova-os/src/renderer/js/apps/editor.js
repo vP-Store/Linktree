@@ -149,7 +149,7 @@ export default {
         const suggestion = p || pathx.join(places.documents || places.home, d.name);
         p = await promptDialog({ title: 'Speichern unter', message: 'Vollständiger Pfad der Datei:', value: suggestion, ok: 'Speichern', select: false });
         if (!p) return;
-        if (!as && await api.fs.exists(p) && !(await confirmDialog({ title: 'Datei überschreiben?', message: p, ok: 'Überschreiben', danger: true }))) return;
+        if (p !== d.path && await api.fs.exists(p) && !(await confirmDialog({ title: 'Datei überschreiben?', message: p, ok: 'Überschreiben', danger: true }))) return;
       }
       try {
         await api.fs.writeText(p, d.text);
@@ -171,12 +171,14 @@ export default {
     }
 
     // ---------- Darstellung ----------
+    let gutterLines = -1;
     function render() {
       if (!cur) return;
       const text = ta.value;
       hl.innerHTML = highlight(text, cur.lang) + '\n ';
       const lines = text.split('\n').length;
-      if (gutter.childElementCount !== lines) {
+      if (gutterLines !== lines) {
+        gutterLines = lines;
         let s = '';
         for (let i = 1; i <= lines; i++) s += i + '\n';
         gutter.textContent = s;
@@ -194,7 +196,7 @@ export default {
       const selLen = Math.abs(ta.selectionEnd - ta.selectionStart);
       statusL.textContent = `Zeile ${ln}, Spalte ${col}${selLen ? ` (${selLen} ausgewählt)` : ''}`;
       const words = (ta.value.match(/\S+/g) || []).length;
-      statusR.textContent = `${words} Wörter · ${LANG_LABEL[cur.lang]} · UTF-8 · ${cur.path ? esc(cur.path) : 'nicht gespeichert'}`;
+      statusR.textContent = `${words} Wörter · ${LANG_LABEL[cur.lang]} · UTF-8 · ${cur.path || 'nicht gespeichert'}`;
     }
 
     function syncScroll() {

@@ -412,11 +412,6 @@ export function activateApp(appId) {
   return w;
 }
 
-export function cycleWindows(step = 1) {
-  const list = [...windows.values()].filter((w) => w.ws === currentWs).sort((a, b) => +b.el.style.zIndex - +a.el.style.zIndex);
-  return list;
-}
-
 export function minimizeAll() {
   const vis = [...windows.values()].filter((w) => w.ws === currentWs && !w.min);
   if (vis.length) vis.forEach((w) => w.minimize());

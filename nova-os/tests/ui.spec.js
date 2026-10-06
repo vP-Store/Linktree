@@ -156,3 +156,24 @@ test('Sitzung: offene Fenster überleben einen Neustart', async ({ page }) => {
   await expect(page.locator('.win[data-app="calc"]')).toHaveCount(1);
   await expect(page.locator('.win[data-app="notes"]')).toHaveCount(1);
 });
+
+test('Terminal: cd und cd - (vorheriger Ordner)', async ({ page }) => {
+  await open(page, 'terminal');
+  const input = page.locator('.term-input');
+  await input.fill('cd Dokumente');
+  await input.press('Enter');
+  await expect(page.locator('.term-prompt .tp-path')).toHaveText('~/Dokumente');
+  await input.fill('cd -');
+  await input.press('Enter');
+  await expect(page.locator('.term-prompt .tp-path')).toHaveText('~');
+});
+
+test('Dateien: Umbenennen auf vorhandenen Namen wird abgelehnt', async ({ page }) => {
+  await open(page, 'files', { path: '/home/nova/Desktop' });
+  await page.locator('.fm-item', { hasText: 'Einkauf.txt' }).click();
+  await page.keyboard.press('F2');
+  await page.locator('.modal input').fill('Willkommen.md');
+  await page.locator('.modal .btn.primary').click();
+  await expect(page.locator('.toast')).toContainText(/existiert/i);
+  await expect(page.locator('.fm-item', { hasText: 'Einkauf.txt' })).toHaveCount(1);
+});

@@ -120,6 +120,12 @@ module.exports = function register(ipcMain) {
   ipcMain.handle('fs:rename', async (_e, p, newName) => {
     if (/[\\/]/.test(newName)) throw new Error('Name darf keine Schrägstriche enthalten.');
     const target = path.join(path.dirname(p), newName);
+    // rename() ersetzt vorhandene Dateien stillschweigend → vorher prüfen
+    // (reine Groß-/Kleinschreibungs-Änderung derselben Datei bleibt erlaubt).
+    if (target.toLowerCase() !== p.toLowerCase()) {
+      const exists = await fsp.access(target).then(() => true, () => false);
+      if (exists) throw new Error(`„${newName}“ existiert bereits.`);
+    }
     await fsp.rename(p, target);
     return target;
   });
@@ -170,13 +176,19 @@ module.exports = function register(ipcMain) {
       return null;
     }
   });
-  ipcMain.handle('fs:search', async (_e, root, query, limit = 200) => {
-    // Breitensuche nach Dateinamen, begrenzt auf Tiefe und Treffer.
+  const searchGen = new Map(); // Kanal → laufende Suchnummer
+  ipcMain.handle('fs:search', async (_e, root, query, limit = 200, channel = null) => {
+    // Breitensuche nach Dateinamen, begrenzt auf Tiefe und Treffer. Eine neue Suche
+    // im selben Kanal (z. B. „palette“) bricht die vorherige ab.
+    const gen = (searchGen.get(channel) || 0) + 1;
+    if (channel) searchGen.set(channel, gen);
+    const stale = () => channel && searchGen.get(channel) !== gen;
     const q = String(query).toLowerCase();
     const results = [];
     const queue = [{ dir: root, depth: 0 }];
     const started = Date.now();
     while (queue.length && results.length < limit && Date.now() - started < 4000) {
+      if (stale()) return [];
       const { dir, depth } = queue.shift();
       let ents;
       try { ents = await fsp.readdir(dir, { withFileTypes: true }); } catch (_) { continue; }

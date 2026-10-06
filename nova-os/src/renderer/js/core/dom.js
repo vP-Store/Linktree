@@ -124,6 +124,8 @@ export const pathx = {
   base(p) { const parts = p.replace(/[\\/]+$/, '').split(/[\\/]/); return parts[parts.length - 1] || p; },
   dir(p) {
     const s = p.replace(/[\\/]+$/, '');
+    // Laufwerkswurzel („C:\“) hat keinen Elternordner – „C:“ allein wäre laufwerksrelativ.
+    if (/^[a-z]:$/i.test(s)) return s + '\\';
     const i = Math.max(s.lastIndexOf('/'), s.lastIndexOf('\\'));
     if (i < 0) return s;
     const d = s.slice(0, i);

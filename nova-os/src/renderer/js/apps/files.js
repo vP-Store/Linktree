@@ -181,6 +181,8 @@ export default {
       search.value = '';
       st.searchResults = null;
       st.selected.clear();
+      st.anchor = null;
+      st.cursor = null;
       await load();
     }
     function back() { if (st.history.length) { st.future.push(st.path); go(st.history.pop(), false); } }
@@ -326,6 +328,7 @@ export default {
     function select(i, ev) {
       const e = rendered[i];
       if (!e) return;
+      st.cursor = i; // Tastatur-Position (bei Umschalt-Auswahl ≠ Anker)
       if (ev.shiftKey && st.anchor != null) {
         const [a, b] = [Math.min(st.anchor, i), Math.max(st.anchor, i)];
         if (!ev.ctrlKey) st.selected.clear();
@@ -415,8 +418,11 @@ export default {
 
     async function paste(target = st.path) {
       if (!fileClip.paths.length || target === ':recent') return;
+      // Ausschneiden + Einfügen im selben Ordner wäre ein verstecktes Umbenennen zu „Name (2)“
+      const sources = fileClip.mode === 'cut' ? fileClip.paths.filter((p) => !samePath(pathx.dir(p), target)) : fileClip.paths;
+      if (!sources.length) { fileClip.mode = null; fileClip.paths = []; renderContent(); return; }
       try {
-        const out = fileClip.mode === 'cut' ? await api.fs.move(fileClip.paths, target) : await api.fs.copy(fileClip.paths, target);
+        const out = fileClip.mode === 'cut' ? await api.fs.move(sources, target) : await api.fs.copy(sources, target);
         toast(fileClip.mode === 'cut' ? 'Verschoben' : 'Kopiert', `${out.length} Element(e) nach ${pathx.base(target)}`, { icon: fileClip.mode === 'cut' ? 'scissors' : 'copy', duration: 2500 });
         if (fileClip.mode === 'cut') { fileClip.mode = null; fileClip.paths = []; }
         await load();
@@ -615,7 +621,7 @@ export default {
       else if (e.altKey && k.toLowerCase() === 'p') { e.preventDefault(); togglePreview(); }
       else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(k) && !e.altKey) {
         e.preventDefault();
-        const cur = st.anchor ?? -1;
+        const cur = st.cursor ?? st.anchor ?? -1;
         let cols = 1;
         if (st.view === 'grid') {
           const first = content.querySelector('.fm-item');

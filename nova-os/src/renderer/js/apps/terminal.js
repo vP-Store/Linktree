@@ -141,7 +141,11 @@ export default {
       if (lc === 'exit') { closeTab(t); return; }
       if (lc === 'cd' || lc === 'chdir' || lc === 'set-location' || (/^[a-z]:$/i.test(cmd) && api.platform === 'win32')) {
         try {
-          t.cwd = await api.term.cd(t.cwd, /^[a-z]:$/i.test(cmd) ? cmd + '\\' : arg);
+          // „cd -“ springt zum vorherigen Ordner (der Hauptprozess liefert dafür null)
+          const next = arg === '-' ? t.prevCwd : await api.term.cd(t.cwd, /^[a-z]:$/i.test(cmd) ? cmd + '\\' : arg);
+          if (!next) return;
+          t.prevCwd = t.cwd;
+          t.cwd = next;
           updatePrompt(t);
         } catch (e) {
           print(t, String(e.message || e).replace(/^Error invoking remote method '[^']+': (Error: )?/, '') + '\n', 'err');
