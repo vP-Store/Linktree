@@ -1,6 +1,9 @@
 // Kleiner, sicherer Markdown-Renderer (HTML wird immer maskiert).
 
 import { esc } from './dom.js';
+import { highlight, langFor } from './highlight.js';
+
+const FENCE_LANG = { javascript: 'js', typescript: 'ts', python: 'py', shell: 'sh', bash: 'sh', zsh: 'sh', powershell: 'ps1', pwsh: 'ps1', batch: 'bat', rust: 'rs', golang: 'go', markdown: 'md', yaml: 'yml', 'c++': 'cpp', csharp: 'cs', html: 'html', xml: 'xml', json: 'json', css: 'css', sql: 'sql' };
 
 function inline(s) {
   // Code zuerst schützen
@@ -34,7 +37,8 @@ export function renderMarkdown(src) {
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
       i++;
-      html += `<pre class="md-code"><code>${esc(buf.join('\n'))}</code></pre>`;
+      const lang = fence[1] ? langFor(FENCE_LANG[fence[1].toLowerCase()] || fence[1].toLowerCase()) : 'text';
+      html += `<pre class="md-code"${fence[1] ? ` data-lang="${esc(fence[1])}"` : ''}><code>${highlight(buf.join('\n'), lang)}</code></pre>`;
       continue;
     }
     const hd = line.match(/^(#{1,6})\s+(.*)$/);

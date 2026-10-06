@@ -17,7 +17,7 @@ export const DEFAULTS = {
   showDesktopIcons: true,
   dockAutohide: false,
   dockSize: 52,
-  dockPinned: ['files', 'terminal', 'browser', 'notes', 'tasks', 'editor', 'monitor', 'settings'],
+  dockPinned: ['files', 'terminal', 'browser', 'assistant', 'notes', 'tasks', 'editor', 'monitor', 'settings'],
   clock24: true,
   showSeconds: false,
   showMeters: true,

@@ -156,6 +156,31 @@ function createMock() {
       onChange: (cb) => { listeners.clip.add(cb); return () => listeners.clip.delete(cb); },
     },
     power: { action: async (a) => { console.info('[mock] Energie', a); return true; } },
+    ai: (() => {
+      const deltas = new Set(), dones = new Set();
+      let key = null;
+      const timers = new Map();
+      return {
+        hasKey: async () => !!key || !!ls.get('mockAiKey'),
+        setKey: async (k) => { key = k || null; ls.set('mockAiKey', !!k); return !!k; },
+        model: async () => 'claude-opus-5-5',
+        chat: async (id, messages) => {
+          const q = (messages[messages.length - 1] || {}).content || '';
+          const text = `**Vorschau-Modus** – in der Desktop-App antwortet hier Claude.\n\nDu hast gefragt:\n\n> ${q.slice(0, 200)}\n\nBeispiel für Code:\n\n\`\`\`js\nconsole.log('Hallo aus NovaOS');\n\`\`\`\n\n- Punkt eins\n- Punkt zwei`;
+          let i = 0;
+          const t = setInterval(() => {
+            const chunk = text.slice(i, i + 12); i += 12;
+            if (chunk) deltas.forEach((cb) => cb({ id, text: chunk }));
+            else { clearInterval(t); timers.delete(id); dones.forEach((cb) => cb({ id, stop: 'end_turn', model: 'claude-opus-5-5' })); }
+          }, 25);
+          timers.set(id, t);
+          return true;
+        },
+        abort: async (id) => { clearInterval(timers.get(id)); timers.delete(id); dones.forEach((cb) => cb({ id, aborted: true })); return true; },
+        onDelta: (cb) => { deltas.add(cb); return () => deltas.delete(cb); },
+        onDone: (cb) => { dones.add(cb); return () => dones.delete(cb); },
+      };
+    })(),
     win: {
       list: async () => [
         { pid: 4120, name: 'chrome', title: 'YouTube – Google Chrome', path: null },

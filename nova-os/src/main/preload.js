@@ -87,6 +87,15 @@ contextBridge.exposeInMainWorld('nova', {
     focus: call('win:focus'),
     screenshot: call('win:screenshot'),
   },
+  ai: {
+    hasKey: call('ai:hasKey'),
+    setKey: call('ai:setKey'),
+    model: call('ai:model'),
+    chat: call('ai:chat'),
+    abort: call('ai:abort'),
+    onDelta: on('ai:delta'),
+    onDone: on('ai:done'),
+  },
   browser: {
     onNewWindow: on('browser:new-window'),
   },

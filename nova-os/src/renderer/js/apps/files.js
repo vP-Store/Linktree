@@ -473,6 +473,7 @@ export default {
         { label: 'Öffnen', icon: 'external', key: 'Enter', action: () => sel.forEach(openEntry) },
         one && !one.dir ? { label: 'Mit Windows-Programm öffnen', icon: 'box', action: () => openPath(one.path, { external: true }) } : null,
         one && !one.dir && (kind === 'text' || kind === 'code' || one.size < 2e6) ? { label: 'Im Code-Editor öffnen', icon: 'code', action: () => openApp('editor', { path: one.path }) } : null,
+        one && !one.dir && (kind === 'text' || kind === 'code') ? { label: 'Mit Nova KI besprechen', icon: 'sparkles', action: () => openApp('assistant', { attach: one.path }) } : null,
         one && one.dir ? { label: 'In neuem Fenster öffnen', icon: 'layout', action: () => openApp('files', { path: one.path }) } : null,
         one && one.dir ? { label: 'Terminal hier öffnen', icon: 'terminal', action: () => openApp('terminal', { cwd: one.path }) } : null,
         one && one.dir ? { label: 'In Seitenleiste anheften', icon: 'pin', action: () => { store.update('filesPinned', (l) => [...new Set([...(l || []), one.path])], []); renderSidebar(); } } : null,

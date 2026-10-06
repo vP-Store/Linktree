@@ -164,6 +164,7 @@ async function render() {
     const seen = new Set(rec.map((f) => f.path));
     const files = [...rec, ...fileHits.filter((f) => !seen.has(f.path) && score(cq, f.name))];
     add('Dateien', files.slice(0, 8).map((f) => ({ file: f, label: f.name, sub: f.path, hint: f.dir ? 'Ordner' : 'Datei', run: () => openPath(f.path, { isDir: !!f.dir }) })));
+    add('Nova KI', [{ app: { id: 'assistant', glyph: 'sparkles', colors: ['#a78bfa', '#ec4899'] }, label: `Nova fragen: „${cq}“`, sub: 'Antwort von Claude im KI-Assistenten', run: () => openApp('assistant', { prompt: cq }) }]);
     add('Web', [{ ic: 'globe', label: `„${cq}“ im Web suchen`, sub: 'DuckDuckGo im NovaOS-Browser', run: () => openApp('browser', { url: 'https://duckduckgo.com/?q=' + encodeURIComponent(cq) }) }]);
   }
 

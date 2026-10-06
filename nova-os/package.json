@@ -24,10 +24,21 @@
   "build": {
     "appId": "store.vp.novaos",
     "productName": "NovaOS",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["src/**/*", "package.json", "build/icon.png", "build/tray.png"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "build/icon.png",
+      "build/tray.png"
+    ],
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "build/icon.png"
     },
     "nsis": {
@@ -36,6 +47,11 @@
       "createDesktopShortcut": true,
       "shortcutName": "NovaOS"
     },
-    "portable": { "artifactName": "NovaOS-${version}-portable.exe" }
+    "portable": {
+      "artifactName": "NovaOS-${version}-portable.exe"
+    }
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
   }
 }

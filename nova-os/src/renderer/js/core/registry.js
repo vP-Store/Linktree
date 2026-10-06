@@ -3,6 +3,7 @@
 import { appIconSvg } from './icons.js';
 
 const APPS = [
+  { id: 'assistant', name: 'Nova KI', glyph: 'sparkles', colors: ['#a78bfa', '#ec4899'], size: [920, 680], singleton: true, desc: 'KI-Assistent (Claude)', keywords: 'ki ai assistent claude chat fragen schreiben', load: () => import('../apps/assistant.js') },
   { id: 'files', name: 'Dateien', glyph: 'folder', colors: ['#60a5fa', '#2563eb'], size: [980, 620], desc: 'Dateien und Ordner verwalten', keywords: 'explorer ordner datei dokumente', load: () => import('../apps/files.js') },
   { id: 'terminal', name: 'Terminal', glyph: 'terminal', colors: ['#3f3f46', '#0a0a0a'], size: [820, 520], desc: 'PowerShell, CMD oder Bash', keywords: 'konsole shell powershell cmd befehl', load: () => import('../apps/terminal.js') },
   { id: 'browser', name: 'Browser', glyph: 'compass', colors: ['#22d3ee', '#0284c7'], size: [1100, 720], desc: 'Im Web surfen', keywords: 'internet web surfen google', load: () => import('../apps/browser.js') },

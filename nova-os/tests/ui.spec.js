@@ -126,3 +126,15 @@ test('Übersicht zeigt alle Fenster und fokussiert per Klick', async ({ page }) 
   await expect(page.locator('#overview')).toHaveCount(0);
   await expect(page.locator('.win[data-app="files"]')).not.toHaveClass(/inactive/);
 });
+
+test('Nova KI: Schlüssel-Einrichtung und Antwort-Streaming', async ({ page }) => {
+  await open(page, 'assistant');
+  await expect(page.locator('.ai-key-card')).toBeVisible();
+  await page.locator('.ai-key-card input').fill('sk-ant-test');
+  await page.locator('.ai-key-card .btn.primary').click();
+  await page.locator('.ai-input').fill('Hallo Nova');
+  await page.locator('.ai-input').press('Enter');
+  await expect(page.locator('.ai-msg.user')).toContainText('Hallo Nova');
+  await expect(page.locator('.ai-msg.bot .ai-md')).toContainText('Punkt zwei', { timeout: 10000 });
+  await expect(page.locator('.ai-chat-item')).toHaveCount(1);
+});
