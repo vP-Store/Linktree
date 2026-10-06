@@ -31,6 +31,8 @@ export const DEFAULTS = {
   workspaces: 4,
   uiScale: 100,
   hotCorner: true,
+  widgetList: ['clock', 'system', 'tasks', 'weather', 'note'],
+  perfMode: false,
   doubleEscHide: true,
 };
 

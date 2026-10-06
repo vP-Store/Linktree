@@ -569,3 +569,4 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .ai-chat-item .count { white-space: nowrap; }
 .md-body pre.md-code[data-lang]::before { content: attr(data-lang); position: absolute; top: 6px; left: 12px; font: 600 10px var(--font); text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); }
 .md-body pre.md-code[data-lang] { position: relative; padding-top: 26px; }
+.set-dockapp .icon-tile { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: var(--surface-2); color: var(--accent); flex: none; }

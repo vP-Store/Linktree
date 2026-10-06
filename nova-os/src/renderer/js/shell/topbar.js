@@ -195,6 +195,7 @@ function renderQs(el) {
     tile('focus', 'Fokus-Modus', store.get('focusMode') ? 'Widgets aus' : 'Aus', store.get('focusMode'), () => { store.set('focusMode', !store.get('focusMode')); re(); }),
     tile('sparkles', 'Animation', store.get('animatedWallpaper') ? 'Wallpaper bewegt' : 'Statisch', store.get('animatedWallpaper'), () => { store.set('animatedWallpaper', !store.get('animatedWallpaper')); re(); }),
     tile('grid', 'Widgets', store.get('showWidgets') ? 'Sichtbar' : 'Versteckt', store.get('showWidgets'), () => { store.set('showWidgets', !store.get('showWidgets')); re(); }),
+    tile('zap', 'Leistungsmodus', store.get('perfMode') ? 'Effekte aus' : 'Aus', store.get('perfMode'), () => { store.set('perfMode', !store.get('perfMode')); re(); }),
     tile('image', 'Bildschirmfoto', 'Windows ohne Overlay', false, () => { closePop(); import('../core/winapps.js').then((m) => m.takeScreenshot()); }),
     tile('dock', 'Dock', store.get('dockAutohide') ? 'Automatisch' : 'Immer', store.get('dockAutohide'), () => { store.set('dockAutohide', !store.get('dockAutohide')); re(); }),
   );

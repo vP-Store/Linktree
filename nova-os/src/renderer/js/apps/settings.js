@@ -141,6 +141,7 @@ export default {
             row('Abdunkeln', 'Bessere Lesbarkeit auf hellen Bildern', slider('wallpaperDim', 0, 80, 5, ' %')),
             row('Deckkraft (Durchsicht auf Windows)', 'Bei 0 % siehst du Windows hinter NovaOS', slider('overlayOpacity', 0, 100, 5, ' %'))),
           section('Effekte', row('Glas-Unschärfe', 'Stärke des Milchglas-Effekts', slider('blur', 0, 60, 2, ' px')),
+            row('Leistungsmodus', 'Schaltet Unschärfe und bewegten Hintergrund ab – ideal für Laptops und ältere PCs', toggle('perfMode')),
             row('Animationen reduzieren', 'Für ruhigere Darstellung und schwächere PCs', toggle('reduceMotion')),
             row('Skalierung', 'Größe der gesamten Oberfläche', select('uiScale', [[80, '80 %'], [90, '90 %'], [100, '100 %'], [110, '110 %'], [125, '125 %'], [150, '150 %']]))));
       }
@@ -151,8 +152,15 @@ export default {
           const on = pinned.includes(a.id);
           return h('button.set-dockapp', { class: on ? 'on' : '', title: on ? 'Vom Dock lösen' : 'Ans Dock heften', onclick: () => { store.set('dockPinned', on ? store.get('dockPinned').filter((x) => x !== a.id) : [...store.get('dockPinned'), a.id]); render(); }, html: `${appIconSpan(a)}<span>${esc(a.name)}</span>${on ? `<i>${icon('check')}</i>` : ''}` });
         }));
+        const WIDGETS = [['clock', 'clock', 'Uhr'], ['system', 'activity', 'System'], ['tasks', 'listChecks', 'Aufgaben'], ['weather', 'cloudSun', 'Wetter'], ['note', 'edit', 'Schnellnotiz']];
+        const wl = store.get('widgetList') || [];
+        const widgetPick = h('div.set-dockapps', ...WIDGETS.map(([id, ic, label]) => {
+          const isOn = wl.includes(id);
+          return h('button.set-dockapp', { class: isOn ? 'on' : '', onclick: () => { const cur = store.get('widgetList') || []; store.set('widgetList', isOn ? cur.filter((x) => x !== id) : WIDGETS.map((w) => w[0]).filter((x) => cur.includes(x) || x === id)); render(); }, html: `<span class="icon-tile">${icon(ic)}</span><span>${label}</span>${isOn ? `<i>${icon('check')}</i>` : ''}` });
+        }));
         main.append(
-          section('Desktop', row('Widgets anzeigen', 'Uhr, System, Aufgaben, Wetter, Schnellnotiz', toggle('showWidgets')),
+          section('Desktop', row('Widgets anzeigen', 'Rechte Spalte auf dem Desktop', toggle('showWidgets')),
+            h('div.set-pad', widgetPick),
             row('Desktop-Symbole', 'Verknüpfungen und Dateien deines Windows-Desktops', toggle('showDesktopIcons')),
             row('Heiße Ecke', 'Maus in die Ecke oben links öffnet die Fensterübersicht', toggle('hotCorner')),
             row('Doppel-Esc blendet aus', 'Zweimal Esc auf dem leeren Desktop versteckt NovaOS', toggle('doubleEscHide')),

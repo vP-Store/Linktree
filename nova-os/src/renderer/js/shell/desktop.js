@@ -47,6 +47,7 @@ export async function initDesktop() {
   store.on('showWidgets', renderWidgets);
   store.on('showDesktopIcons', renderIcons);
   store.on('weatherCity', renderWidgets);
+  store.on('widgetList', renderWidgets);
   bus.on('tasks', debounce(renderWidgets, 100));
   bus.on('desktop:refresh', renderIcons);
   bus.on('overlay:shown', renderIcons);
@@ -237,6 +238,7 @@ async function renderWidgets() {
   widgetsEl.classList.toggle('hide', !store.get('showWidgets'));
   if (!store.get('showWidgets')) return;
 
+  const on = (id) => (store.get('widgetList') || []).includes(id);
   // Uhr
   const d = new Date();
   clockW = {
@@ -244,14 +246,14 @@ async function renderWidgets() {
     date: h('div.date', d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })),
     greet: h('div.greet', { html: icon('sparkles') }, greeting()),
   };
-  widgetsEl.append(h('div.widget.glass.w-clock', clockW.time, clockW.date, clockW.greet));
+  if (on('clock')) widgetsEl.append(h('div.widget.glass.w-clock', clockW.time, clockW.date, clockW.greet));
   tickWidgetClock();
 
   // System
   ringEls.cpu = ring('CPU');
   ringEls.mem = ring('RAM');
   ringEls.disk = ring('Laufwerk');
-  widgetsEl.append(h('div.widget.glass', { style: { cursor: 'default' }, ondblclick: () => openApp('monitor') },
+  if (on('system')) widgetsEl.append(h('div.widget.glass', { style: { cursor: 'default' }, ondblclick: () => openApp('monitor') },
     h('h4', { html: `${icon('activity')} System` }),
     h('div.w-stats', ringEls.cpu.el, ringEls.mem.el, ringEls.disk.el)));
   if (lastStats) updateRings(lastStats);
@@ -270,13 +272,13 @@ async function renderWidgets() {
     tw.append(h('label.t-row', cb, h('span.ellipsis', t.title)));
   }
   tw.append(h('button.btn.sm.ghost', { style: { marginTop: '6px', paddingLeft: '4px' }, html: `${icon('plus')} Aufgabe hinzufügen`, onclick: () => openApp('tasks', { action: 'focusInput' }) }));
-  widgetsEl.append(tw);
+  if (on('tasks')) widgetsEl.append(tw);
 
   // Wetter
   const city = store.get('weatherCity');
   const ww = h('div.widget.glass.w-weather', { ondblclick: () => openApp('weather') }, h('h4', { html: `${icon('cloudSun')} Wetter${city ? ' · ' + esc(city.name) : ''}` }));
-  widgetsEl.append(ww);
-  if (!city) {
+  if (on('weather')) widgetsEl.append(ww);
+  if (!on('weather')) { /* übersprungen */ } else if (!city) {
     ww.append(h('div.faint', { style: { fontSize: '12.5px', marginBottom: '8px' } }, 'Lege deinen Ort fest, um das Wetter zu sehen.'),
       h('button.btn.sm', { html: `${icon('mapPin')} Ort wählen`, onclick: () => openApp('weather') }));
   } else {
@@ -291,5 +293,5 @@ async function renderWidgets() {
   // Schnellnotiz
   const ta = h('textarea.input', { rows: 4, placeholder: 'Schnellnotiz …', value: store.get('quickNote', ''), style: { background: 'transparent', border: '0', padding: '0', boxShadow: 'none' } });
   ta.addEventListener('input', debounce(() => store.set('quickNote', ta.value), 300));
-  widgetsEl.append(h('div.widget.glass', h('h4', { html: `${icon('edit')} Schnellnotiz` }), ta));
+  if (on('note')) widgetsEl.append(h('div.widget.glass', h('h4', { html: `${icon('edit')} Schnellnotiz` }), ta));
 }

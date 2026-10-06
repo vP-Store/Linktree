@@ -50,7 +50,9 @@ export function applyTheme() {
   root.style.setProperty('--accent', accent);
   root.style.setProperty('--accent-rgb', hexToRgb(accent));
   root.style.setProperty('--accent-2', preset ? preset.alt : '#4cc9f0');
-  root.style.setProperty('--blur', store.get('blur') + 'px');
+  const perf = !!store.get('perfMode');
+  root.dataset.perf = String(perf);
+  root.style.setProperty('--blur', (perf ? 0 : store.get('blur')) + 'px');
   const ds = store.get('dockSize');
   root.style.setProperty('--dock-size', ds + 'px');
   root.style.setProperty('--dock-reserve', (ds + 36) + 'px');
@@ -67,7 +69,7 @@ export async function renderWallpaper() {
   const key = store.get('wallpaper');
   const wp = WALLPAPERS[key] || WALLPAPERS.aurora;
   clear(host);
-  host.classList.toggle('animated', !!store.get('animatedWallpaper') && !store.get('reduceMotion'));
+  host.classList.toggle('animated', !!store.get('animatedWallpaper') && !store.get('reduceMotion') && !store.get('perfMode'));
   const opacity = store.get('overlayOpacity') / 100;
 
   if (key === 'image' && store.get('wallpaperImage')) {
@@ -112,8 +114,8 @@ export function wallpaperThumb(key) {
 export function initTheme() {
   applyTheme();
   renderWallpaper();
-  const re = ['theme', 'accent', 'blur', 'dockSize', 'reduceMotion', 'focusMode', 'uiScale'];
-  re.forEach((k) => store.on(k, () => { applyTheme(); if (k === 'reduceMotion') renderWallpaper(); }));
+  const re = ['perfMode', 'theme', 'accent', 'blur', 'dockSize', 'reduceMotion', 'focusMode', 'uiScale'];
+  re.forEach((k) => store.on(k, () => { applyTheme(); if (k === 'reduceMotion' || k === 'perfMode') renderWallpaper(); }));
   ['wallpaper', 'wallpaperImage', 'wallpaperDim', 'overlayOpacity', 'animatedWallpaper'].forEach((k) => store.on(k, renderWallpaper));
   matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => store.get('theme') === 'auto' && applyTheme());
 }
