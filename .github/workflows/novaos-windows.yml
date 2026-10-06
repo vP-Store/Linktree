@@ -46,6 +46,17 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Installer + portable EXE bauen
         run: npx electron-builder --win nsis portable --publish never
+      - name: Rauchtest – NovaOS.exe unter Windows starten
+        shell: pwsh
+        run: |
+          $env:NOVA_SMOKE = "$PWD\smoke.png"
+          $env:NOVA_SMOKE_LOG = "$PWD\smoke.log"
+          $env:NOVA_SMOKE_JS = node -e "process.stdout.write(require('./scripts/smoke.js'))"
+          $p = Start-Process -FilePath "dist\win-unpacked\NovaOS.exe" -PassThru
+          if (-not $p.WaitForExit(120000)) { Stop-Process -Id $p.Id -Force; throw "NovaOS hat sich nicht beendet" }
+          Get-Content smoke.log
+          if (-not (Test-Path smoke.png)) { throw "Kein Screenshot erzeugt" }
+          if ((Get-Content smoke.log -Raw) -match '\[smoke\] Fehler') { throw "Rauchtest fehlgeschlagen" }
       - name: Artefakte hochladen
         uses: actions/upload-artifact@v4
         with:
@@ -53,3 +64,12 @@ jobs:
           path: |
             nova-os/dist/*.exe
           if-no-files-found: error
+      - name: Rauchtest-Ergebnis hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovaOS-Rauchtest
+          path: |
+            nova-os/smoke.png
+            nova-os/smoke.log
+          if-no-files-found: ignore

@@ -105,22 +105,29 @@ function createWindow() {
   if (isDev) win.webContents.openDevTools({ mode: 'detach' });
 
   // Automatischer Rauchtest (CI): Konsole mitschreiben, Screenshot speichern, beenden.
+  // NOVA_SMOKE=<png>  NOVA_SMOKE_JS=<Code im Renderer>  NOVA_SMOKE_LOG=<Protokolldatei>
   if (process.env.NOVA_SMOKE) {
-    win.webContents.on('console-message', (_e, level, message) => console.log(`[renderer:${level}] ${message}`));
-    win.webContents.on('render-process-gone', (_e, d) => { console.error('[renderer] abgestürzt', d); app.exit(2); });
+    const lines = [];
+    const log = (msg) => { lines.push(msg); console.log(msg); };
+    const flushLog = () => { if (process.env.NOVA_SMOKE_LOG) require('fs').writeFileSync(process.env.NOVA_SMOKE_LOG, lines.join('\n') + '\n'); };
+    win.webContents.on('console-message', (_e, level, message) => log(`[renderer:${level}] ${message}`));
+    win.webContents.on('render-process-gone', (_e, d) => { log('[renderer] abgestürzt ' + JSON.stringify(d)); flushLog(); app.exit(2); });
     win.webContents.once('did-finish-load', () => {
       setTimeout(async () => {
+        let code = 0;
         try {
-          if (process.env.NOVA_SMOKE_JS) await win.webContents.executeJavaScript(process.env.NOVA_SMOKE_JS);
+          if (process.env.NOVA_SMOKE_JS) log('[smoke] Ergebnis: ' + JSON.stringify(await win.webContents.executeJavaScript(process.env.NOVA_SMOKE_JS)));
           await new Promise((r) => setTimeout(r, 1500));
           const img = await win.webContents.capturePage();
           require('fs').writeFileSync(process.env.NOVA_SMOKE, img.toPNG());
-          console.log('[smoke] Screenshot gespeichert:', process.env.NOVA_SMOKE);
+          log('[smoke] Screenshot gespeichert: ' + process.env.NOVA_SMOKE);
         } catch (err) {
-          console.error('[smoke] Fehler:', err);
-          app.exit(1);
+          log('[smoke] Fehler: ' + (err && err.stack || err));
+          code = 1;
         }
-        quit();
+        flushLog();
+        quitting = true;
+        app.exit(code);
       }, 2500);
     });
   }
