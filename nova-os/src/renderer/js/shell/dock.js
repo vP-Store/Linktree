@@ -8,9 +8,12 @@ import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus } from
 import { contextMenu } from '../core/ui.js';
 import { toggleStart } from './start.js';
 import { getOpenWindows, focusWindow, loadExeIcon } from '../core/winapps.js';
-import { esc } from '../core/dom.js';
+import { esc, isoDate } from '../core/dom.js';
+import { getTasks } from '../core/tasks.js';
+import { getNotifications } from '../core/ui.js';
 
 let dock, wrap;
+let lastDay = new Date().getDate();
 
 export function initDock() {
   wrap = document.getElementById('dock-wrap');
@@ -18,6 +21,9 @@ export function initDock() {
   render();
   bus.on('wm:change', render);
   store.on('dockPinned', render);
+  bus.on('tasks', render);
+  // Kalender-Icon um Mitternacht aktualisieren
+  setInterval(() => { const d = new Date().getDate(); if (d !== lastDay) { lastDay = d; render(); } }, 60000);
   store.on('dockAutohide', applyAutohide);
   applyAutohide();
 
@@ -38,11 +44,18 @@ function applyAutohide() {
   document.getElementById('dock-hot').classList.toggle('hidden', !on);
 }
 
+function badgeFor(id) {
+  if (id === 'tasks') { const n = getTasks().filter((t) => !t.done && t.due && t.due <= isoDate()).length; return n || null; }
+  if (id === 'clipboard') return null;
+  return null;
+}
+
 function item(app, { running, active }) {
+  const badge = badgeFor(app.id);
   const btn = h('button.dock-item', {
     class: (running ? 'running ' : '') + (active ? 'active' : ''),
     dataset: { app: app.id },
-    html: `${appIconSpan(app)}<span class="run-dot"></span><span class="dock-tip">${app.name}</span>`,
+    html: `${appIconSpan(app)}<span class="run-dot"></span><span class="dock-tip">${app.name}</span>${badge ? `<span class="dock-badge">${badge > 99 ? '99+' : badge}</span>` : ''}`,
     onclick: () => {
       if (!running) { btn.classList.add('bounce'); setTimeout(() => btn.classList.remove('bounce'), 700); }
       activateApp(app.id);

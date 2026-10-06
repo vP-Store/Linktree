@@ -31,7 +31,23 @@ export function getApp(id) { return byId.get(id); }
 // sonst verschwinden Farben, wenn das erste Vorkommen unsichtbar ist.
 export function appIconHtml(app) {
   if (!app) return '';
+  if (app.id === 'calendar') return calendarIcon();
   return appIconSvg(app.glyph, app.colors[0], app.colors[1]);
+}
+
+let calSeq = 0;
+/** Kalender-Icon mit dem heutigen Datum (wie ein Abreißkalender) */
+function calendarIcon() {
+  const d = new Date();
+  const id = 'cal' + (calSeq++);
+  const wd = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()];
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9ecf3"/></linearGradient></defs>
+    <path d="M32 2c17 0 23.5 0 26.8 3.2S62 15 62 32s0 23.5-3.2 26.8S49 62 32 62s-23.5 0-26.8-3.2S2 49 2 32 2 8.5 5.2 5.2 15 2 32 2Z" fill="url(#${id})"/>
+    <path d="M32 2c17 0 23.5 0 26.8 3.2C61 7.4 61.7 11 61.9 19H2.1C2.3 11 3 7.4 5.2 5.2 8.5 2 15 2 32 2Z" fill="#f43f5e"/>
+    <text x="32" y="15.5" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="700" fill="#fff" letter-spacing="1">${wd}</text>
+    <text x="32" y="50" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="300" fill="#1f2433">${d.getDate()}</text>
+  </svg>`;
 }
 
 /** <span class="app-icon">…</span> */
