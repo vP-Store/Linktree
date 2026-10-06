@@ -25,6 +25,7 @@ const FALLBACK_HOTKEYS = ['Alt+Space', 'Control+Alt+Space', 'Control+Shift+Space
 let win = null;
 let tray = null;
 let activeHotkey = null;
+const PALETTE_HOTKEY = 'Alt+Shift+Space';
 let quitting = false;
 
 if (!app.requestSingleInstanceLock()) {
@@ -164,6 +165,15 @@ function registerHotkey(preferred) {
   return null;
 }
 
+function showPalette() {
+  showOverlay();
+  if (win) win.webContents.send('overlay:palette');
+}
+
+function registerPaletteHotkey() {
+  try { globalShortcut.register(PALETTE_HOTKEY, showPalette); } catch (_) {}
+}
+
 function trayIcon() {
   const file = path.join(__dirname, '..', '..', 'build', 'tray.png');
   const img = nativeImage.createFromPath(file);
@@ -175,6 +185,7 @@ function createTray() {
   tray.setToolTip('NovaOS');
   const menu = Menu.buildFromTemplate([
     { label: 'NovaOS anzeigen', click: showOverlay },
+    { label: 'Suchen … (Alt+Umschalt+Leertaste)', click: showPalette },
     { label: 'Ausblenden', click: hideOverlay },
     { type: 'separator' },
     { label: 'Neu laden', click: () => win && win.reload() },
@@ -238,6 +249,7 @@ app.whenReady().then(() => {
   createWindow();
   createTray();
   registerHotkey(store.get('hotkey'));
+  registerPaletteHotkey();
 
   // Bei Bildschirmänderungen Größe neu anpassen.
   const refit = () => win && win.isVisible() && win.setBounds(displayForCursor().bounds);

@@ -35,15 +35,18 @@ npm run dist         # Installer + portable EXE nach nova-os/dist bauen
 | Taste | Aktion |
 |---|---|
 | `Alt + Leertaste` | NovaOS ein-/ausblenden (in Einstellungen änderbar) |
-| `Strg + K` | Befehlspalette: Apps, Programme, Dateien, Befehle, Rechnen (`=`), Websuche (`?`) |
+| `Alt + Umschalt + Leertaste` | Von überall: NovaOS mit Suche öffnen |
+| `Strg + K` | Befehlspalette: Apps, Programme, Dateien, Befehle, Rechnen (`=`), Websuche (`?`), Nova fragen |
 | `Strg + Leertaste` | Startmenü |
 | `Strg + Tab` | Fenster wechseln |
 | `Alt + Q` | Fenster schließen |
 | `Alt + ↑ / ↓ / ← / →` | Maximieren / Minimieren / links / rechts einrasten |
+| `Alt + W` / Maus in Ecke oben links | Fensterübersicht |
 | `Alt + D` | Alle Fenster minimieren |
 | `Alt + T` / `Alt + E` | Terminal / Dateien |
 | `Alt + 1 … 4` | Arbeitsfläche wechseln |
 
+Das Dock zeigt rechts auch **laufende Windows-Programme** – ein Klick holt sie nach vorne.
 Fenster an den Bildschirmrand ziehen rastet sie ein (Hälfte, Viertel, oben = maximieren).
 Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen …
 
@@ -65,6 +68,7 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Bilder** | Galerie, Zoom, Drehen, Diashow, als Hintergrund setzen |
 | **Fokus** | Pomodoro, Timer, Stoppuhr – mit Anzeige in der Statusleiste |
 | **Wetter** | Aktuell, 24 Stunden, 7 Tage (Open-Meteo, ohne Anmeldung) |
+| **Nova KI** | KI-Assistent mit Claude: Chats, Dateien als Kontext, Antworten als Notiz (eigener API-Schlüssel) |
 | **Zwischenablage** | Verlauf aller kopierten Texte, Anheften |
 | **Einstellungen** | Design, Akzentfarbe, Hintergründe, Durchsichtigkeit, Dock, Hotkey, Autostart |
 

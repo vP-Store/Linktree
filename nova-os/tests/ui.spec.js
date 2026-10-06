@@ -147,3 +147,12 @@ test('Heiße Ecke: nur beim Hineinfahren, nicht beim Draufliegen', async ({ page
   await page.mouse.move(1, 1, { steps: 4 });
   await expect(page.locator('#overview')).toHaveCount(1);
 });
+
+test('Sitzung: offene Fenster überleben einen Neustart', async ({ page }) => {
+  await open(page, 'calc');
+  await open(page, 'notes');
+  await page.waitForTimeout(900); // Sitzung wird verzögert gespeichert
+  await page.reload();
+  await expect(page.locator('.win[data-app="calc"]')).toHaveCount(1);
+  await expect(page.locator('.win[data-app="notes"]')).toHaveCount(1);
+});

@@ -70,6 +70,7 @@ function createMock() {
       getHotkey: async () => 'Alt+Space', setHotkey: async (a) => a,
       getAutostart: async () => false, setAutostart: async (v) => v,
       onVisibility: (cb) => { listeners.vis.add(cb); return () => listeners.vis.delete(cb); },
+      onPalette: () => () => {},
     },
     store: { get: async (k) => ls.get(k), all: async () => ls.all(), set: async (k, v) => ls.set(k, v) },
     fs: {

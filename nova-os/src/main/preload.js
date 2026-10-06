@@ -25,6 +25,7 @@ contextBridge.exposeInMainWorld('nova', {
     getAutostart: call('overlay:autostart:get'),
     setAutostart: call('overlay:autostart:set'),
     onVisibility: on('overlay:visibility'),
+    onPalette: on('overlay:palette'),
   },
   store: {
     get: call('store:get'),

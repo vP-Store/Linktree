@@ -22,6 +22,7 @@ const PAGES = [
 const SHORTCUTS = [
   ['NovaOS ein-/ausblenden', 'Alt + Leertaste (änderbar)'],
   ['Befehlspalette / Suche', 'Strg + K'],
+  ['Suchen von überall (global)', 'Alt + Umschalt + Leertaste'],
   ['Startmenü', 'Strg + Leertaste'],
   ['Fenster wechseln', 'Strg + Tab (halten)'],
   ['Fenster schließen', 'Alt + Q'],

@@ -40,6 +40,8 @@ async function boot() {
     if (visible) bus.emit('overlay:shown');
   });
 
+  if (api.overlay.onPalette) api.overlay.onPalette(() => import('./shell/palette.js').then((m) => m.openPalette()));
+
   const restored = await restoreSession().catch(() => 0);
 
   const minBoot = store.get('bootAnimation') ? 900 : 0;
