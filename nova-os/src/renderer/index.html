@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: nova-file:; media-src 'self' data: blob: nova-file:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; font-src 'self' data:; frame-src https: http:">
+  <title>NovaOS</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/shell.css">
+  <link rel="stylesheet" href="css/window.css">
+  <link rel="stylesheet" href="css/apps.css">
+</head>
+<body>
+  <div id="os">
+    <div id="wallpaper"></div>
+    <div id="desktop"></div>
+    <div id="windows"></div>
+    <header id="topbar"></header>
+    <div id="dock-hot" class="hidden"></div>
+    <div id="dock-wrap"><nav id="dock" class="glass"></nav></div>
+    <div id="start-wrap"></div>
+    <div id="palette-wrap"></div>
+    <div id="modal-root"></div>
+    <div id="toasts"></div>
+    <div id="ctx-root"></div>
+    <div id="boot">
+      <div class="boot-inner">
+        <div class="boot-logo" id="boot-logo"></div>
+        <div class="boot-name">NOVA</div>
+        <div class="boot-bar"><i></i></div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

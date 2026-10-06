@@ -1,0 +1,41 @@
+{
+  "name": "nova-os",
+  "productName": "NovaOS",
+  "version": "1.0.0",
+  "description": "NovaOS – ein Overlay für Windows, das sich wie ein eigenes Betriebssystem anfühlt.",
+  "main": "src/main/main.js",
+  "author": "vP-Store",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "check": "node scripts/check.js",
+    "preview": "node scripts/serve.js",
+    "test": "node scripts/check.js && playwright test",
+    "icons": "node scripts/make-icons.js",
+    "dist": "electron-builder --win nsis portable",
+    "dist:dir": "electron-builder --dir"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "store.vp.novaos",
+    "productName": "NovaOS",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["src/**/*", "package.json", "build/icon.png", "build/tray.png"],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "NovaOS"
+    },
+    "portable": { "artifactName": "NovaOS-${version}-portable.exe" }
+  }
+}
