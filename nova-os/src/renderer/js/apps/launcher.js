@@ -80,6 +80,10 @@ export default {
           contextMenu(e.clientX, e.clientY, [
             { label: 'Starten', icon: 'rocket', action: () => launchWinApp(a) },
             { label: isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten', icon: 'star', action: () => { store.set('launcherFavs', isFav ? favs().filter((p) => p !== a.path) : [...favs(), a.path]); render(); } },
+            (() => {
+              const docked = (store.get('dockWinApps', []) || []).some((x) => x.path === a.path);
+              return { label: docked ? 'Vom Dock lösen' : 'Ans Dock heften', icon: 'pin', action: () => store.update('dockWinApps', (l) => (docked ? (l || []).filter((x) => x.path !== a.path) : [...(l || []), { name: a.name, path: a.path }]), []) };
+            })(),
             { label: 'Speicherort öffnen', icon: 'folder', action: () => api.fs.reveal(a.path) },
           ]);
         });

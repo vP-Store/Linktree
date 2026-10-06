@@ -7,7 +7,7 @@ import { listApps, getApp, appIconSpan } from '../core/registry.js';
 import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus } from '../core/wm.js';
 import { contextMenu } from '../core/ui.js';
 import { toggleStart } from './start.js';
-import { getOpenWindows, focusWindow, loadExeIcon } from '../core/winapps.js';
+import { getOpenWindows, focusWindow, loadExeIcon, loadAppIcon, launchWinApp } from '../core/winapps.js';
 import { esc, isoDate } from '../core/dom.js';
 import { getTasks } from '../core/tasks.js';
 import { getNotifications } from '../core/ui.js';
@@ -21,6 +21,7 @@ export function initDock() {
   render();
   bus.on('wm:change', render);
   store.on('dockPinned', render);
+  store.on('dockWinApps', render);
   bus.on('tasks', render);
   // Kalender-Icon um Mitternacht aktualisieren
   setInterval(() => { const d = new Date().getDate(); if (d !== lastDay) { lastDay = d; render(); } }, 60000);
@@ -96,6 +97,24 @@ function render() {
 
   for (const id of pinned) {
     dock.append(item(getApp(id), { running: runningIds.has(id), active: act && act.appId === id }));
+  }
+  const winPinned = store.get('dockWinApps', []) || [];
+  if (winPinned.length) {
+    dock.append(h('div.dock-sep'));
+    for (const a of winPinned) {
+      const ico = h('span.dock-exe');
+      loadAppIcon(a, ico);
+      const btn = h('button.dock-item.win-app', { title: a.name, onclick: () => { btn.classList.add('bounce'); setTimeout(() => btn.classList.remove('bounce'), 700); launchWinApp(a); } },
+        ico, h('span.dock-tip', a.name));
+      btn.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        contextMenu(e.clientX, e.clientY - 10, [
+          { label: 'Starten', icon: 'rocket', action: () => launchWinApp(a) },
+          { label: 'Vom Dock lösen', icon: 'pin', action: () => store.set('dockWinApps', (store.get('dockWinApps', []) || []).filter((x) => x.path !== a.path)) },
+        ]);
+      });
+      dock.append(btn);
+    }
   }
   const extra = [...runningIds].filter((id) => !pinned.includes(id));
   dock.append(h('div.dock-sep'), h('button.dock-item', {

@@ -205,3 +205,13 @@ test('Palette findet Aufgaben und Termine', async ({ page }) => {
   await page.locator('.pal-item', { hasText: 'Zahnarzt Termin' }).click();
   await expect(page.locator('.cal-ag-title')).toHaveText('Zahnarzt Termin');
 });
+
+test('Windows-Programm ans Dock heften und wieder lösen', async ({ page }) => {
+  await open(page, 'launcher');
+  await page.locator('.lp-tile', { hasText: 'Spotify' }).click({ button: 'right' });
+  await page.locator('.ctx-item', { hasText: 'Ans Dock heften' }).click();
+  await expect(page.locator('.dock-item.win-app[title="Spotify"]')).toHaveCount(1);
+  await page.locator('.dock-item.win-app[title="Spotify"]').click({ button: 'right' });
+  await page.locator('.ctx-item', { hasText: 'Vom Dock lösen' }).click();
+  await expect(page.locator('.dock-item.win-app')).toHaveCount(0);
+});
