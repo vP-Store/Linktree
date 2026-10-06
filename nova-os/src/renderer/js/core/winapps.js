@@ -34,7 +34,7 @@ export async function launchWinApp(app) {
     await api.apps.launch(app.path);
     toast(app.name, 'wird gestartet …', { icon: 'rocket', duration: 2200 });
     store.update('recentApps', (list) => [app.path, ...(list || []).filter((p) => p !== app.path)].slice(0, 12), []);
-    if (store.get('hideOnLaunch', true)) setTimeout(() => import('../shell/state.js').then((m) => m.overlayHide()), 350);
+    import('../shell/state.js').then((m) => m.stepAside());
   } catch (e) {
     showError(e, `${app.name} konnte nicht gestartet werden`);
   }

@@ -57,7 +57,7 @@ export function openStart(initialTab) {
   wrap.classList.add('open');
   renderTabs();
   render();
-  setTimeout(() => input.focus(), 20);
+  input.focus();
 }
 
 function renderTabs() {

@@ -12,7 +12,7 @@ function createMock() {
   };
   [
     '/', '/home', HOME, `${HOME}/Desktop`, `${HOME}/Dokumente`, `${HOME}/Downloads`, `${HOME}/Bilder`, `${HOME}/Musik`, `${HOME}/Videos`,
-    `${HOME}/Dokumente/Projekte`, `${HOME}/Dokumente/NovaOS`, `${HOME}/Dokumente/NovaOS/Notizen`,
+    `${HOME}/Dokumente/Projekte`, `${HOME}/Dokumente/NovaOS`,
   ].forEach((p) => add(p, null, 600));
   add(`${HOME}/Desktop/Willkommen.md`, '# Willkommen bei NovaOS\n\nDrücke **Strg+K** für die Befehlspalette.\n', 5);
   add(`${HOME}/Desktop/Einkauf.txt`, 'Milch\nBrot\nKaffee\n', 50);
@@ -159,7 +159,19 @@ function createMock() {
   };
 }
 
-export const api = window.nova || createMock();
+const base = window.nova || createMock();
+
+// Aktionen, die ein Windows-Fenster öffnen, lassen NovaOS danach zur Seite treten.
+function aside(fn) {
+  return async (...args) => {
+    const r = await fn(...args);
+    import('../shell/state.js').then((m) => m.stepAside());
+    return r;
+  };
+}
+export const api = base.isElectron
+  ? { ...base, fs: { ...base.fs, open: aside(base.fs.open), reveal: aside(base.fs.reveal), openExternal: aside(base.fs.openExternal) } }
+  : base;
 export const isElectron = !!(window.nova && window.nova.isElectron);
 export const isWindows = api.platform === 'win32';
 

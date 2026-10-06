@@ -88,7 +88,8 @@ export function openPalette(initial = '') {
   input.addEventListener('input', () => { kb = 0; render(); searchFiles(); });
   input.addEventListener('keydown', onKey);
   render();
-  setTimeout(() => { input.focus(); input.select(); }, 10);
+  input.focus();
+  input.select();
 }
 
 const searchFiles = debounce(async () => {
