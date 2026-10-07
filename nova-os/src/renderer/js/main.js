@@ -18,6 +18,18 @@ import { initClipboardHistory } from './apps/clipboard.js';
 import { startReminders } from './apps/calendar.js';
 import { initBrowserHooks } from './shell/browserhooks.js';
 
+// Unerwartete Fehler sichtbar machen statt sie still zu verschlucken (höchstens einmal je Meldung)
+const seenErrors = new Set();
+function reportError(err) {
+  const msg = String((err && (err.message || err.reason && err.reason.message)) || err || 'Unbekannter Fehler');
+  console.error(err);
+  if (seenErrors.has(msg) || /ResizeObserver|AbortError|The play\(\) request/.test(msg)) return;
+  seenErrors.add(msg);
+  import('./core/ui.js').then((m) => m.toast('Unerwarteter Fehler', msg.slice(0, 160), { kind: 'error', force: true, duration: 6000 })).catch(() => {});
+}
+addEventListener('error', (e) => reportError(e.error || e.message));
+addEventListener('unhandledrejection', (e) => reportError(e.reason));
+
 async function boot() {
   const bootEl = document.getElementById('boot');
   document.getElementById('boot-logo').innerHTML = logoSvg(92);
