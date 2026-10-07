@@ -84,7 +84,7 @@ export default {
 
       if (page === 'welcome') {
         main.append(h('div.set-welcome',
-          h('div.set-hero', { html: logoSvg(84) }),
+          h('div.set-hero', { html: `<div class="boot-orb set-orb"><i class="r1"></i><i class="r2"></i><i class="r3"></i><div class="boot-logo">${logoSvg(84)}</div></div>` }),
           h('h1', 'Willkommen bei NovaOS'),
           h('p.muted', 'Dein eigenes Betriebssystem – als Overlay über Windows. Ein Tastendruck holt es hervor, ein weiterer bringt dich zurück.'),
           (() => {
@@ -225,7 +225,7 @@ export default {
         const ov = await api.overlay.info().catch(() => ({}));
         const info = sysInfo() || {};
         main.append(h('div.set-about',
-          h('div.set-hero', { html: logoSvg(96) }),
+          h('div.set-hero', { html: `<div class="boot-orb set-orb"><i class="r1"></i><i class="r2"></i><i class="r3"></i><div class="boot-logo">${logoSvg(96)}</div></div>` }),
           h('h2', 'NovaOS'),
           h('div.faint', `Version ${ov.version || '1.0.0'}`),
           h('p.muted', 'Ein Overlay für Windows, das sich wie ein eigenes Betriebssystem anfühlt – mit echten Dateien, echtem Terminal und all deinen Programmen.')),

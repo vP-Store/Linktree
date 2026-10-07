@@ -733,3 +733,8 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .br-tile.tilt3d { position: relative; }
 .br-tile.tilting .br-tile-ico { transform: translateZ(26px) scale(1.06); }
 .br-tile .br-tile-ico { transition: transform .4s cubic-bezier(.2, 1.3, .4, 1); }
+.set-hero .set-orb { width: 150px; height: 150px; margin: 0 auto; }
+.set-hero .set-orb > i { inset: 0; }
+.set-hero .set-orb .r2 { inset: 11px; }
+.set-hero .set-orb .r3 { inset: 22px; }
+:root[data-reduce-motion="true"] .set-orb > i, :root[data-reduce-motion="true"] .set-orb::before { animation: none; }
