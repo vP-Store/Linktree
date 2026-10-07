@@ -14,6 +14,7 @@ export const DEFAULTS = {
   blur: 28,
   reduceMotion: false,
   fx3d: true,
+  saverMinutes: 10,
   showWidgets: true,
   showDesktopIcons: true,
   dockAutohide: false,

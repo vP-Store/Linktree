@@ -9,6 +9,7 @@ import { notify } from './core/ui.js';
 import { initTheme } from './shell/theme.js';
 import { initTopbar } from './shell/topbar.js';
 import { initTilt } from './shell/tilt.js';
+import { initScreensaver } from './shell/screensaver.js';
 import { initDock } from './shell/dock.js';
 import { initDesktop } from './shell/desktop.js';
 import { initStart } from './shell/start.js';
@@ -47,6 +48,7 @@ async function boot() {
   initTilt();
   initStart();
   initPalette();
+  initScreensaver(); // vor den Tastenkürzeln: beendende Taste wird verschluckt
   initKeys();
   initClipboardHistory();
   startReminders(notify);

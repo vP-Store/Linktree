@@ -506,3 +506,13 @@ body.focus-mode #stickies { opacity: 0; pointer-events: none; }
 /* Raumtiefe (Parallaxe-Ebenen) */
 #desk-icons { translate: calc(var(--px, 0) * -5px) calc(var(--py, 0) * -4px); transition: translate .25s ease-out; }
 #widgets { translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -7px); transition: opacity .3s, transform .3s var(--ease), translate .25s ease-out; }
+
+/* Bildschirmschoner */
+#saver { position: absolute; inset: 0; z-index: 8500; display: grid; place-items: center; cursor: none; background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.45)); animation: fadeIn .8s ease; }
+#saver.out { opacity: 0; transition: opacity .4s; }
+.saver-clock { text-align: center; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,.5); animation: saverFloat 14s ease-in-out infinite; }
+.saver-time { font: 200 clamp(90px, 16vw, 220px)/1 var(--font-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.saver-date { margin-top: 10px; font: 400 clamp(18px, 2vw, 28px) var(--font-display); opacity: .8; }
+.saver-hint { position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); font-size: 13px; color: rgba(255,255,255,.55); animation: fadeIn 2s ease 3s both; }
+@keyframes saverFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+body.saver-on #windows, body.saver-on #dock-wrap, body.saver-on #widgets, body.saver-on #desk-icons, body.saver-on #topbar, body.saver-on #stickies { opacity: 0; transition: opacity .8s; pointer-events: none; }

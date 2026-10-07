@@ -72,6 +72,15 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Zwischenablage** | Verlauf aller kopierten Texte, Anheften |
 | **Einstellungen** | Design, Akzentfarbe, Hintergründe, Durchsichtigkeit, Dock, Hotkey, Autostart |
 
+## 3D & Effekte
+
+- **Live-3D-Hintergründe:** *Galaxie 3D* (rotierende Spiralgalaxie, Standard), *Horizont 3D* (Flug über eine Gitterlandschaft), *Wellen 3D* (Meer aus Lichtpunkten). Sie folgen der Maus, drehen sich beim Wechsel der Arbeitsfläche mit, übernehmen die Akzentfarbe und pausieren, wenn NovaOS ausgeblendet ist oder ein maximiertes Fenster sie verdeckt
+- **3D-Fenster:** öffnen sich perspektivisch, kippen beim Schließen/Minimieren weg und neigen sich beim Ziehen; der Rand leuchtet dort, wo die Maus ist
+- **Strg + Tab** als 3D-Karussell, **Alt + W** mit schwebenden Fenstern, Arbeitsflächen drehen wie ein Würfel herein
+- **Weltuhr 3D:** Globus mit echter Tag-/Nachtseite und Uhrzeiten
+- Karten, Widgets und Symbole kippen zum Mauszeiger mit Glanzlicht, Dock-Spiegelung, Raumtiefe (Parallaxe), Plattenspieler in der Musik-App, Kalender blättert um
+- Alles abschaltbar: Einstellungen → Erscheinungsbild → *Räumliche 3D-Effekte*, *Bewegter Hintergrund* oder *Leistungsmodus*
+
 ## Weitere Funktionen
 
 - **Dock:** NovaOS-Apps und angeheftete Windows-Programme (Rechtsklick auf ein Programm → „Ans Dock heften“), Badge für fällige Aufgaben, Kalender-Symbol mit Tagesdatum, Knopf für laufende Windows-Fenster

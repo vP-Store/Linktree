@@ -72,7 +72,7 @@ export function startScene(host, kind, { still = false } = {}) {
     last = now;
     // Pause, wenn NovaOS ausgeblendet ist oder ein maximiertes Fenster alles verdeckt
     const paused = document.hidden || document.body.classList.contains('overlay-hidden')
-      || !!document.querySelector('#windows .win.max:not(.min):not(.other-ws):not(.closing)');
+      || (!document.body.classList.contains('saver-on') && !!document.querySelector('#windows .win.max:not(.min):not(.other-ws):not(.closing)'));
     if (!paused) {
       t += dt;
       mouse.sx += (mouse.x - mouse.sx) * Math.min(1, dt * 2.5);

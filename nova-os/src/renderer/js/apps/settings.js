@@ -160,6 +160,7 @@ export default {
             h('div.set-pad', widgetPick),
             row('Desktop-Symbole', 'Verknüpfungen und Dateien deines Windows-Desktops', toggle('showDesktopIcons')),
             row('Heiße Ecke', 'Maus in die Ecke oben links öffnet die Fensterübersicht', toggle('hotCorner')),
+            row('Bildschirmschoner', 'Zeigt nach einer Weile ohne Eingabe den 3D-Hintergrund mit großer Uhr', select('saverMinutes', [[0, 'Aus'], [2, '2 Min.'], [5, '5 Min.'], [10, '10 Min.'], [20, '20 Min.'], [30, '30 Min.']])),
             row('Doppel-Esc blendet aus', 'Zweimal Esc auf dem leeren Desktop versteckt NovaOS', toggle('doubleEscHide')),
             row('Arbeitsflächen', 'Anzahl der virtuellen Desktops', select('workspaces', [[1, '1 (aus)'], [2, '2'], [3, '3'], [4, '4'], [6, '6'], [9, '9']]))),
           section('Dock', row('Automatisch ausblenden', 'Erscheint, wenn die Maus den unteren Rand berührt', toggle('dockAutohide')),

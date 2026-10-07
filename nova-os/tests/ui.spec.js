@@ -342,3 +342,14 @@ test('Kalender: Weiter vom 31. Januar führt in den Februar (blättert in 3D)', 
   await win.locator('button[title="Weiter"]').click();
   await expect(win.locator('.app-toolbar')).toContainText('März 2026');
 });
+
+test('Bildschirmschoner: startet per Befehl, Taste beendet ihn ohne Nebenwirkung', async ({ page }) => {
+  await page.evaluate(async () => { const m = await import('/js/shell/screensaver.js'); m.startSaver(); });
+  await expect(page.locator('#saver .saver-time')).toHaveText(/\d\d:\d\d/);
+  await expect(page.locator('body')).toHaveClass(/saver-on/);
+  await page.waitForTimeout(700);
+  await page.keyboard.press('Control+k'); // darf die Palette nicht öffnen
+  await expect(page.locator('#saver')).toHaveCount(0);
+  await expect(page.locator('#palette')).toHaveCount(0);
+  await expect(page.locator('body')).not.toHaveClass(/saver-on/);
+});

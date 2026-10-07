@@ -112,7 +112,8 @@ dem Backlog.
 | R50 | 3D-Mikroanimationen (Startmenü, Palette, Meldungen, Menüs, Dialoge, Kalender blättert); Kalender-Monatssprung am 31. behoben | ✅ |
 | R51 | Musik: 3D-Plattenspieler (Vinyl gleitet heraus, dreht sich); Systemmonitor füllt die Höhe, Achsen ohne Abschneiden | ✅ |
 | R52 | Rechner skaliert mit dem Fenster, Tasten mit 3D-Kante; Raumtiefe (Parallaxe-Ebenen) auf dem Desktop | ✅ |
-| R53+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R53 | Bildschirmschoner mit 3D-Hintergrund und großer Uhr (Einstellung, Befehl), README „3D & Effekte“ | ✅ |
+| R54+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
