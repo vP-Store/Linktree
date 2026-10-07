@@ -413,3 +413,16 @@ test('Snap-Layouts am Maximieren-Knopf ordnen das Fenster an', async ({ page }) 
   expect(box.width).toBeGreaterThan(vw / 3 - 40);
   expect(box.width).toBeLessThan(vw / 3 + 10);
 });
+
+test('Fenster-Anordnung speichern und per Palette wiederherstellen', async ({ page }) => {
+  await open(page, 'notes');
+  await open(page, 'calc');
+  await page.keyboard.press('Control+k'); await page.keyboard.type('Anordnung speichern'); await page.keyboard.press('Enter');
+  await page.locator('.modal input').fill('Schreibtisch');
+  await page.keyboard.press('Enter');
+  await page.evaluate(async () => { const m = await import('/js/core/wm.js'); for (const w of m.allWindows()) await w.close(true); });
+  await expect(page.locator('.win:not(.closing)')).toHaveCount(0);
+  await page.keyboard.press('Control+k'); await page.keyboard.type('Anordnung öffnen: Schreib'); await page.keyboard.press('Enter');
+  await expect(page.locator('.win:not(.closing)')).toHaveCount(2);
+  await expect(page.locator('.win[data-app="calc"]')).toHaveCount(1);
+});

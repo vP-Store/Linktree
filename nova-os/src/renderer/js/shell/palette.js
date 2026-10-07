@@ -5,7 +5,7 @@ import { icon, fileGlyph } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { api } from '../core/api.js';
 import { listApps, appIconSpan } from '../core/registry.js';
-import { openApp, allWindows, focus, minimizeAll, switchWorkspace, activeWindow } from '../core/wm.js';
+import { openApp, allWindows, focus, minimizeAll, switchWorkspace, activeWindow, getLayouts, saveLayout, applyLayout, deleteLayout } from '../core/wm.js';
 import { getWinApps, loadAppIcon, launchWinApp, recentFiles, getOpenWindows, focusWindow, loadExeIcon, takeScreenshot } from '../core/winapps.js';
 import { openPath } from '../core/open.js';
 import { evaluate, formatNumber, looksLikeMath } from '../core/math.js';
@@ -43,7 +43,15 @@ function snippetAround(text, q) {
 
 function commands() {
   const c = (label, ic, run, hint = '', kw = '') => ({ label, ic, run, hint, kw });
+  const layouts = getLayouts();
   return [
+    c('Fenster-Anordnung speichern …', 'layers', async () => {
+      const { promptDialog } = await import('../core/ui.js');
+      const name = await promptDialog({ title: 'Fenster-Anordnung speichern', message: `Merkt sich alle ${allWindows().length} offenen Fenster mit Position, Arbeitsfläche und Inhalt.`, value: '', placeholder: 'z. B. Programmieren', ok: 'Speichern' });
+      if (name && saveLayout(name)) toast('Anordnung gespeichert', name, { icon: 'layers', kind: 'ok' });
+    }, '', 'layout arbeitsplatz sitzung speichern anordnung workspace'),
+    ...layouts.map((l) => c(`Anordnung öffnen: ${l.name}`, 'layers', async () => { if (await applyLayout(l.name)) toast('Anordnung geöffnet', l.name, { icon: 'layers' }); }, `${l.wins.length} Fenster`, 'layout arbeitsplatz anordnung wiederherstellen ' + l.name)),
+    ...layouts.map((l) => c(`Anordnung löschen: ${l.name}`, 'trash', () => { deleteLayout(l.name); toast('Anordnung gelöscht', l.name, { icon: 'trash' }); }, '', 'layout anordnung entfernen ' + l.name)),
     c('Design: Hell / Dunkel umschalten', 'moon', () => store.set('theme', document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'), '', 'theme dark light modus'),
     c('Fokus-Modus umschalten', 'focus', () => store.set('focusMode', !store.get('focusMode')), '', 'focus konzentration'),
     c('Nicht stören umschalten', 'bellOff', () => store.set('dnd', !store.get('dnd')), '', 'dnd mitteilungen'),

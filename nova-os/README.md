@@ -87,6 +87,7 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 - **Desktop:** echte Dateien deines Windows-Desktops (Drag & Drop), Widgets (einzeln wählbar), **Haftnotizen** (Rechtsklick → „Neue Haftnotiz“)
 - **Statusleiste:** CPU/RAM/Netz, Fokus-Timer, **Mini-Player** während Musik läuft, Download-Fortschritt, Mitteilungen, Schnelleinstellungen
 - **Snap-Layouts:** Maus auf dem Maximieren-Knopf halten → Hälften, Drittel, Viertel, Mitte
+- **Fenster-Anordnungen:** Befehlspalette → „Fenster-Anordnung speichern …“ merkt alle offenen Fenster; „Anordnung öffnen: Name“ stellt sie wieder her
 - **Fensterübersicht** (`Alt + W` oder Maus in die Ecke oben links), **4 Arbeitsflächen** (`Alt + 1…4`)
 - **Dateien:** Vorschau (Bild, Text, PDF, Audio, Video), ZIP packen/entpacken, Mehrfachauswahl, Drag & Drop
 - **PDF-Export** aus Notizen und Code-Editor

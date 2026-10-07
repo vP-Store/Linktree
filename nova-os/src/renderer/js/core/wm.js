@@ -552,8 +552,8 @@ export function moveToWorkspace(id, i) {
 }
 
 // ---------- Sitzung ----------
-const saveSession = debounce(() => {
-  const list = [...windows.values()].map((w) => ({
+function snapshot() {
+  return [...windows.values()].map((w) => ({
     app: w.appId,
     bounds: w.restoreBounds && (w.max || w.snap) ? w.restoreBounds : w.bounds(),
     max: w.max,
@@ -562,8 +562,38 @@ const saveSession = debounce(() => {
     min: w.min,
     args: (w.instance && w.instance.getState && w.instance.getState()) || null,
   }));
-  store.set('session', list);
-}, 600);
+}
+
+const saveSession = debounce(() => store.set('session', snapshot()), 600);
+
+// ---------- Benannte Fenster-Anordnungen ----------
+export function getLayouts() { return store.get('layouts', []) || []; }
+
+export function saveLayout(name) {
+  name = String(name || '').trim();
+  if (!name) return false;
+  const list = getLayouts().filter((l) => l.name.toLowerCase() !== name.toLowerCase());
+  list.unshift({ name, wins: snapshot(), t: Date.now() });
+  store.set('layouts', list.slice(0, 20));
+  return true;
+}
+
+export function deleteLayout(name) { store.set('layouts', getLayouts().filter((l) => l.name !== name)); }
+
+/** Schließt die offenen Fenster (mit Rückfrage bei Ungespeichertem) und öffnet die Anordnung */
+export async function applyLayout(name) {
+  const l = getLayouts().find((x) => x.name === name);
+  if (!l) return false;
+  for (const w of [...windows.values()]) await w.close();
+  if (windows.size) return false; // ein Fenster wollte nicht geschlossen werden
+  for (const s of l.wins) {
+    if (!getApp(s.app)) continue;
+    const w = await openApp(s.app, s.args || {}, { bounds: s.bounds, ws: s.ws || 0, max: s.max, snap: s.snap });
+    if (w && s.min) w.minimize();
+  }
+  saveSession();
+  return true;
+}
 
 export { saveSession };
 

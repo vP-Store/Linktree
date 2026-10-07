@@ -126,7 +126,8 @@ dem Backlog.
 | R64 | Browser-Starttab: farbige Schnellwahl-Kacheln mit 3D-Neigung | ✅ |
 | R65 | Korrekte Silbentrennung in App-Kacheln (weiche Trennstellen, Suche unverändert) | ✅ |
 | R66 | Snap-Layouts am Maximieren-Knopf (Hälften, Drittel, 2/3+1/3, Viertel, Mitte, Maximiert) | ✅ |
-| R67+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R67 | Benannte Fenster-Anordnungen speichern/öffnen/löschen (Befehlspalette) | ✅ |
+| R68+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
