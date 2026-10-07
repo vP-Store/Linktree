@@ -4,7 +4,7 @@ import { h, clear, bus } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { listApps, getApp, appIconSpan } from '../core/registry.js';
-import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus } from '../core/wm.js';
+import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus, setLaunchOrigin } from '../core/wm.js';
 import { contextMenu } from '../core/ui.js';
 import { toggleStart } from './start.js';
 import { getOpenWindows, focusWindow, loadExeIcon, loadAppIcon, launchWinApp, dockPinMenuItem } from '../core/winapps.js';
@@ -58,7 +58,7 @@ function item(app, { running, active }) {
     dataset: { app: app.id },
     html: `${appIconSpan(app)}<span class="run-dot"></span><span class="dock-tip">${app.name}</span>${badge ? `<span class="dock-badge">${badge > 99 ? '99+' : badge}</span>` : ''}`,
     onclick: () => {
-      if (!running) { btn.classList.add('bounce'); setTimeout(() => btn.classList.remove('bounce'), 700); }
+      if (!running) { btn.classList.add('bounce'); setTimeout(() => btn.classList.remove('bounce'), 700); setLaunchOrigin(btn.getBoundingClientRect()); }
       activateApp(app.id);
     },
     oncontextmenu: (e) => { e.preventDefault(); menu(app, e.clientX, e.clientY); },

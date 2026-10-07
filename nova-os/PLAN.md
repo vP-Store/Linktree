@@ -119,7 +119,8 @@ dem Backlog.
 | R57 | Wetter: animierter Himmel (Regen in Tiefenebenen, Gewitter, Schnee, Wolken, Sonnenstrahlen, Mond + Sterne) | ✅ |
 | R58 | Code-Review der 3D-Runden: 14 Befunde behoben (Papier-Terminal, Schoner + Webview/Video, Toast-Ausblendung, Standbild nach Resize, Leistung Lichtkante/Parallaxe, Globus-Schleife, Karussell-Tasten u. a.) | ✅ |
 | R59 | Einstellungen: echte Standbild-Vorschau der 3D-Hintergründe | ✅ |
-| R60+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R60 | Start aus dem Dock: Fenster fliegt räumlich aus dem Symbol auf | ✅ |
+| R61+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

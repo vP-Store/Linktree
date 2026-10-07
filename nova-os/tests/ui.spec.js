@@ -372,3 +372,16 @@ test('Bilder: 3D-Karussell blättert per Tastatur und öffnet das Bild', async (
   await page.keyboard.press('Escape');
   await expect(win.locator('.ph-flow-label')).toContainText('2 /');
 });
+
+test('Start aus dem Dock: Fenster fliegt aus dem Symbol auf', async ({ page }) => {
+  await page.locator('#dock .dock-item[data-app="notes"]').click();
+  const win = page.locator('.win').last();
+  await expect(win).toHaveClass(/launch/);
+  const ly = await win.evaluate((el) => parseInt(el.style.getPropertyValue('--ly'), 10));
+  expect(ly).toBeGreaterThan(0); // Ursprung liegt unterhalb (Dock)
+  await expect(win).not.toHaveClass(/launch/, { timeout: 3000 });
+  // Start über die Palette: keine Dock-Animation
+  await page.keyboard.press('Control+k'); await page.keyboard.type('Rechner'); await page.keyboard.press('Enter');
+  await expect(page.locator('.win')).toHaveCount(2);
+  await expect(page.locator('.win.launch')).toHaveCount(0);
+});

@@ -352,6 +352,12 @@ export function initWM() {
   }, 120));
 }
 
+let launchOrigin = null;
+/** Merkt sich, von wo (Bildschirmpunkt) die nächste App gestartet wird */
+export function setLaunchOrigin(rect) {
+  launchOrigin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, t: Date.now() };
+}
+
 export async function openApp(appId, args = {}, opts = {}) {
   const app = getApp(appId);
   if (!app) { showError(`App „${appId}“ nicht gefunden.`); return null; }
@@ -373,6 +379,15 @@ export async function openApp(appId, args = {}, opts = {}) {
   layer.append(win.el);
   const b = opts.bounds || placement(app);
   win.setBounds(b);
+  // Start aus dem Dock: Fenster wächst räumlich aus dem angeklickten Symbol heraus
+  if (launchOrigin && Date.now() - launchOrigin.t < 1500) {
+    const o = launchOrigin;
+    win.el.style.setProperty('--lx', Math.round(o.x - (b.x + b.w / 2)) + 'px');
+    win.el.style.setProperty('--ly', Math.round(o.y - (b.y + b.h / 2)) + 'px');
+    win.el.classList.add('launch');
+    setTimeout(() => win.el.classList.remove('launch'), 700);
+  }
+  launchOrigin = null;
   if (win.ws !== currentWs) win.el.classList.add('other-ws');
   focus(win.id);
   bus.emit('wm:open', win);
