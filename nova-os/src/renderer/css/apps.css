@@ -675,3 +675,18 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .term-root[data-tt="light"] .term-tabs { border-bottom-color: rgba(0,0,0,.08); }
 .term-root[data-tt="light"] .term-out .dim { color: #8b949e; }
 :root[data-reduce-motion="true"] .term-body::after { animation: none; }
+
+/* Aufgaben: Fortschrittsring + Konfetti */
+.tk-ring { position: relative; width: 46px; height: 46px; flex: none; margin-right: 12px; display: grid; place-items: center; }
+.tk-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.tk-ring circle { fill: none; stroke-width: 3.4; }
+.tk-ring .bg { stroke: var(--surface-3); }
+.tk-ring .fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dasharray .6s var(--ease); }
+.tk-ring b { font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.confetti { position: absolute; left: 50%; top: 40%; width: 0; height: 0; pointer-events: none; z-index: 30; perspective: 600px; }
+.confetti i { position: absolute; width: 8px; height: 12px; border-radius: 2px; animation: confetti 1.4s cubic-bezier(.15, .7, .4, 1) forwards; }
+@keyframes confetti {
+  0% { transform: translate3d(0, 0, 0) rotateX(0) rotateY(0); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate3d(var(--dx), calc(var(--dy) + 260px), 0) rotateX(var(--rx)) rotateY(var(--ry)); opacity: 0; }
+}

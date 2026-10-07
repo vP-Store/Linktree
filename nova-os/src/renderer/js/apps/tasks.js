@@ -122,6 +122,24 @@ export default {
       return { label: v.label, filter: v.filter };
     }
 
+    let prevOpen = -1, prevView = null;
+    function celebrate(host) {
+      if (document.documentElement.dataset.reduceMotion === 'true') return;
+      const box = h('div.confetti');
+      const colors = ['#7c5cff', '#4cc9f0', '#f43f5e', '#facc15', '#34d399', '#fb923c'];
+      for (let i = 0; i < 46; i++) {
+        const a = Math.random() * Math.PI * 2, dist = 120 + Math.random() * 220;
+        box.append(h('i', { style: {
+          background: colors[i % colors.length],
+          '--dx': `${Math.cos(a) * dist}px`, '--dy': `${Math.sin(a) * dist * 0.7 - 120}px`,
+          '--rx': `${Math.random() * 720 - 360}deg`, '--ry': `${Math.random() * 720 - 360}deg`,
+          animationDelay: `${Math.random() * 80}ms`,
+        } }));
+      }
+      host.closest('.win-body')?.append(box);
+      setTimeout(() => box.remove(), 1600);
+    }
+
     function render() {
       renderSide();
       const f = currentFilter();
@@ -130,7 +148,15 @@ export default {
       const done = tasks.filter((t) => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
       clear(listHead);
       const d = new Date();
+      // Fortschrittsring: erledigt / gesamt in dieser Ansicht
+      const total = open.length + done.length;
+      const pct = total ? done.length / total : 0;
+      const ring = total ? h('div.tk-ring', { title: `${done.length} von ${total} erledigt`, html: `<svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" class="bg"/><circle cx="18" cy="18" r="15.5" class="fg" style="stroke-dasharray:${(pct * 97.4).toFixed(1)} 97.4"/></svg><b>${Math.round(pct * 100)}%</b>` }) : null;
+      // Alles erledigt → kleine Konfetti-Feier
+      if (prevOpen > 0 && open.length === 0 && done.length && prevView === view) celebrate(listEl);
+      prevOpen = open.length; prevView = view;
       listHead.append(
+        ring,
         h('div', h('h2', f.label), h('div.faint', view === 'today' ? d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }) : `${open.length} offen · ${done.length} erledigt`)),
         h('div.grow'),
         done.length ? h('button.btn.sm.ghost', { onclick: () => { showDone = !showDone; render(); } }, showDone ? 'Erledigte ausblenden' : `Erledigte zeigen (${done.length})`) : null,
