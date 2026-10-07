@@ -483,14 +483,14 @@ test('Mitteilungscenter zeigt „Heute“ mit Terminen und Aufgaben', async ({ p
   await expect(page.locator('.win[data-app="calendar"]')).toHaveCount(1);
 });
 
-test('Alt+Umschalt+2 nimmt das Fenster mit, Strg+Alt+← wechselt zurück', async ({ page }) => {
+test('Alt+Umschalt+2 nimmt das Fenster mit, Alt+Bild↑ wechselt zurück', async ({ page }) => {
   await open(page, 'calc');
   await page.locator('.win').last().click();
   await page.keyboard.press('Alt+Shift+Digit2');
   await expect(page.locator('#topbar')).toBeVisible();
   expect(await page.evaluate(async () => (await import('/js/core/wm.js')).getWorkspace())).toBe(1);
   await expect(page.locator('.win[data-app="calc"]:not(.other-ws)')).toHaveCount(1);
-  await page.keyboard.press('Control+Alt+ArrowLeft');
+  await page.keyboard.press('Alt+PageUp');
   expect(await page.evaluate(async () => (await import('/js/core/wm.js')).getWorkspace())).toBe(0);
   await expect(page.locator('.win[data-app="calc"].other-ws')).toHaveCount(1);
 });

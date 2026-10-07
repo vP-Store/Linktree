@@ -82,11 +82,12 @@ function onKey(e) {
     return;
   }
 
-  // Strg + Alt + ← / →: vorige / nächste Arbeitsfläche (wie unter Windows)
-  if (e.ctrlKey && e.altKey && !e.shiftKey && (k === 'ArrowLeft' || k === 'ArrowRight')) {
+  // Alt + Bild↑ / Bild↓: vorige / nächste Arbeitsfläche
+  // (nicht Strg+Alt+Pfeil – das dreht bei manchen Intel-Grafiktreibern den Bildschirm)
+  if (e.altKey && !e.ctrlKey && !e.shiftKey && (k === 'PageUp' || k === 'PageDown')) {
     e.preventDefault();
     const n = store.get('workspaces');
-    switchWorkspace((getWorkspace() + (k === 'ArrowRight' ? 1 : n - 1)) % n);
+    switchWorkspace((getWorkspace() + (k === 'PageDown' ? 1 : n - 1)) % n);
     return;
   }
   // Alt-Kürzel (AltGr = Strg+Alt wird ignoriert, damit @ € usw. funktionieren)

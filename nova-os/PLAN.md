@@ -134,7 +134,7 @@ dem Backlog.
 | R72 | Geführte Tour (Lichtkegel, 6 Schritte, beim ersten Start, Willkommensseite, Palette) | ✅ |
 | R73 | Weltuhr-Globus im hellen Design hell | ✅ |
 | R74 | Mitteilungscenter mit „Heute“ (Termine + fällige Aufgaben, Klick öffnet) | ✅ |
-| R75 | Tastenkürzel: Fenster auf Arbeitsfläche mitnehmen (Alt+Umschalt+Zahl), vorige/nächste Arbeitsfläche (Strg+Alt+←/→) | ✅ |
+| R75 | Tastenkürzel: Fenster auf Arbeitsfläche mitnehmen (Alt+Umschalt+Zahl), vorige/nächste Arbeitsfläche (Alt+Bild↑/↓) | ✅ |
 | R76+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
