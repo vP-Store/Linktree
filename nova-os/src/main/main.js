@@ -103,6 +103,17 @@ function createWindow() {
     return { action: 'deny' };
   });
 
+  // Die Oberfläche hat Zugriff auf window.nova (Terminal, Dateien) → sie darf
+  // niemals zu einer anderen Seite wechseln. Webseiten laufen nur in Webviews.
+  win.webContents.on('will-navigate', (e) => e.preventDefault());
+  win.webContents.on('will-attach-webview', (_e, prefs, params) => {
+    delete prefs.preload;
+    prefs.nodeIntegration = false;
+    prefs.contextIsolation = true;
+    prefs.sandbox = true;
+    params.partition = 'persist:browser';
+  });
+
   if (isDev) win.webContents.openDevTools({ mode: 'detach' });
 
   // Automatischer Rauchtest (CI): Konsole mitschreiben, Screenshot speichern, beenden.

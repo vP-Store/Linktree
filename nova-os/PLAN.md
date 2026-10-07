@@ -100,7 +100,8 @@ dem Backlog.
 | R38 | Kalender-Import/Export (.ics) | ✅ |
 | R39 | **Nova KI handelt**: Werkzeuge für Aufgaben, Termine, Notizen, Dateisuche | ✅ |
 | R40 | Nova KI aus Editor und Notizen (erklären, verbessern, zusammenfassen) | ✅ |
-| R41+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R41 | Sicherheits-Review: Markdown-Attribut-Ausbruch, KI-Bilder als Link, Navigationssperre | ✅ |
+| R42+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

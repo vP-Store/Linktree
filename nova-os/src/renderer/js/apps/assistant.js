@@ -175,7 +175,7 @@ export default {
     function act(ic, title, fn) { return h('button.icon-btn.sm', { title, html: icon(ic), onclick: fn }); }
 
     function setMd(el, text) {
-      el.innerHTML = renderMarkdown(text || '');
+      el.innerHTML = renderMarkdown(text || '', { remoteImages: false });
       // Kopier-Knopf an Codeblöcken
       el.querySelectorAll('pre.md-code').forEach((pre) => {
         const b = h('button.ai-codecopy', { html: `${icon('copy')} Kopieren`, onclick: () => { api.clip.write(pre.textContent.replace(/Kopieren$/, '')); toast('Code kopiert', '', { icon: 'copy', duration: 1200 }); } });
