@@ -54,6 +54,12 @@ function onKey(e) {
     toggleStart();
     return;
   }
+  // Hilfe: Tastenkürzel-Übersicht
+  if (k === 'F1') {
+    e.preventDefault();
+    showShortcuts();
+    return;
+  }
   // Fensterwechsler
   if (e.ctrlKey && k === 'Tab') {
     e.preventDefault();
@@ -133,4 +139,32 @@ function cancelSwitcher() {
   if (!sw) return;
   sw.el.remove();
   sw = null;
+}
+
+let helpOpen = false;
+async function showShortcuts() {
+  if (helpOpen) return;
+  helpOpen = true;
+  const [{ SHORTCUTS }, { alertDialog }] = await Promise.all([import('../apps/settings.js'), import('../core/ui.js')]);
+  const p = alertDialog({ title: 'Tastenkürzel', message: '' });
+  const box = document.querySelector('#modal-root .modal:last-child');
+  if (box) {
+    box.classList.add('help-modal');
+    const list = document.createElement('div');
+    list.className = 'help-list';
+    for (const [label, keys] of SHORTCUTS) {
+      const row = document.createElement('div');
+      row.className = 'help-row';
+      const l = document.createElement('span');
+      l.textContent = label;
+      const r = document.createElement('span');
+      r.className = 'set-keys';
+      r.innerHTML = keys.split(' ').map((x) => (/^[+/…]$|^\(/.test(x) ? `<span class="faint">${x}</span>` : `<span class="kbd">${x}</span>`)).join(' ');
+      row.append(l, r);
+      list.append(row);
+    }
+    box.querySelector('h3').after(list);
+  }
+  await p;
+  helpOpen = false;
 }

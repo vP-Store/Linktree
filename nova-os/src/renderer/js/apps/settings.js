@@ -19,7 +19,7 @@ const PAGES = [
   ['about', 'info', 'Über NovaOS'],
 ];
 
-const SHORTCUTS = [
+export const SHORTCUTS = [
   ['NovaOS ein-/ausblenden', 'Alt + Leertaste (änderbar)'],
   ['Befehlspalette / Suche', 'Strg + K'],
   ['Suchen von überall (global)', 'Alt + Umschalt + Leertaste'],

@@ -37,6 +37,9 @@ export default {
       clear(body);
       if (!city) {
         body.append(h('div.empty', { style: { flex: 1 }, html: `${icon('cloudSun')}<b>Wo bist du?</b><span>Suche oben nach deiner Stadt, um das Wetter zu sehen.</span>` }));
+        // Vorschlag aus der Zeitzone (z. B. Europe/Berlin → Berlin), ganz ohne Standortabfrage
+        const tzCity = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').split('/').pop().replace(/_/g, ' ');
+        if (tzCity && !search.value) { search.value = tzCity; doSearch(); }
         setTimeout(() => search.focus(), 30);
         return;
       }

@@ -573,3 +573,7 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .fm-pv-pdf { width: 100%; height: 300px; margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
 :root[data-theme="light"] .cal-hol { color: #047857; }
 .set-hotkey-note { display: flex; gap: 10px; align-items: flex-start; text-align: left; max-width: 560px; margin: -8px auto 18px; padding: 10px 14px; border-radius: 12px; background: rgba(251, 191, 36, .12); border: 1px solid rgba(251, 191, 36, .35); font-size: 13px; color: var(--text); }
+.help-modal { width: min(560px, calc(100vw - 32px)); }
+.help-list { display: flex; flex-direction: column; max-height: 60vh; overflow: auto; margin: 6px 0 0; }
+.help-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 2px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.help-row:last-child { border-bottom: 0; }

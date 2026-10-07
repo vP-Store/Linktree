@@ -245,3 +245,11 @@ test('Haftnotiz behält Text beim Neuzeichnen; Termin-Notizen erscheinen beim Be
   await page.locator('.cal-ag-ev', { hasText: 'Meeting' }).click();
   await expect(page.locator('.modal textarea')).toHaveValue('Raum 3');
 });
+
+test('F1 zeigt die Tastenkürzel', async ({ page }) => {
+  await page.keyboard.press('F1');
+  await expect(page.locator('.help-modal .help-row').first()).toBeVisible();
+  await expect(page.locator('.help-modal')).toContainText('Befehlspalette');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.help-modal')).toHaveCount(0);
+});
