@@ -25,7 +25,19 @@ function reset(el) {
 
 export function initTilt() {
   const root = document.documentElement;
+  // Raumtiefe: Desktop-Ebenen verschieben sich je nach Mausposition unterschiedlich stark
+  const desk = document.getElementById('desktop');
+  let depthX = 0, depthY = 0, queued = false;
+  const applyDepth = () => {
+    queued = false;
+    if (!desk) return;
+    const on = root.dataset.fx3d !== 'false' && root.dataset.perf !== 'true';
+    desk.style.setProperty('--px', on ? depthX.toFixed(3) : '0');
+    desk.style.setProperty('--py', on ? depthY.toFixed(3) : '0');
+  };
   document.addEventListener('pointermove', (e) => {
+    depthX = (e.clientX / innerWidth) * 2 - 1; depthY = (e.clientY / innerHeight) * 2 - 1;
+    if (!queued) { queued = true; requestAnimationFrame(applyDepth); }
     if (root.dataset.fx3d === 'false' || root.dataset.perf === 'true' || e.buttons) {
       if (current) { reset(current); current = null; }
       return;
