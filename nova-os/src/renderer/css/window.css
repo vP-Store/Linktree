@@ -80,3 +80,13 @@
 .side-item.on .icon { color: var(--accent); }
 .side-item .count { margin-left: auto; font-size: 11px; color: var(--text-3); }
 .side-item .meter { margin-left: auto; width: 40px; }
+
+/* Lichtkante, die dem Mauszeiger folgt */
+.win::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 50;
+  background: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), rgba(var(--accent-rgb), .85), rgba(var(--accent-rgb), .15) 45%, transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .35s;
+}
+.win.lit::after { opacity: 1; }
+.win.max::after, :root[data-perf="true"] .win::after { display: none; }

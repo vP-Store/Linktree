@@ -432,7 +432,9 @@ body.focus-mode #stickies { opacity: 0; pointer-events: none; }
 .tilt3d.tilting::after { opacity: 1; }
 .widget.tilting { box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px 0 var(--highlight); }
 .app-tile.tilt3d { position: relative; }
-.app-tile.tilting .app-icon { transform: translateZ(28px) scale(1.06); }
+.app-tile.tilting .app-icon, .desk-icon.tilting .app-icon, .desk-icon.tilting .file-glyph { transform: translateZ(28px) scale(1.06); }
+.desk-icon.tilt3d { position: relative; }
+.desk-icon .app-icon, .desk-icon .file-glyph { transition: transform .4s cubic-bezier(.2, 1.3, .4, 1); }
 .app-tile .app-icon { transition: transform .4s cubic-bezier(.2, 1.3, .4, 1); }
 
 /* Spiegelung der Dock-Symbole auf der Glasfläche + Schatten auf dem „Boden“ */

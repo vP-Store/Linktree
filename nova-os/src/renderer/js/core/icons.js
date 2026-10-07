@@ -182,11 +182,12 @@ export function appIconSvg(glyph, c1, c2) {
   return `<svg viewBox="0 0 64 64" aria-hidden="true">
     <defs>
       <linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
-      <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient>
     </defs>
     <path d="M32 2c17 0 23.5 0 26.8 3.2S62 15 62 32s0 23.5-3.2 26.8S49 62 32 62s-23.5 0-26.8-3.2S2 49 2 32 2 8.5 5.2 5.2 15 2 32 2Z" fill="url(#${id})"/>
     <path d="M32 2c17 0 23.5 0 26.8 3.2S62 15 62 32s0 23.5-3.2 26.8S49 62 32 62s-23.5 0-26.8-3.2S2 49 2 32 2 8.5 5.2 5.2 15 2 32 2Z" fill="url(#${id}h)"/>
     <path d="M32 2.5c17 0 23.3 0 26.5 3.1S61.5 15 61.5 32" fill="none" stroke="#fff" stroke-opacity=".25"/>
+    <g transform="translate(16 17.6) scale(1.333)" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${body}</g>
     <g transform="translate(16 16) scale(1.333)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${body}</g>
   </svg>`;
 }
