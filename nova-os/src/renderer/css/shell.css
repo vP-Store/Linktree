@@ -524,3 +524,21 @@ body.saver-on #os > :not(#wallpaper):not(#saver) { opacity: 0; transition: opaci
 /* Mitteilungscenter offen → neue Meldungen erscheinen nur dort, nicht als Toast darüber */
 #toasts { transition: opacity .2s; }
 #os:has(> .popover.nc) #toasts { opacity: 0; pointer-events: none; }
+
+/* Downloads-Stapel */
+.stack-fan { position: absolute; z-index: 1500; width: 0; height: 0; perspective: 900px; }
+.stack-item {
+  position: absolute; right: -32px; bottom: 0; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: var(--text);
+  transform-origin: 100% 100%; transform: translate(var(--x), var(--y)) rotate(var(--rot));
+  animation: stackIn .38s cubic-bezier(.2, 1.2, .35, 1) both;
+}
+.stack-item .app-icon, .stack-item .stack-thumb { width: 52px; height: 52px; flex: none; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,.4); transition: transform .15s; }
+.stack-item .stack-thumb { object-fit: cover; border: 2px solid rgba(255,255,255,.85); }
+.stack-label { max-width: 220px; padding: 5px 11px; border-radius: 999px; background: var(--glass-strong); border: 1px solid var(--border); font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: var(--shadow-sm); transition: background .15s, color .15s; }
+.stack-item:hover .stack-label { background: var(--accent); color: #fff; border-color: transparent; }
+.stack-item:hover .app-icon, .stack-item:hover .stack-thumb { transform: scale(1.1); }
+.stack-empty { position: absolute; right: -80px; bottom: 70px; padding: 8px 14px; border-radius: 12px; font-size: 12.5px; white-space: nowrap; }
+@keyframes stackIn { from { opacity: 0; transform: translate(0, 0) rotate(0) scale(.4) rotateX(40deg); } to { opacity: 1; transform: translate(var(--x), var(--y)) rotate(var(--rot)); } }
+.stack-fan.out .stack-item { animation: stackOut .2s ease forwards; }
+@keyframes stackOut { to { opacity: 0; transform: translate(0, 0) scale(.4); } }
+#dock.stack-open .dock-tip { opacity: 0 !important; }

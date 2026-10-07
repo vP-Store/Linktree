@@ -83,7 +83,7 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 
 ## Weitere Funktionen
 
-- **Dock:** NovaOS-Apps und angeheftete Windows-Programme (Rechtsklick auf ein Programm → „Ans Dock heften“), Badge für fällige Aufgaben, Kalender-Symbol mit Tagesdatum, Knopf für laufende Windows-Fenster
+- **Dock:** Downloads-Stapel (neueste Dateien fächern sich als Bogen auf), NovaOS-Apps und angeheftete Windows-Programme (Rechtsklick auf ein Programm → „Ans Dock heften“), Badge für fällige Aufgaben, Kalender-Symbol mit Tagesdatum, Knopf für laufende Windows-Fenster
 - **Desktop:** echte Dateien deines Windows-Desktops (Drag & Drop), Widgets (einzeln wählbar), **Haftnotizen** (Rechtsklick → „Neue Haftnotiz“)
 - **Statusleiste:** CPU/RAM/Netz, Fokus-Timer, **Mini-Player** während Musik läuft, Download-Fortschritt, Mitteilungen, Schnelleinstellungen
 - **Snap-Layouts:** Maus auf dem Maximieren-Knopf halten → Hälften, Drittel, Viertel, Mitte

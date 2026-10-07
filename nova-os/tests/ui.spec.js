@@ -426,3 +426,13 @@ test('Fenster-Anordnung speichern und per Palette wiederherstellen', async ({ pa
   await expect(page.locator('.win:not(.closing)')).toHaveCount(2);
   await expect(page.locator('.win[data-app="calc"]')).toHaveCount(1);
 });
+
+test('Downloads-Stapel im Dock fächert auf und öffnet Dateien', async ({ page }) => {
+  await page.evaluate(async () => { const { api } = await import('/js/core/api.js'); const pl = await api.fs.places(); await api.fs.writeText(pl.downloads + '/liste.txt', 'Hallo Stapel'); });
+  await page.locator('#dock .dock-stack').click();
+  await expect(page.locator('.stack-fan .stack-item').first()).toBeVisible();
+  await expect(page.locator('.stack-fan .stack-item', { hasText: 'Im Ordner öffnen' })).toHaveCount(1);
+  await page.locator('.stack-fan .stack-item', { hasText: 'liste.txt' }).click();
+  await expect(page.locator('.stack-fan')).toHaveCount(0);
+  await expect(page.locator('.win[data-app="editor"]')).toHaveCount(1);
+});

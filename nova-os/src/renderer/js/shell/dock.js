@@ -1,7 +1,9 @@
 // Dock: angeheftete und laufende Apps.
 
 import { h, clear, bus } from '../core/dom.js';
-import { icon } from '../core/icons.js';
+import { icon, appIconSvg, fileGlyph, fileKind } from '../core/icons.js';
+import { api, fileUrl } from '../core/api.js';
+import { openPath } from '../core/open.js';
 import { store } from '../core/store.js';
 import { listApps, getApp, appIconSpan } from '../core/registry.js';
 import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus, setLaunchOrigin } from '../core/wm.js';
@@ -121,6 +123,10 @@ function render() {
     title: 'Laufende Windows-Programme',
     html: `<span class="app-icon">${winIcon()}</span><span class="dock-tip">Windows-Programme</span>`,
     onclick: (e) => toggleWinList(e.currentTarget),
+  }), h('button.dock-item.dock-stack', {
+    title: 'Downloads',
+    html: `<span class="app-icon">${appIconSvg('download', '#22d3ee', '#2563eb')}</span><span class="dock-tip">Downloads</span>`,
+    onclick: (e) => toggleStack(e.currentTarget),
   }));
   if (extra.length) {
     dock.append(h('div.dock-sep'));
@@ -158,6 +164,44 @@ async function toggleWinList(btn) {
 }
 addEventListener('pointerdown', (e) => { if (winPop && !winPop.contains(e.target) && !e.target.closest('.dock-item')) closeWinList(); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWinList(); });
+
+// ---------- Downloads-Stapel: neueste Dateien fächern sich als 3D-Bogen auf ----------
+let stack = null;
+function closeStack() { if (stack) { const s = stack; stack = null; dock.classList.remove('stack-open'); s.classList.add('out'); setTimeout(() => s.remove(), 220); } }
+async function toggleStack(btn) {
+  if (stack) return closeStack();
+  const places = await api.fs.places();
+  const dir = places.downloads || places.home;
+  let files = [];
+  try { files = (await api.fs.list(dir)).filter((f) => !f.dir).sort((a, b) => b.mtime - a.mtime).slice(0, 8); } catch (_) { /* Ordner fehlt */ }
+  const r = btn.getBoundingClientRect();
+  const el = h('div.stack-fan', { style: { left: r.left + r.width / 2 + 'px', bottom: innerHeight - r.top + 8 + 'px' } });
+  const items = [
+    ...files.map((f) => ({ label: f.name, f })),
+    { label: 'Im Ordner öffnen', folder: true },
+  ];
+  items.forEach((it, i) => {
+    let ico;
+    if (it.folder) ico = `<span class="app-icon">${appIconSvg('folder', '#60a5fa', '#2563eb')}</span>`;
+    else if (fileKind(it.f.ext) === 'image' && fileUrl(it.f.path)) ico = `<img class="stack-thumb" alt="" src="${esc(fileUrl(it.f.path))}">`;
+    else ico = fileGlyph(it.f.ext);
+    // Bogen: je höher, desto weiter nach rechts und stärker gedreht
+    const y = -(i * 60) - 14, x = i * i * 2.2, rot = i * 2.4;
+    const b = h('button.stack-item', {
+      style: { '--x': x + 'px', '--y': y + 'px', '--rot': rot + 'deg', animationDelay: i * 28 + 'ms', zIndex: String(50 - i) },
+      title: it.folder ? dir : it.f.path,
+      html: `<span class="stack-label">${esc(it.label)}</span>${ico}`,
+      onclick: () => { closeStack(); it.folder ? openApp('files', { path: dir }) : openPath(it.f.path); },
+    });
+    el.append(b);
+  });
+  if (!files.length) el.prepend(h('div.stack-empty.glass', 'Noch keine Downloads'));
+  document.getElementById('os').append(el);
+  dock.classList.add('stack-open');
+  stack = el;
+}
+addEventListener('pointerdown', (e) => { if (stack && !stack.contains(e.target) && !e.target.closest('.dock-stack')) closeStack(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') closeStack(); });
 
 function launcherIcon() {
   return `<svg viewBox="0 0 64 64"><defs><linearGradient id="dl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent-2)"/></linearGradient></defs>
