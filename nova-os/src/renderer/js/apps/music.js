@@ -30,6 +30,9 @@ export default {
     audio.volume = store.get('musicVolume', 0.8);
 
     const art = h('div.mu-art');
+    // 3D-Plattenspieler: Hülle (art) + Schallplatte, die beim Abspielen herausgleitet und rotiert
+    const vinyl = h('div.mu-vinyl', h('i.mu-label'));
+    const deck = h('div.mu-deck', vinyl, art);
     const tTitle = h('div.mu-title', 'Nichts ausgewählt');
     const tArtist = h('div.mu-artist.faint', 'Wähle einen Titel aus der Liste');
     const seek = h('input.range', { type: 'range', min: 0, max: 1000, value: 0 });
@@ -44,7 +47,7 @@ export default {
 
     root.append(h('div.app-split',
       h('div.mu-now',
-        art,
+        deck,
         h('div.mu-meta', tTitle, tArtist),
         h('div.mu-seek', seek, h('div.mu-times', tCur, tDur)),
         h('div.mu-ctrls', shufBtn, h('button.icon-btn.mu-skip', { html: icon('skipBack'), title: 'Zurück', onclick: () => prev() }), playBtn, h('button.icon-btn.mu-skip', { html: icon('skipFwd'), title: 'Weiter', onclick: () => next(true) }), repBtn),
@@ -88,6 +91,7 @@ export default {
     function setArt(t) {
       const h1 = hue(t ? t.album + t.title : 'nova');
       art.style.background = `radial-gradient(circle at 30% 25%, hsl(${h1} 85% 70%), transparent 55%), linear-gradient(135deg, hsl(${h1} 70% 45%), hsl(${(h1 + 70) % 360} 75% 30%))`;
+      vinyl.style.setProperty('--label', art.style.background);
       art.innerHTML = icon('music');
     }
 
@@ -143,8 +147,8 @@ export default {
 
     // Den geladenen Titel ansagen – nicht tracks[idx], das nach einem Ordnerwechsel veraltet sein kann
     const announce = () => bus.emit('music:state', nowPlaying ? { title: nowPlaying.title, artist: nowPlaying.artist, playing: !audio.paused } : null);
-    audio.addEventListener('play', () => { playBtn.innerHTML = icon('pause'); renderList(); announce(); });
-    audio.addEventListener('pause', () => { playBtn.innerHTML = icon('play'); renderList(); announce(); });
+    audio.addEventListener('play', () => { deck.classList.add('playing'); playBtn.innerHTML = icon('pause'); renderList(); announce(); });
+    audio.addEventListener('pause', () => { deck.classList.remove('playing'); playBtn.innerHTML = icon('play'); renderList(); announce(); });
     const offCtl = bus.on('music:control', (cmd) => { if (cmd === 'toggle') toggle(); if (cmd === 'next') next(true); if (cmd === 'prev') prev(); });
     audio.addEventListener('ended', () => next());
     audio.addEventListener('timeupdate', () => {

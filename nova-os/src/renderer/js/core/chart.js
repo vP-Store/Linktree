@@ -44,16 +44,17 @@ export class LiveChart {
     const css = getComputedStyle(document.documentElement);
     const grid = css.getPropertyValue('--border').trim() || 'rgba(255,255,255,.08)';
     const muted = css.getPropertyValue('--text-3').trim() || '#888';
-    const padL = 44, padR = 6, padT = 8, padB = 6;
-    const pw = w - padL - padR, ph = hgt - padT - padB;
     let max = this.max;
     if (max == null) {
       max = Math.max(1, ...this.series.flatMap((s) => s.values));
       const mag = Math.pow(10, Math.floor(Math.log10(max)));
       max = Math.ceil(max / mag) * mag;
     }
-    // Raster + Achsenbeschriftung
+    // Raster + Achsenbeschriftung (linker Rand passt sich der längsten Beschriftung an)
     ctx.font = '10.5px ' + (css.getPropertyValue('--font').trim() || 'sans-serif');
+    const labelW = Math.max(...[0, 2, 4].map((i) => ctx.measureText(this.format((max * i) / 4)).width));
+    const padL = Math.max(36, Math.ceil(labelW) + 14), padR = 6, padT = 8, padB = 6;
+    const pw = w - padL - padR, ph = hgt - padT - padB;
     ctx.fillStyle = muted;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';

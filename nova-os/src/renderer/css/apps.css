@@ -345,7 +345,7 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 
 /* ---------- Musik ---------- */
 .mu-now { width: 300px; flex: none; padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 14px; border-right: 1px solid var(--border); background: var(--glass-soft); overflow: auto; }
-.mu-art { width: 100%; max-width: 240px; aspect-ratio: 1; border-radius: 22px; display: grid; place-items: center; color: rgba(255,255,255,.85); font-size: 64px; box-shadow: var(--shadow-lg); flex: none; }
+.mu-art { position: relative; z-index: 2; width: 100%; max-width: 240px; aspect-ratio: 1; border-radius: 22px; display: grid; place-items: center; color: rgba(255,255,255,.85); font-size: 64px; box-shadow: var(--shadow-lg); flex: none; }
 .mu-meta { text-align: center; width: 100%; }
 .mu-title { font: 650 17px var(--font-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mu-artist { font-size: 12.5px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -587,3 +587,35 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .ai-tool.err .icon { color: var(--danger); }
 .wp-thumb .wp-3d { position: absolute; right: 6px; bottom: 5px; font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 1px 6px; border-radius: 6px; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .wp-thumb.is-3d::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 62% 48%, rgba(255,236,210,.55) 0, rgba(var(--accent-rgb),.35) 12%, transparent 40%); }
+
+/* Musik: 3D-Plattenspieler */
+.mu-deck { position: relative; width: 100%; max-width: 220px; aspect-ratio: 1; flex: none; perspective: 900px; margin: 6px 0 4px; }
+.mu-deck .mu-art { position: absolute; inset: 0; max-width: none; transition: transform .7s cubic-bezier(.2, 1, .3, 1); transform-origin: 0 50%; }
+.mu-vinyl {
+  position: absolute; inset: 4%; border-radius: 50%; z-index: 1;
+  background:
+    radial-gradient(circle, transparent 0 15%, rgba(255,255,255,.05) 15.5% 16%, transparent 16.5%),
+    repeating-radial-gradient(circle, #111 0 2px, #1b1b1f 2px 3px),
+    #121214;
+  box-shadow: 0 14px 40px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.06);
+  transition: transform .7s cubic-bezier(.2, 1, .3, 1);
+}
+.mu-vinyl::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 30deg, transparent 0 10%, rgba(255,255,255,.12) 14%, transparent 20% 55%, rgba(255,255,255,.08) 60%, transparent 66%); }
+.mu-label { position: absolute; inset: 34%; border-radius: 50%; background: var(--label, linear-gradient(135deg, var(--accent), var(--accent-2))); box-shadow: 0 0 0 2px rgba(0,0,0,.4); }
+.mu-label::after { content: ''; position: absolute; left: 50%; top: 50%; width: 9%; height: 9%; margin: -4.5% 0 0 -4.5%; border-radius: 50%; background: #0b0b0d; }
+.mu-deck.playing .mu-vinyl { transform: translateX(19%); }
+.mu-deck.playing .mu-vinyl .mu-label { animation: vinylSpin 1.8s linear infinite; }
+.mu-deck.playing .mu-art { transform: translateX(-17%) rotateY(24deg) scale(.9); }
+@keyframes vinylSpin { to { transform: rotate(360deg); } }
+:root[data-reduce-motion="true"] .mu-deck .mu-vinyl .mu-label { animation: none; }
+
+/* Systemmonitor: Diagramme füllen die verfügbare Höhe */
+.mon-perf { min-height: 100%; box-sizing: border-box; grid-template-rows: minmax(260px, 1fr); grid-auto-rows: auto; }
+.mon-perf .mon-card:not(.mon-wide) { min-height: 250px; }
+.mon-perf .mon-wide { grid-column: 1 / -1; }
+.mon-perf .mon-wide .mon-disks { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px 24px; }
+.mon-perf .mon-card { display: flex; flex-direction: column; min-height: 0; }
+.mon-perf .mon-wide { min-height: auto; }
+.mon-perf .chart { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.mon-perf .chart-plot { flex: 1; position: relative; min-height: 110px; }
+.mon-perf .chart-canvas { position: absolute; inset: 0; height: 100% !important; }

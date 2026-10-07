@@ -110,7 +110,8 @@ dem Backlog.
 | R48 | Symbole mit Tiefe, Lichtkante an Fenstern, Desktop-Symbole in 3D, dritter 3D-Hintergrund „Wellen“ | ✅ |
 | R49 | Widget „Weltuhr 3D“: Punkt-Globus mit echter Tag-/Nachtseite, Städte, Uhrzeiten | ✅ |
 | R50 | 3D-Mikroanimationen (Startmenü, Palette, Meldungen, Menüs, Dialoge, Kalender blättert); Kalender-Monatssprung am 31. behoben | ✅ |
-| R51+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R51 | Musik: 3D-Plattenspieler (Vinyl gleitet heraus, dreht sich); Systemmonitor füllt die Höhe, Achsen ohne Abschneiden | ✅ |
+| R52+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

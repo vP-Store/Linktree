@@ -44,7 +44,7 @@ export default {
         card('Prozessor', 'cpu', cpuVal, cpuSub, cpuChart, cores),
         card('Arbeitsspeicher', 'memory', memVal, memSub, memChart),
         card('Netzwerk', 'wifi', netVal, netSub, netChart),
-        h('div.mon-card.card', h('div.mon-card-head', h('span', { html: `${icon('hardDrive')} Laufwerke` })), disks));
+        h('div.mon-card.card.mon-wide', h('div.mon-card-head', h('span', { html: `${icon('hardDrive')} Laufwerke` })), disks));
     }
 
     async function loadDisks() {
