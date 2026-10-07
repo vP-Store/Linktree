@@ -215,3 +215,17 @@ test('Windows-Programm ans Dock heften und wieder lösen', async ({ page }) => {
   await page.locator('.ctx-item', { hasText: 'Vom Dock lösen' }).click();
   await expect(page.locator('.dock-item.win-app')).toHaveCount(0);
 });
+
+test('Einstellungen: Sicherung erstellen', async ({ page }) => {
+  await page.evaluate(async () => { const t = await import('/js/core/tasks.js'); t.addTask('Sicherungs-Test'); });
+  await open(page, 'settings', { page: 'system' });
+  await page.locator('.btn', { hasText: 'Sichern' }).click();
+  await expect(page.locator('.toast')).toContainText('Sicherung erstellt');
+  const content = await page.evaluate(async () => {
+    const { api } = await import('/js/core/api.js');
+    const files = await api.fs.list('/home/nova/Dokumente/NovaOS');
+    const f = files.find((x) => x.name.startsWith('Sicherung'));
+    return f ? api.fs.readText(f.path) : '';
+  });
+  expect(content).toContain('Sicherungs-Test');
+});

@@ -208,6 +208,8 @@ export default {
             row('Startanimation', '', toggle('bootAnimation'))),
           section('Verhalten', row('Nach Programmstart ausblenden', 'Wenn du ein Windows-Programm startest, tritt NovaOS zur Seite', (() => { const i = h('input', { type: 'checkbox', checked: store.get('hideOnLaunch', true) }); i.onchange = () => store.set('hideOnLaunch', i.checked); return h('span.switch', i, h('span')); })()),
             row('Standard-Shell im Terminal', '', select('terminalShell', shells))),
+          section('Sicherung', row('Daten sichern', 'Einstellungen, Aufgaben, Termine, KI-Chats, Lesezeichen … als Datei in Dokumente\\NovaOS', h('button.btn', { html: `${icon('download')} Sichern`, onclick: backup })),
+            row('Wiederherstellen', 'Eine zuvor erstellte Sicherungsdatei einlesen', h('button.btn', { html: `${icon('upload')} Wiederherstellen`, onclick: restore }))),
           section('Daten', row('Einstellungen zurücksetzen', 'Design, Dock und Desktop auf Standard (Notizen & Dateien bleiben)', h('button.btn.danger', { onclick: async () => {
             if (!(await confirmDialog({ title: 'Einstellungen zurücksetzen?', message: 'Alle NovaOS-Einstellungen gehen auf den Standard zurück. Deine Dateien und Notizen bleiben erhalten.', ok: 'Zurücksetzen', danger: true }))) return;
             for (const k of Object.keys(DEFAULTS)) store.set(k, DEFAULTS[k]);
@@ -230,6 +232,33 @@ export default {
           section('Technik', row('Plattform', '', h('span', `${info.platform === 'win32' ? 'Windows' : info.platform || '–'} ${info.release || ''}`)),
             row('Electron', '', h('span', ov.electron || '–')), row('Chromium', '', h('span', ov.chrome || '–')), row('Node.js', '', h('span', ov.node || '–'))));
       }
+    }
+
+    async function backup() {
+      try {
+        const places = await api.fs.places();
+        const data = await api.store.all();
+        delete data.session;
+        const stamp = new Date().toISOString().slice(0, 10);
+        const file = (places.novaData || places.documents) + (places.sep || '/') + `Sicherung ${stamp}.json`;
+        await api.fs.writeText(file, JSON.stringify({ app: 'NovaOS', version: 1, created: new Date().toISOString(), data }, null, 2));
+        const { notify } = await import('../core/ui.js');
+        notify('Sicherung erstellt', file, { icon: 'download', kind: 'ok', onClick: () => api.fs.reveal(file) });
+      } catch (e) { showError(e, 'Sicherung fehlgeschlagen'); }
+    }
+
+    async function restore() {
+      const places = await api.fs.places();
+      const p = await promptDialog({ title: 'Sicherung wiederherstellen', message: 'Pfad der Sicherungsdatei (.json):', value: (places.novaData || places.documents) + (places.sep || '/'), ok: 'Weiter', select: false });
+      if (!p) return;
+      try {
+        const json = JSON.parse(await api.fs.readText(p));
+        if (!json || json.app !== 'NovaOS' || typeof json.data !== 'object') throw new Error('Das ist keine NovaOS-Sicherung.');
+        const keys = Object.keys(json.data);
+        if (!(await confirmDialog({ title: 'Sicherung einspielen?', message: `${keys.length} Einträge vom ${new Date(json.created).toLocaleString('de-DE')} überschreiben die aktuellen Daten. NovaOS lädt danach neu.`, ok: 'Wiederherstellen', danger: true }))) return;
+        for (const k of keys) store.set(k, json.data[k]);
+        setTimeout(() => api.overlay.reload(), 600);
+      } catch (e) { showError(e, 'Wiederherstellen fehlgeschlagen'); }
     }
 
     renderSide();
