@@ -180,3 +180,18 @@ export function prettyAccel(acc) {
   const map = { Control: 'Strg', CommandOrControl: 'Strg', Shift: 'Umschalt', Space: 'Leertaste', Super: 'Win', Up: '↑', Down: '↓', Left: '←', Right: '→', Esc: 'Esc' };
   return acc.split('+').map((k) => map[k] || k).join(' + ');
 }
+
+// Weiche Trennstellen für lange deutsche Wörter in schmalen Kacheln (Chromium hat offline
+// kein Trennwörterbuch). Nur für die Anzeige – Suchtexte bleiben unverändert.
+const SPLITS = ['zwischen', 'einstellungen', 'programme', 'aufgaben', 'kalender', 'notizen', 'dokumente', 'download', 'persönlicher', 'system', 'überwachung', 'steuerung', 'verwaltung', 'ablage'];
+export function softHyphens(text) {
+  return String(text).replace(/[A-Za-zÄÖÜäöüß]{12,}/g, (w) => {
+    const low = w.toLowerCase();
+    for (const s of SPLITS) {
+      const i = low.indexOf(s);
+      if (i > 2 && w.length - i > 3) return w.slice(0, i) + '\u00AD' + w.slice(i); // vor dem Teilwort
+      if (i === 0 && s.length < w.length - 3) return w.slice(0, s.length) + '\u00AD' + w.slice(s.length); // danach
+    }
+    return w.slice(0, Math.ceil(w.length / 2)) + '\u00AD' + w.slice(Math.ceil(w.length / 2));
+  });
+}

@@ -1,6 +1,6 @@
 // Programme: alle installierten Windows-Programme durchsuchen, starten, anheften.
 
-import { h, clear, esc } from '../core/dom.js';
+import { h, clear, esc, softHyphens } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { getWinApps, loadAppIcon, launchWinApp, getOpenWindows, focusWindow, loadExeIcon, dockPinMenuItem } from '../core/winapps.js';
@@ -71,7 +71,7 @@ export default {
       }
       for (const a of list) {
         const ico = h('span.lp-ico');
-        const tile = h('button.app-tile.lp-tile', { title: a.path, onclick: () => launchWinApp(a) }, ico, h('span', a.name));
+        const tile = h('button.app-tile.lp-tile', { title: a.path, onclick: () => launchWinApp(a) }, ico, h('span', softHyphens(a.name)));
         if (favs().includes(a.path)) tile.append(h('span.lp-star', { html: icon('star') }));
         loadAppIcon(a, ico);
         tile.addEventListener('contextmenu', (e) => {

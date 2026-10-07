@@ -88,3 +88,11 @@ test('Markdown: Auto-Links schreiben nicht in Attribute, KI-Bilder nur als Link'
   assert.ok(!c.includes('<img') && c.includes('data-ext="1"'), c);
   assert.equal(renderMarkdown('[`code`](https://a.de)'), '<p><a href="https://a.de" data-ext="1"><code>code</code></a></p>');
 });
+
+test('Weiche Trennstellen nur in langen Wörtern', async () => {
+  const { softHyphens } = await import('../src/renderer/js/core/dom.js');
+  assert.equal(softHyphens('Zwischenablage'), 'Zwischen­ablage');
+  assert.equal(softHyphens('Einstellungen'), 'Einstel\u00ADlungen');
+  assert.equal(softHyphens('Rechner'), 'Rechner');
+  assert.equal(softHyphens('Systemsteuerung').replace(/­/g, ''), 'Systemsteuerung');
+});

@@ -124,7 +124,8 @@ dem Backlog.
 | R62 | Popover mit dichterem Glas; keine Toasts über dem offenen Mitteilungscenter | ✅ |
 | R63 | Systemklänge (Web Audio, synthetisch, abschaltbar, Lautstärke) | ✅ |
 | R64 | Browser-Starttab: farbige Schnellwahl-Kacheln mit 3D-Neigung | ✅ |
-| R65+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R65 | Korrekte Silbentrennung in App-Kacheln (weiche Trennstellen, Suche unverändert) | ✅ |
+| R66+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

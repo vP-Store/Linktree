@@ -1,6 +1,6 @@
 // Startmenü: Nova-Apps, installierte Programme, zuletzt verwendet – mit Suche.
 
-import { h, clear, esc } from '../core/dom.js';
+import { h, clear, esc, softHyphens } from '../core/dom.js';
 import { icon, fileGlyph } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { listApps, appIconSpan } from '../core/registry.js';
@@ -135,7 +135,7 @@ function register(el, run) {
 }
 
 function appTile(app) {
-  return register(h('button.app-tile', { html: `${appIconSpan(app)}<span>${esc(app.name)}</span>`, title: app.desc }), () => { closeStart(); openApp(app.id); });
+  return register(h('button.app-tile', { html: `${appIconSpan(app)}<span>${esc(softHyphens(app.name))}</span>`, title: app.desc }), () => { closeStart(); openApp(app.id); });
 }
 
 function winRow(a) {
