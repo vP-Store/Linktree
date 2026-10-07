@@ -15,6 +15,8 @@ export default {
     let idx = -1;
     let zoom = 1, rot = 0, panX = 0, panY = 0;
     let slideshow = null;
+    let view = store.get('photosView') || 'grid'; // 'grid' | 'flow' (3D-Karussell)
+    let flowIdx = 0, flowCards = [];
 
     const gallery = h('div.ph-gallery');
     const stage = h('div.ph-stage.hidden');
@@ -37,6 +39,7 @@ export default {
       if (idx < 0) {
         toolbar.append(
           h('span', { html: icon('folder') }), h('b.ellipsis', { style: { maxWidth: '50%' } }, folder), h('span.faint', `${images.length} Bilder`), h('div.grow'),
+          h('div.seg', ...[['grid', 'grid', 'Raster'], ['flow', 'layers', '3D-Karussell']].map(([v, ic, t]) => h('button.seg-btn', { class: view === v ? 'on' : '', title: t, html: `${icon(ic)} ${t}`, onclick: () => { view = v; store.set('photosView', v); renderGallery(); renderToolbar(); root.focus(); } }))),
           h('button.btn.sm', { html: `${icon('image')} Bilder`, onclick: () => load(places.pictures) }),
           h('button.btn.sm', { html: `${icon('monitor')} Desktop`, onclick: () => load(places.desktop) }),
           h('button.btn.sm', { html: `${icon('download')} Downloads`, onclick: () => load(places.downloads) }));
@@ -76,7 +79,9 @@ export default {
       gallery.classList.remove('hidden');
       clear(gallery);
       win.setTitle(`${pathx.base(folder)} – Bilder`);
+      gallery.classList.toggle('flow', view === 'flow' && images.length > 0);
       if (!images.length) { gallery.append(h('div.empty', { html: `${icon('image')}<b>Keine Bilder hier</b><span>Wähle oben einen anderen Ordner oder öffne ein Bild über Dateien.</span>` })); return; }
+      if (view === 'flow') { renderFlow(); return; }
       images.forEach((f, i) => {
         const im = h('img', { loading: 'lazy', alt: '' });
         src(f.path).then((u) => { im.src = u; });
@@ -92,6 +97,49 @@ export default {
         gallery.append(tile);
       });
     }
+
+    // ---- 3D-Karussell: Bild in der Mitte groß, die übrigen drehen nach hinten weg ----
+    function renderFlow() {
+      flowIdx = Math.min(flowIdx, images.length - 1);
+      const stageEl = h('div.ph-flow-stage');
+      const label = h('div.ph-flow-label');
+      flowCards = images.slice(0, 400).map((f, i) => {
+        const im = h('img', { alt: '', draggable: false });
+        const card = h('button.ph-flow-card', { title: f.name, onclick: () => (i === flowIdx ? show(i) : setFlow(i)) }, im);
+        card._img = im; card._loaded = false;
+        stageEl.append(card);
+        return card;
+      });
+      gallery.append(stageEl, label);
+      gallery._flowLabel = label;
+      setFlow(flowIdx);
+    }
+
+    function setFlow(i) {
+      if (!flowCards.length) return;
+      flowIdx = Math.max(0, Math.min(flowCards.length - 1, i));
+      flowCards.forEach((card, k) => {
+        const off = k - flowIdx, abs = Math.abs(off);
+        if (abs <= 8 && !card._loaded) { card._loaded = true; src(images[k].path).then((u) => { card._img.src = u; }); }
+        card.classList.toggle('on', off === 0);
+        card.style.visibility = abs > 9 ? 'hidden' : '';
+        card.style.zIndex = String(100 - abs);
+        card.style.transform = off === 0 ? 'translateZ(150px)'
+          : `translateX(${off * 105 + Math.sign(off) * 200}px) translateZ(${-abs * 40}px) rotateY(${off < 0 ? 60 : -60}deg)`;
+        card.style.opacity = abs > 8 ? '0' : '';
+      });
+      const f = images[flowIdx];
+      if (gallery._flowLabel) gallery._flowLabel.innerHTML = `<b>${esc(f.name)}</b><span class="faint">${flowIdx + 1} / ${images.length} · Klick öffnet · ← → blättern</span>`;
+    }
+
+    gallery.addEventListener('wheel', (e) => {
+      if (view !== 'flow' || idx >= 0) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now - (gallery._wheelT || 0) < 90) return;
+      gallery._wheelT = now;
+      setFlow(flowIdx + ((e.deltaY || e.deltaX) > 0 ? 1 : -1));
+    }, { passive: false });
 
     async function show(i) {
       if (!images.length) return;
@@ -128,7 +176,7 @@ export default {
 
     function apply() { img.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rot}deg)`; img.style.cursor = zoom > 1 ? 'grab' : 'default'; }
     function setZoom(z) { zoom = Math.max(0.1, Math.min(10, z)); if (zoom <= 1) { panX = panY = 0; } apply(); renderToolbar(); }
-    function back() { stopSlides(); idx = -1; renderGallery(); renderToolbar(); }
+    function back() { stopSlides(); if (idx >= 0) flowIdx = idx; idx = -1; renderGallery(); renderToolbar(); root.focus(); }
     function toggleSlides() { slideshow ? stopSlides() : (slideshow = setInterval(() => show(idx + 1), 3500)); renderToolbar(); }
     function stopSlides() { clearInterval(slideshow); slideshow = null; }
     async function remove() {
@@ -149,6 +197,16 @@ export default {
     img.addEventListener('dblclick', () => setZoom(zoom > 1 ? 1 : 2));
     root.tabIndex = 0;
     root.addEventListener('keydown', (e) => {
+      if (idx < 0 && view === 'flow' && images.length) {
+        if (e.key === 'ArrowRight') setFlow(flowIdx + 1);
+        else if (e.key === 'ArrowLeft') setFlow(flowIdx - 1);
+        else if (e.key === 'Enter' || e.key === ' ') show(flowIdx);
+        else if (e.key === 'Home') setFlow(0);
+        else if (e.key === 'End') setFlow(images.length - 1);
+        else return;
+        e.preventDefault();
+        return;
+      }
       if (idx < 0) return;
       const k = e.key;
       if (k === 'ArrowRight') show(idx + 1);

@@ -353,3 +353,22 @@ test('Bildschirmschoner: startet per Befehl, Taste beendet ihn ohne Nebenwirkung
   await expect(page.locator('#palette')).toHaveCount(0);
   await expect(page.locator('body')).not.toHaveClass(/saver-on/);
 });
+
+test('Bilder: 3D-Karussell blättert per Tastatur und öffnet das Bild', async ({ page }) => {
+  await page.evaluate(async () => {
+    const { api } = await import('/js/core/api.js');
+    const pl = await api.fs.places();
+    for (let i = 0; i < 3; i++) await api.fs.writeText(pl.pictures + '/K' + i + '.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="4" height="3"/>');
+  });
+  await open(page, 'photos');
+  const win = page.locator('.win').last();
+  await win.locator('.seg-btn', { hasText: '3D-Karussell' }).click();
+  await expect(win.locator('.ph-flow-card.on')).toHaveCount(1);
+  await expect(win.locator('.ph-flow-label')).toContainText('1 /');
+  await page.keyboard.press('ArrowRight');
+  await expect(win.locator('.ph-flow-label')).toContainText('2 /');
+  await page.keyboard.press('Enter');
+  await expect(win.locator('.ph-stage')).not.toHaveClass(/hidden/);
+  await page.keyboard.press('Escape');
+  await expect(win.locator('.ph-flow-label')).toContainText('2 /');
+});

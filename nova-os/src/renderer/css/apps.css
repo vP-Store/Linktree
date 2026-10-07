@@ -633,3 +633,18 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .calc-key { box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 3px 0 rgba(0,0,0,.28), 0 6px 14px rgba(0,0,0,.18); transition: background .12s, transform .08s, box-shadow .08s; }
 .calc-key:active { transform: translateY(3px) scale(.98); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 0 0 rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.15); }
 .calc-key.eq { box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 3px 0 rgba(0,0,0,.3), 0 8px 22px rgba(var(--accent-rgb), .4); }
+
+/* Bilder: 3D-Karussell */
+.ph-gallery.flow { display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 0; perspective: 1200px; }
+.ph-flow-stage { position: relative; width: min(46%, 420px); aspect-ratio: 4 / 3; transform-style: preserve-3d; margin-top: -30px; }
+.ph-flow-card {
+  position: absolute; inset: 0; border: 0; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface-2); cursor: pointer;
+  transition: transform .5s cubic-bezier(.2, 1, .3, 1), opacity .3s, box-shadow .3s;
+  box-shadow: 0 24px 60px rgba(0,0,0,.5); -webkit-box-reflect: below 10px linear-gradient(transparent 72%, rgba(255,255,255,.2));
+}
+.ph-flow-card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.ph-flow-card:not(.on)::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,.28); transition: background .3s; }
+.ph-flow-card:not(.on):hover::after { background: rgba(0,0,0,.1); }
+.ph-flow-card.on { box-shadow: 0 34px 90px rgba(0,0,0,.6), 0 0 0 2px rgba(var(--accent-rgb), .7); }
+.ph-flow-label { margin-top: 70px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 13px; text-align: center; max-width: 80%; }
+.ph-flow-label b { font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
