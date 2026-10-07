@@ -114,7 +114,8 @@ dem Backlog.
 | R52 | Rechner skaliert mit dem Fenster, Tasten mit 3D-Kante; Raumtiefe (Parallaxe-Ebenen) auf dem Desktop | ✅ |
 | R53 | Bildschirmschoner mit 3D-Hintergrund und großer Uhr (Einstellung, Befehl), README „3D & Effekte“ | ✅ |
 | R54 | Bilder: 3D-Karussell-Ansicht (Pfeiltasten, Mausrad, Klick öffnet, Rückkehr zum zuletzt gesehenen Bild) | ✅ |
-| R55+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R55 | Terminal-Designs: Nova, Retro-CRT (Phosphor + Scanlines), Bernstein, Papier | ✅ |
+| R56+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

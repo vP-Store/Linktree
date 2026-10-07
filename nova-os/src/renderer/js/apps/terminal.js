@@ -21,6 +21,7 @@ export default {
     const tabBar = h('div.term-tabs');
     const body = h('div.term-body');
     root.classList.add('term-root');
+    root.dataset.tt = store.get('termTheme') || 'nova';
     root.append(tabBar, body);
 
     win.tools.append(
@@ -32,7 +33,13 @@ export default {
       import('../core/ui.js').then(({ contextMenu }) => {
         const r = btn.getBoundingClientRect();
         const opts = api.platform === 'win32' ? ['powershell', 'cmd', 'bash'] : ['bash'];
-        contextMenu(r.left - 150, r.bottom + 4, opts.map((s) => ({ label: `Neuer Tab: ${SHELLS[s]}`, icon: 'terminal', action: () => newTab({ shell: s }) })));
+        const themes = [['nova', 'Nova'], ['crt', 'Retro-CRT (grün)'], ['amber', 'Bernstein'], ['light', 'Papier (hell)']];
+        const cur = root.dataset.tt;
+        contextMenu(r.left - 150, r.bottom + 4, [
+          ...opts.map((s) => ({ label: `Neuer Tab: ${SHELLS[s]}`, icon: 'terminal', action: () => newTab({ shell: s }) })),
+          '-', { header: true, label: 'Design' },
+          ...themes.map(([id, label]) => ({ label, icon: cur === id ? 'check' : 'circle', action: () => { root.dataset.tt = id; store.set('termTheme', id); } })),
+        ]);
       });
     }
 
