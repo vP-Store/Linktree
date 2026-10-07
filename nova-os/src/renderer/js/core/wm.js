@@ -34,12 +34,51 @@ function snapRect(zone) {
     case 'tr': return { x: a.x + g * 2 + hw, y: a.y + g, w: hw, h: hh };
     case 'bl': return { x: a.x + g, y: a.y + g * 2 + hh, w: hw, h: hh };
     case 'br': return { x: a.x + g * 2 + hw, y: a.y + g * 2 + hh, w: hw, h: hh };
+    // Drittel: l3 | c3 | r3, sowie zwei Drittel links/rechts
+    case 'l3': case 'c3': case 'r3': case 'l23': case 'r23': {
+      const tw = Math.round((a.w - g * 4) / 3), full = a.h - g * 2;
+      if (zone === 'l3') return { x: a.x + g, y: a.y + g, w: tw, h: full };
+      if (zone === 'c3') return { x: a.x + g * 2 + tw, y: a.y + g, w: tw, h: full };
+      if (zone === 'r3') return { x: a.x + g * 3 + tw * 2, y: a.y + g, w: tw, h: full };
+      if (zone === 'l23') return { x: a.x + g, y: a.y + g, w: tw * 2 + g, h: full };
+      return { x: a.x + g * 2 + tw, y: a.y + g, w: tw * 2 + g, h: full };
+    }
     case 'center': {
       const w = Math.min(a.w - 80, Math.round(a.w * 0.62)), hgt = Math.min(a.h - 60, Math.round(a.h * 0.75));
       return { x: Math.round(a.x + (a.w - w) / 2), y: Math.round(a.y + (a.h - hgt) / 2), w, h: hgt };
     }
     default: return null;
   }
+}
+
+// ---------- Snap-Layouts (Menü am Maximieren-Knopf) ----------
+const SNAP_GROUPS = [['left', 'right'], ['l23', 'r3'], ['l3', 'c3', 'r3'], ['tl', 'tr', 'bl', 'br'], ['center'], ['max']];
+let snapPop = null, snapHideT = 0;
+function hideSnapLayouts() { clearTimeout(snapHideT); if (snapPop) { snapPop.remove(); snapPop = null; } }
+function scheduleHideSnap() { clearTimeout(snapHideT); snapHideT = setTimeout(hideSnapLayouts, 260); }
+function showSnapLayouts(win) {
+  hideSnapLayouts();
+  const a = area();
+  const pop = h('div.snap-pop.glass', { onpointerenter: () => clearTimeout(snapHideT), onpointerleave: scheduleHideSnap });
+  for (const group of SNAP_GROUPS) {
+    const box = h('div.snap-group');
+    for (const z of group) {
+      const r = snapRect(z);
+      box.append(h('button.snap-cell', {
+        title: { left: 'Linke Hälfte', right: 'Rechte Hälfte', l23: 'Zwei Drittel links', r3: 'Drittel rechts', l3: 'Drittel links', c3: 'Drittel Mitte', tl: 'Oben links', tr: 'Oben rechts', bl: 'Unten links', br: 'Unten rechts', center: 'Mitte', max: 'Maximiert' }[z],
+        dataset: { zone: z },
+        style: { left: ((r.x - a.x) / a.w) * 100 + '%', top: ((r.y - a.y) / a.h) * 100 + '%', width: (r.w / a.w) * 100 + '%', height: (r.h / a.h) * 100 + '%' },
+        onclick: (e) => { e.stopPropagation(); hideSnapLayouts(); win.snapTo(z); focus(win.id); saveSession(); },
+      }));
+    }
+    pop.append(box);
+  }
+  const b = win.maxBtn.getBoundingClientRect();
+  document.getElementById('ctx-root').append(pop);
+  const pw = pop.offsetWidth;
+  pop.style.left = Math.max(8, Math.min(innerWidth - pw - 8, b.left + b.width / 2 - pw / 2)) + 'px';
+  pop.style.top = b.bottom + 6 + 'px';
+  snapPop = pop;
 }
 
 class Win {
@@ -62,7 +101,11 @@ class Win {
     const ctrl = (cls, ic, title, fn) => h('button.win-ctrl.' + cls, { title, html: icon(ic), onclick: (e) => { e.stopPropagation(); fn(); } });
     this.titleEl = h('div.win-title', this.title);
     this.tools = h('div.win-tools');
-    this.maxBtn = ctrl('max', 'maximize', 'Maximieren (Alt+↑)', () => this.toggleMax());
+    this.maxBtn = ctrl('max', 'maximize', 'Maximieren (Alt+↑) – Maus halten für Anordnungen', () => { hideSnapLayouts(); this.toggleMax(); });
+    // Snap-Layouts: kurz auf dem Knopf verweilen → Menü mit Anordnungen
+    let hoverT = 0;
+    this.maxBtn.addEventListener('pointerenter', () => { hoverT = setTimeout(() => showSnapLayouts(this), 420); });
+    this.maxBtn.addEventListener('pointerleave', () => { clearTimeout(hoverT); scheduleHideSnap(); });
     this.titlebar = h('div.win-titlebar',
       h('span.app-icon', { html: appIconHtml(this.app, true) }),
       this.titleEl,
@@ -144,7 +187,7 @@ class Win {
 
   snapTo(zone) {
     if (zone === 'max') return this.maximize();
-    if (!this.snap) this.restoreBounds = this.bounds();
+    if (!this.snap && !this.max) this.restoreBounds = this.bounds(); // aus maximiert: alte Größe behalten
     this.max = false;
     this.el.classList.remove('max');
     this.maxBtn.innerHTML = icon('maximize');

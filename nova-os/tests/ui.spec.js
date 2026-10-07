@@ -397,3 +397,19 @@ test('Systemklänge: aus = kein Audio, an = Töne werden erzeugt', async ({ page
   await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('uiSounds', true); const ui = await import('/js/core/ui.js'); ui.notify('Test', 'Klang'); });
   expect(await count()).toBeGreaterThan(0);
 });
+
+test('Snap-Layouts am Maximieren-Knopf ordnen das Fenster an', async ({ page }) => {
+  await open(page, 'notes');
+  const win = page.locator('.win').last();
+  await win.locator('.win-ctrl.max').hover();
+  await expect(page.locator('.snap-pop')).toBeVisible();
+  await expect(page.locator('.snap-pop .snap-cell')).toHaveCount(13);
+  await page.locator('.snap-pop .snap-cell[data-zone="l3"]').click();
+  await expect(page.locator('.snap-pop')).toHaveCount(0);
+  await page.waitForTimeout(350);
+  const box = await win.boundingBox();
+  const vw = page.viewportSize().width;
+  expect(box.x).toBeLessThan(20);
+  expect(box.width).toBeGreaterThan(vw / 3 - 40);
+  expect(box.width).toBeLessThan(vw / 3 + 10);
+});
