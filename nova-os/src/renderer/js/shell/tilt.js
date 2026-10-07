@@ -1,7 +1,7 @@
 // 3D-Neigung mit Lichtreflex für Karten (Widgets, Hintergrund-Vorschauen, App-Kacheln):
 // die Karte kippt sanft zum Mauszeiger, ein Glanzlicht folgt ihm.
 
-const SELECTOR = '.widget, .wp-thumb, .app-tile, .desk-icon';
+const SELECTOR = '.widget, .wp-thumb, .app-tile, .desk-icon, .br-tile';
 let current = null;
 let litWin = null;
 

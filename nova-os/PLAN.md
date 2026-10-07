@@ -123,7 +123,8 @@ dem Backlog.
 | R61 | Minimieren fliegt ins Dock-Symbol der App (und von dort zurück) | ✅ |
 | R62 | Popover mit dichterem Glas; keine Toasts über dem offenen Mitteilungscenter | ✅ |
 | R63 | Systemklänge (Web Audio, synthetisch, abschaltbar, Lautstärke) | ✅ |
-| R64+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R64 | Browser-Starttab: farbige Schnellwahl-Kacheln mit 3D-Neigung | ✅ |
+| R65+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

@@ -45,6 +45,15 @@ function favImg(src, fallback = '') {
   return img;
 }
 
+/** feste Farbe je Seite (für die Kachel hinter dem Symbol) */
+function hueOf(url) {
+  let host = url;
+  try { host = new URL(url).hostname.replace(/^www\./, ''); } catch (_) { /* Rohtext */ }
+  let n = 0;
+  for (const ch of host) n = (n * 31 + ch.charCodeAt(0)) % 360;
+  return String(n);
+}
+
 function favicon(url) {
   try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`; } catch (_) { return ''; }
 }
@@ -140,7 +149,7 @@ export default {
         h('div.br-start-inner',
           h('h1', greet),
           h('div.search-field', { html: icon('search') }, q),
-          h('div.br-tiles', ...bookmarks().slice(0, 12).map((b) => h('button.br-tile', { onclick: () => navigate(t, b.url) }, h('span.br-tile-ico', favImg(favicon(b.url), (b.title[0] || '?').toUpperCase())), h('span', b.title)))),
+          h('div.br-tiles', ...bookmarks().slice(0, 12).map((b) => h('button.br-tile', { onclick: () => navigate(t, b.url) }, h('span.br-tile-ico', { style: { '--hue': hueOf(b.url) } }, favImg(favicon(b.url), (b.title[0] || '?').toUpperCase())), h('span', b.title)))),
           !isElectron ? h('p.faint', { style: { marginTop: '20px', fontSize: '12px' } }, 'Vorschau-Modus: In der Desktop-App laufen Webseiten in echten Chromium-Webviews.') : null));
       t.pane.append(t.start);
       setTabMeta(t);
