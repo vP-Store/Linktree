@@ -116,15 +116,31 @@ function stepSwitcher(dir) {
   renderSwitcher();
 }
 
+// 3D-Karussell: die gewählte Karte steht vorne, die übrigen drehen nach hinten weg
 function renderSwitcher() {
-  clear(sw.el);
-  const panel = h('div.sw-panel.glass');
-  sw.list.forEach((w, i) => panel.append(h('div.sw-item', {
-    class: i === sw.idx ? 'on' : '',
-    html: `${appIconSpan(w.app)}<span>${esc(w.title)}</span>`,
-    onclick: () => { sw.idx = i; commitSwitcher(); },
-  })));
-  sw.el.append(panel);
+  if (!sw.panel) {
+    sw.panel = h('div.sw-stage');
+    sw.label = h('div.sw-label');
+    sw.items = sw.list.map((w, i) => {
+      const item = h('div.sw-card.glass', {
+        html: `<div class="sw-glow"></div>${appIconSpan(w.app)}<b>${esc(w.title)}</b>`,
+        onclick: () => { sw.idx = i; commitSwitcher(); },
+      });
+      sw.panel.append(item);
+      return item;
+    });
+    sw.el.append(sw.panel, sw.label);
+  }
+  sw.items.forEach((item, i) => {
+    const off = i - sw.idx;
+    const abs = Math.abs(off);
+    item.classList.toggle('on', off === 0);
+    item.style.transform = `translateX(${off * 150 + Math.sign(off) * 70}px) translateZ(${-abs * 110}px) rotateY(${off === 0 ? 0 : off < 0 ? 52 : -52}deg)`;
+    item.style.zIndex = String(100 - abs);
+    item.style.opacity = abs > 4 ? '0' : String(1 - abs * 0.12);
+  });
+  const w = sw.list[sw.idx];
+  sw.label.textContent = w ? `${w.title}  ·  ${sw.idx + 1} / ${sw.list.length}` : '';
 }
 
 function commitSwitcher() {

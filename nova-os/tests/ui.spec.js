@@ -301,3 +301,15 @@ test('3D-Hintergründe: Galaxie läuft, Horizont umschaltbar, Standbild bei redu
   await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('reduceMotion', true); store.set('wallpaper', 'galaxy3d'); });
   await expect(canvas).toHaveAttribute('data-frames', '1');
 });
+
+test('Strg+Tab: 3D-Karussell wählt und fokussiert ein Fenster', async ({ page }) => {
+  for (const a of ['files', 'notes', 'calc']) await open(page, a);
+  await page.keyboard.down('Control');
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#switcher .sw-card')).toHaveCount(3);
+  await expect(page.locator('#switcher .sw-card.on')).toHaveCount(1);
+  const chosen = (await page.locator('#switcher .sw-label').textContent()).split('  ·  ')[0];
+  await page.keyboard.up('Control');
+  await expect(page.locator('#switcher')).toHaveCount(0);
+  await expect(page.locator('.win:not(.inactive) .win-title')).toHaveText(chosen);
+});

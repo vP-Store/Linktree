@@ -104,7 +104,8 @@ dem Backlog.
 | R42 | Live-3D-Hintergründe (Galaxie, Horizont) mit Maus-Parallaxe, pausieren wenn verdeckt | ✅ |
 | R43 | 3D-Fenster: perspektivisches Öffnen/Schließen/Minimieren, Neigung beim Ziehen | ✅ |
 | R44 | 3D-Karten mit Glanzlicht (Widgets, App-Kacheln, Vorschauen), Dock-Spiegelung | ✅ |
-| R45+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R45 | Strg+Tab als 3D-Karussell mit Spiegelung, 3D-Startbildschirm (Orb mit Ringen, Flug hinein) | ✅ |
+| R46+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
