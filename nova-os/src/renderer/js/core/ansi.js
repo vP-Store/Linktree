@@ -17,14 +17,15 @@ function xterm256(n) {
 export function applyCarriageReturns(text) {
   return text.split('\n').map((line) => {
     if (!line.includes('\r')) return line;
-    const parts = line.split('\r').filter((p, i, a) => p || i === a.length - 1);
+    // Leere Abschnitte (z. B. abschließendes \r einer CRLF-Zeile) löschen nichts
+    const parts = line.split('\r').filter(Boolean);
     return parts.length ? parts[parts.length - 1] : '';
   }).join('\n');
 }
 
 export function ansiToHtml(text) {
   // Andere Steuersequenzen (Cursor, Löschen, Titel) entfernen
-  text = text.replace(/\x1b\][^\x07]*(\x07|\x1b\\)/g, '').replace(/\x1b\[[0-9;?]*[A-HJKSTfhlnsu]/g, '');
+  text = text.replace(/\x1b\][^\x07]*(\x07|\x1b\\)/g, '').replace(/\x1b\[[0-9;?<=>]*[ -\/]*[@-ln-~]/g, '').replace(/\x1b[()][0-9A-Za-z]/g, '');
   let fg = null, bold = false, dim = false;
   let out = '';
   const parts = text.split(/\x1b\[([\d;]*)m/);

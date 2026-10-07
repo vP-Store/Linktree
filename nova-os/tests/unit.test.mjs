@@ -30,6 +30,8 @@ test('ANSI: Farben, Fett, 256/Truecolor, Maskierung', () => {
   assert.match(ansiToHtml('\x1b[38;5;196mrot'), /rgb\(255,0,0\)/);
   assert.match(ansiToHtml('\x1b[38;2;1;2;3mx'), /rgb\(1,2,3\)/);
   assert.equal(applyCarriageReturns('10%\r100%\nok'), '100%\nok');
+  assert.equal(applyCarriageReturns('eins\r\nzwei\r\n'), 'eins\nzwei\n');
+  assert.equal(ansiToHtml('a\x1b[2Xb\x1b(Bc'), 'abc');
 });
 
 test('Highlighting: Sprachen erkennen, HTML sicher', () => {

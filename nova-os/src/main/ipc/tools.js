@@ -2,6 +2,7 @@
 // Werkzeuge: ZIP-Archive und PDF-Export.
 
 const path = require('path');
+const os = require('os');
 const fs = require('fs');
 const fsp = fs.promises;
 const { execFile } = require('child_process');
@@ -61,15 +62,20 @@ const PDF_CSS = `
 
 async function htmlToPdf(html, dest, title) {
   const w = new BrowserWindow({ show: false, webPreferences: { sandbox: true, javascript: false } });
+  let tmp = null;
   try {
     const doc = `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${String(title || '').replace(/</g, '&lt;')}</title><style>${PDF_CSS}</style></head><body>${html}</body></html>`;
-    await w.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(doc));
+    // Über eine temporäre Datei laden: data:-URLs sind in Chromium auf 2 MB begrenzt
+    tmp = path.join(os.tmpdir(), `nova-pdf-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}.html`);
+    await fsp.writeFile(tmp, doc, 'utf8');
+    await w.loadFile(tmp);
     const pdf = await w.webContents.printToPDF({ pageSize: 'A4', printBackground: true, margins: { marginType: 'default' } });
     await fsp.mkdir(path.dirname(dest), { recursive: true });
     await fsp.writeFile(dest, pdf);
     return dest;
   } finally {
     w.destroy();
+    if (tmp) fsp.unlink(tmp).catch(() => {});
   }
 }
 

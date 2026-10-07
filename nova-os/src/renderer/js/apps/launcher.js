@@ -3,7 +3,7 @@
 import { h, clear, esc } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { store } from '../core/store.js';
-import { getWinApps, loadAppIcon, launchWinApp, getOpenWindows, focusWindow, loadExeIcon } from '../core/winapps.js';
+import { getWinApps, loadAppIcon, launchWinApp, getOpenWindows, focusWindow, loadExeIcon, dockPinMenuItem } from '../core/winapps.js';
 import { contextMenu, toast } from '../core/ui.js';
 import { api } from '../core/api.js';
 
@@ -80,10 +80,7 @@ export default {
           contextMenu(e.clientX, e.clientY, [
             { label: 'Starten', icon: 'rocket', action: () => launchWinApp(a) },
             { label: isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten', icon: 'star', action: () => { store.set('launcherFavs', isFav ? favs().filter((p) => p !== a.path) : [...favs(), a.path]); render(); } },
-            (() => {
-              const docked = (store.get('dockWinApps', []) || []).some((x) => x.path === a.path);
-              return { label: docked ? 'Vom Dock lösen' : 'Ans Dock heften', icon: 'pin', action: () => store.update('dockWinApps', (l) => (docked ? (l || []).filter((x) => x.path !== a.path) : [...(l || []), { name: a.name, path: a.path }]), []) };
-            })(),
+            dockPinMenuItem(a),
             { label: 'Speicherort öffnen', icon: 'folder', action: () => api.fs.reveal(a.path) },
           ]);
         });

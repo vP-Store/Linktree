@@ -30,6 +30,18 @@ module.exports = `(async () => {
   await t('aiKey', () => n.ai.hasKey());
   await t('aufraeumen', async () => { await n.fs.trash(tmp); return true; });
   const m = await import('./js/core/wm.js');
+  await t('terminalUI', async () => {
+    const w = await m.openApp('terminal');
+    const inp = w.body.querySelector('.term-input');
+    inp.value = 'echo Zeile1; echo Zeile2';
+    inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await new Promise((res) => setTimeout(res, 5000));
+    const txt = w.body.querySelector('.term-out').innerText;
+    await w.close(true);
+    const lines = txt.split(String.fromCharCode(10)).map((x) => x.trim());
+    const i = lines.indexOf('Zeile1');
+    return i >= 0 && lines[i + 1] === 'Zeile2' ? 'ok' : 'FEHLER: ' + JSON.stringify(txt.slice(-160));
+  });
   for (const id of ['files', 'monitor', 'launcher']) await m.openApp(id);
   await new Promise((res) => setTimeout(res, 2500));
   r.fehlerToasts = [...document.querySelectorAll('.toast')].map((x) => x.textContent).filter((x) => /Fehler|fehlgeschlagen/i.test(x));

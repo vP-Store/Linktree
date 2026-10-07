@@ -5,7 +5,7 @@ import { icon, fileGlyph } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { listApps, appIconSpan } from '../core/registry.js';
 import { openApp } from '../core/wm.js';
-import { getWinApps, loadAppIcon, launchWinApp, recentFiles } from '../core/winapps.js';
+import { getWinApps, loadAppIcon, launchWinApp, recentFiles, dockPinMenuItem } from '../core/winapps.js';
 import { openPath } from '../core/open.js';
 import { contextMenu } from '../core/ui.js';
 import { sysInfo } from './state.js';
@@ -144,10 +144,9 @@ function winRow(a) {
   loadAppIcon(a, ico);
   row.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    const docked = (store.get('dockWinApps', []) || []).some((x) => x.path === a.path);
     contextMenu(e.clientX, e.clientY, [
       { label: 'Starten', icon: 'rocket', action: () => { closeStart(); launchWinApp(a); } },
-      { label: docked ? 'Vom Dock lösen' : 'Ans Dock heften', icon: 'pin', action: () => store.update('dockWinApps', (l) => (docked ? (l || []).filter((x) => x.path !== a.path) : [...(l || []), { name: a.name, path: a.path }]), []) },
+      dockPinMenuItem(a),
     ]);
   });
   return register(row, () => { closeStart(); launchWinApp(a); });

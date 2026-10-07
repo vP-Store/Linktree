@@ -65,6 +65,7 @@ jobs:
           $log = Get-Content smoke.log -Raw
           if ($log -match '\[smoke\] Fehler') { throw "Rauchtest fehlgeschlagen" }
           if ($log -match 'FEHLER:') { throw "Mindestens eine Prüfung im Rauchtest ist fehlgeschlagen" }
+          if ($log -match '"fehlerToasts":\[[^\]]') { throw "NovaOS hat beim Öffnen von Apps Fehlermeldungen angezeigt" }
       - name: Artefakte hochladen
         uses: actions/upload-artifact@v4
         with:

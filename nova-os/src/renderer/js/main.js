@@ -23,6 +23,7 @@ const seenErrors = new Set();
 function reportError(err) {
   const msg = String((err && (err.message || err.reason && err.reason.message)) || err || 'Unbekannter Fehler');
   console.error(err);
+  if (err && err.name === 'AbortError') return;
   if (seenErrors.has(msg) || /ResizeObserver|AbortError|The play\(\) request/.test(msg)) return;
   seenErrors.add(msg);
   import('./core/ui.js').then((m) => m.toast('Unerwarteter Fehler', msg.slice(0, 160), { kind: 'error', force: true, duration: 6000 })).catch(() => {});

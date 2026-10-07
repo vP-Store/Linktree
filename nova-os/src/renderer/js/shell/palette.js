@@ -12,6 +12,7 @@ import { evaluate, formatNumber, looksLikeMath } from '../core/math.js';
 import { toast, notify } from '../core/ui.js';
 import { ACCENTS, WALLPAPERS } from './theme.js';
 import { overlayHide } from './state.js';
+import { getTasks } from '../core/tasks.js';
 
 let wrap, input, list;
 let results = [];
@@ -196,12 +197,10 @@ async function render() {
         const title = (n.text.split('\n').find((l) => l.trim()) || '').replace(/^#+\s*/, '').slice(0, 60) || 'Notiz';
         return { ic: 'stickyNote', label: title, sub: snippetAround(n.text, cq), hint: 'Notiz', run: () => openApp('notes', { open: n.path }) };
       }));
-      const { getTasks } = await import('../core/tasks.js');
       const tasks = getTasks().filter((t) => t.title.toLowerCase().includes(lq)).slice(0, 4);
       add('Aufgaben', tasks.map((t) => ({ ic: t.done ? 'checkCircle' : 'circle', label: t.title, sub: t.done ? 'Erledigt' : (t.due ? `Fällig ${new Date(t.due + 'T00:00').toLocaleDateString('de-DE')}` : 'Offen'), hint: 'Aufgabe', run: () => openApp('tasks') })));
       const events = (store.get('calendarEvents', []) || []).filter((e) => e.title.toLowerCase().includes(lq)).slice(0, 4);
       add('Termine', events.map((e) => ({ ic: 'calendar', label: e.title, sub: `${new Date(e.date + 'T00:00').toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'long' })}${e.time ? ' · ' + e.time : ''}`, hint: 'Termin', run: () => openApp('calendar', { date: e.date }) })));
-      if (input.value !== raw) return;
     }
     add('Nova KI', [{ app: { id: 'assistant', glyph: 'sparkles', colors: ['#a78bfa', '#ec4899'] }, label: `Nova fragen: „${cq}“`, sub: 'Antwort von Claude im KI-Assistenten', run: () => openApp('assistant', { prompt: cq }) }]);
     add('Web', [{ ic: 'globe', label: `„${cq}“ im Web suchen`, sub: 'DuckDuckGo im NovaOS-Browser', run: () => openApp('browser', { url: 'https://duckduckgo.com/?q=' + encodeURIComponent(cq) }) }]);

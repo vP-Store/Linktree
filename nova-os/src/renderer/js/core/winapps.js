@@ -29,6 +29,16 @@ export function loadAppIcon(app, el) {
   }).catch(() => iconCache.set(app.path, null));
 }
 
+/** Kontextmenü-Eintrag: Windows-Programm ans Dock heften bzw. davon lösen */
+export function dockPinMenuItem(app) {
+  const docked = (store.get('dockWinApps', []) || []).some((x) => x.path === app.path);
+  return {
+    label: docked ? 'Vom Dock lösen' : 'Ans Dock heften',
+    icon: 'pin',
+    action: () => store.update('dockWinApps', (l) => (docked ? (l || []).filter((x) => x.path !== app.path) : [...(l || []), { name: app.name, path: app.path }]), []),
+  };
+}
+
 export async function launchWinApp(app) {
   try {
     await api.apps.launch(app.path);

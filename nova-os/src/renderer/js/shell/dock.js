@@ -7,7 +7,7 @@ import { listApps, getApp, appIconSpan } from '../core/registry.js';
 import { allWindows, activeWindow, activateApp, openApp, windowsOf, focus } from '../core/wm.js';
 import { contextMenu } from '../core/ui.js';
 import { toggleStart } from './start.js';
-import { getOpenWindows, focusWindow, loadExeIcon, loadAppIcon, launchWinApp } from '../core/winapps.js';
+import { getOpenWindows, focusWindow, loadExeIcon, loadAppIcon, launchWinApp, dockPinMenuItem } from '../core/winapps.js';
 import { esc, isoDate } from '../core/dom.js';
 import { getTasks } from '../core/tasks.js';
 import { getNotifications } from '../core/ui.js';
@@ -110,7 +110,7 @@ function render() {
         e.preventDefault();
         contextMenu(e.clientX, e.clientY - 10, [
           { label: 'Starten', icon: 'rocket', action: () => launchWinApp(a) },
-          { label: 'Vom Dock lösen', icon: 'pin', action: () => store.set('dockWinApps', (store.get('dockWinApps', []) || []).filter((x) => x.path !== a.path)) },
+          dockPinMenuItem(a),
         ]);
       });
       dock.append(btn);

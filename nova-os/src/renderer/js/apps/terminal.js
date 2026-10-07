@@ -94,18 +94,19 @@ export default {
     }
 
     function print(t, text, cls = '') {
+      text = text.replace(/\r\n/g, '\n'); // Windows-Zeilenenden sind kein Überschreiben
       // Fortschrittsbalken (\r) überschreiben die zuletzt ausgegebene Zeile
-      if (text.includes('\r') && t.out.lastChild && !text.startsWith('\n')) {
-        const prev = t.out.lastChild;
-        if (prev.dataset && prev.dataset.raw != null && !prev.dataset.raw.endsWith('\n')) {
-          text = prev.dataset.raw + text;
-          prev.remove();
-        }
+      const prev = t.out.lastChild;
+      const prevRaw = prev && prev.dataset ? prev.dataset.raw : null;
+      if (prevRaw != null && !prevRaw.endsWith('\n') && !text.startsWith('\n') && (text.includes('\r') || prevRaw.endsWith('\r'))) {
+        text = prevRaw + text;
+        prev.remove();
       }
-      const raw = text;
+      const openCr = text.endsWith('\r');
       text = applyCarriageReturns(text);
       const span = h('span', { class: cls, html: ansiToHtml(text) });
-      span.dataset.raw = raw;
+      // Nur den sichtbaren Stand merken (plus offenes \r), sonst wächst er bei jedem Fortschrittsschritt
+      span.dataset.raw = text + (openCr ? '\r' : '');
       t.out.append(span);
       // Ausgabe begrenzen, damit sehr lange Läufe flüssig bleiben
       while (t.out.childNodes.length > 4000) t.out.firstChild.remove();
