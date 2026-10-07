@@ -31,7 +31,12 @@
   to { opacity: 1; transform: perspective(1400px) translateY(0) rotateX(0) scale(1); }
 }
 @keyframes winClose { to { opacity: 0; transform: perspective(1400px) translateY(14px) rotateX(-12deg) scale(.92); } }
-[data-reduce-motion="true"] .win { animation-name: fadeIn; }
+[data-fx3d="false"] .win { animation-name: winOpenFlat; }
+[data-fx3d="false"] .win.closing { animation-name: winCloseFlat; }
+[data-fx3d="false"] .win.minimizing { transform: translateY(40vh) scale(.3); }
+[data-reduce-motion="true"] .win:not(.closing) { animation-name: fadeIn; }
+@keyframes winOpenFlat { from { opacity: 0; transform: scale(.95) translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes winCloseFlat { to { opacity: 0; transform: scale(.96); } }
 
 .win-titlebar {
   height: 40px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 6px 0 12px;

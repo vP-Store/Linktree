@@ -13,7 +13,7 @@ function reset(el) {
 export function initTilt() {
   const root = document.documentElement;
   document.addEventListener('pointermove', (e) => {
-    if (root.dataset.reduceMotion === 'true' || root.dataset.perf === 'true' || e.buttons) {
+    if (root.dataset.fx3d === 'false' || root.dataset.perf === 'true' || e.buttons) {
       if (current) { reset(current); current = null; }
       return;
     }

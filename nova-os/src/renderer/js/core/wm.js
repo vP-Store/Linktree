@@ -211,7 +211,7 @@ class Win {
     let zone = null;
     const a = area();
     // 3D-Neigung beim Ziehen: Fenster kippt leicht in Bewegungsrichtung
-    const tiltOn = document.documentElement.dataset.reduceMotion !== 'true' && document.documentElement.dataset.perf !== 'true';
+    const tiltOn = document.documentElement.dataset.fx3d !== 'false' && document.documentElement.dataset.perf !== 'true';
     let lastX = startX, lastY = startY, lastT = performance.now(), vx = 0, vy = 0, settle = 0;
     const tilt = (rx, ry) => { this.el.style.setProperty('--tilt-x', rx.toFixed(2) + 'deg'); this.el.style.setProperty('--tilt-y', ry.toFixed(2) + 'deg'); };
     const onMove = (ev) => {
@@ -445,7 +445,7 @@ export function switchWorkspace(i) {
   for (const w of windows.values()) w.el.classList.toggle('other-ws', w.ws !== i);
   // 3D-Drehung der Fensterebene in Wechselrichtung + Anzeige der Arbeitsfläche
   const layer = document.getElementById('windows');
-  if (layer && document.documentElement.dataset.reduceMotion !== 'true') {
+  if (layer && document.documentElement.dataset.fx3d !== 'false') {
     layer.classList.remove('ws-next', 'ws-prev');
     void layer.offsetWidth;
     layer.classList.add('ws-' + dir);

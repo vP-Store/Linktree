@@ -361,9 +361,10 @@ body.focus-mode #widgets, body.focus-mode #desk-icons { opacity: 0; pointer-even
 #overview { position: absolute; inset: 0; z-index: 2500; background: rgba(4, 6, 14, .45); backdrop-filter: blur(18px) saturate(140%); animation: fadeIn .2s; }
 body.overview-open #windows { z-index: 2600; pointer-events: none; }
 body.overview-open #windows .win { pointer-events: none; }
-.win.ov-item { transition: transform .32s var(--ease); box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.win.ov-item { transition: transform .42s cubic-bezier(.2, 1.1, .35, 1), box-shadow .25s; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.win.ov-item.ov-hover { box-shadow: 0 34px 80px rgba(0,0,0,.6), 0 0 0 3px var(--accent), 0 0 50px rgba(var(--accent-rgb), .35); }
 .ov-hit { position: absolute; z-index: 2700; border-radius: 12px; cursor: pointer; transition: box-shadow .15s; }
-.ov-hit:hover { box-shadow: 0 0 0 3px var(--accent); }
+
 .ov-hit.dragging { opacity: .4; }
 .ov-label { position: absolute; z-index: 2700; display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.6); pointer-events: none; }
 .ov-label .app-icon { width: 18px; height: 18px; flex: none; }

@@ -61,20 +61,30 @@ export function openOverview() {
 
   if (!wins.length) el.append(h('div.ov-empty', { html: `${icon('layers')}<b>Keine Fenster auf dieser Arbeitsfläche</b><span>Esc oder Klick schließt die Übersicht.</span>` }));
 
-  for (const L of layout) {
+  layout.forEach((L, i) => {
     const w = L.w;
     w._ovWasMin = w.min;
     if (w.min) { w.el.classList.remove('min'); }
     w.el.classList.add('ov-item');
     w.el.style.transformOrigin = '0 0';
-    w.el.style.transform = `translate(${L.x - w.x}px, ${L.y - w.y}px) scale(${L.scale})`;
+    // gestaffelt einschweben; beim Hover hebt sich das Fenster an (3D)
+    const place = (lift) => {
+      const z = lift ? 1.035 : 1;
+      const dx = (L.tw * (z - 1)) / 2, dy = (L.th * (z - 1)) / 2 + (lift ? 8 : 0);
+      w.el.style.transform = `translate(${L.x - w.x - dx}px, ${L.y - w.y - dy}px) scale(${L.scale * z})`;
+    };
+    w.el.style.transitionDelay = i * 28 + 'ms';
+    setTimeout(() => { if (w.el.classList.contains('ov-item')) w.el.style.transitionDelay = ''; }, 400 + i * 28);
+    place(false);
     w.el.style.zIndex = String(+w.el.style.zIndex || 20);
     const label = h('div.ov-label', { style: { left: L.x + 'px', top: L.y + L.th + 8 + 'px', width: L.tw + 'px' }, html: `${appIconSpan(w.app)}<span>${esc(w.title)}</span>${w._ovWasMin ? '<em>minimiert</em>' : ''}` });
     const close = h('button.ov-close', { style: { left: L.x + L.tw - 14 + 'px', top: L.y - 12 + 'px' }, title: 'Schließen', html: icon('x'), onclick: async (e) => { e.stopPropagation(); const ok = await w.close(); if (ok) { closeOverview(); openOverview(); } } });
     const hit = h('div.ov-hit', { style: { left: L.x + 'px', top: L.y + 'px', width: L.tw + 'px', height: L.th + 'px' } });
     hit.addEventListener('pointerdown', (e) => startDrag(e, w, hit));
+    hit.addEventListener('pointerenter', () => { w.el.classList.add('ov-hover'); place(true); });
+    hit.addEventListener('pointerleave', () => { w.el.classList.remove('ov-hover'); place(false); });
     el.append(hit, label, close);
-  }
+  });
 
   el.addEventListener('pointerdown', (e) => { if (e.target === el) closeOverview(); });
 }
@@ -127,7 +137,8 @@ export function closeOverview() {
   for (const L of state.layout) {
     const w = L.w;
     w.el.style.transform = '';
-    w.el.classList.remove('ov-item');
+    w.el.style.transitionDelay = '';
+    w.el.classList.remove('ov-item', 'ov-hover');
     if (w._ovWasMin && w.min) w.el.classList.add('min');
     delete w._ovWasMin;
   }

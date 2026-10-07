@@ -313,3 +313,12 @@ test('Strg+Tab: 3D-Karussell wählt und fokussiert ein Fenster', async ({ page }
   await expect(page.locator('#switcher')).toHaveCount(0);
   await expect(page.locator('.win:not(.inactive) .win-title')).toHaveText(chosen);
 });
+
+test('3D-Effekte lassen sich abschalten', async ({ page }) => {
+  await expect(page.locator('html')).toHaveAttribute('data-fx3d', 'true');
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('fx3d', false); });
+  await expect(page.locator('html')).toHaveAttribute('data-fx3d', 'false');
+  await open(page, 'calc');
+  const anim = await page.locator('.win').first().evaluate((el) => getComputedStyle(el).animationName);
+  expect(anim).toBe('winOpenFlat');
+});

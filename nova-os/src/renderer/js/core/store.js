@@ -13,6 +13,7 @@ export const DEFAULTS = {
   animatedWallpaper: true,
   blur: 28,
   reduceMotion: false,
+  fx3d: true,
   showWidgets: true,
   showDesktopIcons: true,
   dockAutohide: false,

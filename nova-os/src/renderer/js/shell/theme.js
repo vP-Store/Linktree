@@ -62,6 +62,7 @@ export function applyTheme() {
   root.style.setProperty('--dock-size', ds + 'px');
   root.style.setProperty('--dock-reserve', (ds + 36) + 'px');
   root.dataset.reduceMotion = String(!!store.get('reduceMotion'));
+  root.dataset.fx3d = String(store.get('fx3d') !== false && !store.get('reduceMotion'));
   if (api.setZoom) api.setZoom((store.get('uiScale') || 100) / 100);
   document.body.classList.toggle('focus-mode', !!store.get('focusMode'));
 }
@@ -126,7 +127,7 @@ export function wallpaperThumb(key) {
 export function initTheme() {
   applyTheme();
   renderWallpaper();
-  const re = ['perfMode', 'theme', 'accent', 'blur', 'dockSize', 'reduceMotion', 'focusMode', 'uiScale'];
+  const re = ['fx3d', 'perfMode', 'theme', 'accent', 'blur', 'dockSize', 'reduceMotion', 'focusMode', 'uiScale'];
   re.forEach((k) => store.on(k, () => { applyTheme(); if (k === 'reduceMotion' || k === 'perfMode') renderWallpaper(); }));
   ['wallpaper', 'wallpaperImage', 'wallpaperDim', 'overlayOpacity', 'animatedWallpaper'].forEach((k) => store.on(k, renderWallpaper));
   matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => store.get('theme') === 'auto' && applyTheme());
