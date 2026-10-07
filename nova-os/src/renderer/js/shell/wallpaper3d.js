@@ -1,6 +1,7 @@
 // Live-3D-Hintergründe auf Canvas (ohne WebGL, ohne Bibliotheken):
 //  galaxy  – rotierende Spiralgalaxie aus Tausenden Sternen, leicht geneigt
 //  horizon – Flug über eine Gitterlandschaft mit Sonne am Horizont
+//  waves   – Meer aus leuchtenden Punkten, über das Wellen laufen
 // Beide folgen der Maus mit sanfter Parallaxe. Läuft nur, solange NovaOS
 // sichtbar ist; bei „Bewegung reduzieren“ / Leistungsmodus ein Standbild.
 
@@ -59,7 +60,7 @@ export function startScene(host, kind, { still = false } = {}) {
   let colors = accentColors();
   const colorTimer = setInterval(() => { colors = accentColors(); }, 1500);
 
-  const scene = kind === 'horizon' ? horizonScene() : galaxyScene();
+  const scene = kind === 'horizon' ? horizonScene() : kind === 'waves' ? wavesScene() : galaxyScene();
   let raf = 0, last = performance.now(), t = 0, stopped = false;
   canvas.dataset.frames = '0';
   let frames = 0;
@@ -301,5 +302,55 @@ function horizonScene() {
     haze.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = haze;
     ctx.fillRect(0, horizon - 40, W, 100);
+  };
+}
+
+/* ------------------------------------------------------------------ Wellen */
+
+function wavesScene() {
+  const ROWS = 90, BUCKETS = 10, DX = 0.13, Z0 = 1.5, DZ = 0.15;
+  return (ctx, W, H, t, m, col) => {
+    const cx = W / 2 + m.sx * 50 - Math.sin(m.ws) * W * 0.1;
+    const horizon = H * (0.4 + m.sy * 0.04);
+    const f = H * 0.8; // Brennweite
+    const camH = 1.6;
+    const drift = t * 0.5; // Wellen laufen langsam auf uns zu
+    const groups = Array.from({ length: BUCKETS }, () => []);
+    for (let r = 0; r < ROWS; r++) {
+      const z = Z0 + r * DZ;
+      const wz = z + drift; // Weltkoordinate für die Wellen
+      // nur den sichtbaren Ausschnitt dieser Reihe berechnen
+      const half = ((W / 2 + 40) / f) * z;
+      const c0 = Math.ceil((-half - m.sx) / DX), c1 = Math.floor((half - m.sx) / DX);
+      for (let c = c0; c <= c1; c++) {
+        const x = c * DX;
+        const hgt = Math.sin(x * 0.45 + wz * 0.35 + t * 0.9) * 0.45 + Math.cos(wz * 0.8 - t * 1.3 + x * 0.25) * 0.35 + Math.sin((x - wz) * 0.22 + t * 0.5) * 0.3;
+        const sx = cx + (x / z) * f;
+        const sy = horizon + ((camH - hgt * 0.75) / z) * f;
+        if (sy > H + 4 || sy < horizon - 60) continue;
+        const k = Math.max(0, Math.min(BUCKETS - 1, Math.floor(((hgt + 1.1) / 2.2) * BUCKETS)));
+        const depth = (z - Z0) / (ROWS * DZ);
+        groups[k].push(sx, sy, Math.max(1.1, 5 / z), Math.max(0.22, 1 - depth * 0.85));
+      }
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    for (let k = 0; k < BUCKETS; k++) {
+      const c = mix(col.a, col.b, k / (BUCKETS - 1));
+      ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
+      const g = groups[k];
+      for (let i = 0; i < g.length; i += 4) {
+        ctx.globalAlpha = Math.min(1, g[i + 3] * (0.55 + k / BUCKETS * 0.6));
+        ctx.fillRect(g[i], g[i + 1], g[i + 2], g[i + 2]);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    // Dunst am Horizont
+    const haze = ctx.createLinearGradient(0, horizon - 80, 0, horizon + 120);
+    haze.addColorStop(0, 'rgba(0,0,0,0)');
+    haze.addColorStop(0.5, `rgba(${col.a.join(',')},.14)`);
+    haze.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = haze;
+    ctx.fillRect(0, horizon - 80, W, 200);
   };
 }

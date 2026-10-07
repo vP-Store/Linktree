@@ -22,6 +22,8 @@ export const WALLPAPERS = {
     blobs: [['#4c1d95', 50, 30, 40], ['#0c4a6e', 10, 70, 34]] },
   horizon3d: { name: 'Horizont 3D', bg: 'linear-gradient(180deg,#05030f 0%,#1a0b33 48%,#2a0d3a 58%,#05030c 100%)', scene: 'horizon',
     blobs: [['#6d28d9', 50, 30, 30]] },
+  waves3d: { name: 'Wellen 3D', bg: 'linear-gradient(180deg,#02040c 0%,#06122a 45%,#020610 100%)', scene: 'waves',
+    blobs: [['#1d4ed8', 50, 18, 30]] },
   aurora: { name: 'Aurora', bg: 'linear-gradient(160deg,#0b0b1f 0%,#120d2e 45%,#06161f 100%)', stars: true,
     blobs: [['#7c3aed', 8, 12, 46], ['#0ea5e9', 62, 4, 42], ['#10b981', 40, 60, 38], ['#db2777', 78, 62, 34]] },
   nebula: { name: 'Nebel', bg: 'linear-gradient(140deg,#120318 0%,#1d0b2e 50%,#0a0616 100%)', stars: true,

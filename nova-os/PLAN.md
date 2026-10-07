@@ -107,7 +107,8 @@ dem Backlog.
 | R45 | Strg+Tab als 3D-Karussell mit Spiegelung, 3D-Startbildschirm (Orb mit Ringen, Flug hinein) | ✅ |
 | R46 | Arbeitsflächen-Wechsel als 3D-Drehung, Anzeige der Arbeitsfläche, 3D-Hintergrund dreht mit | ✅ |
 | R47 | Schalter „Räumliche 3D-Effekte“, Übersicht mit gestaffeltem Einschweben und Anheben beim Hover | ✅ |
-| R48+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R48 | Symbole mit Tiefe, Lichtkante an Fenstern, Desktop-Symbole in 3D, dritter 3D-Hintergrund „Wellen“ | ✅ |
+| R49+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
