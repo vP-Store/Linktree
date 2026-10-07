@@ -385,3 +385,15 @@ test('Start aus dem Dock: Fenster fliegt aus dem Symbol auf', async ({ page }) =
   await expect(page.locator('.win')).toHaveCount(2);
   await expect(page.locator('.win.launch')).toHaveCount(0);
 });
+
+test('Systemklänge: aus = kein Audio, an = Töne werden erzeugt', async ({ page }) => {
+  const count = () => page.evaluate(() => window.__osc || 0);
+  await page.evaluate(() => {
+    const orig = AudioContext.prototype.createOscillator;
+    AudioContext.prototype.createOscillator = function () { window.__osc = (window.__osc || 0) + 1; return orig.call(this); };
+  });
+  await open(page, 'calc');
+  expect(await count()).toBe(0);
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('uiSounds', true); const ui = await import('/js/core/ui.js'); ui.notify('Test', 'Klang'); });
+  expect(await count()).toBeGreaterThan(0);
+});

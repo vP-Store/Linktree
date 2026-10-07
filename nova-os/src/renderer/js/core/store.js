@@ -15,6 +15,8 @@ export const DEFAULTS = {
   reduceMotion: false,
   fx3d: true,
   saverMinutes: 10,
+  uiSounds: false,
+  uiSoundVolume: 40,
   showWidgets: true,
   showDesktopIcons: true,
   dockAutohide: false,

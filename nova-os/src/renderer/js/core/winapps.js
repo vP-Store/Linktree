@@ -81,6 +81,7 @@ export async function takeScreenshot() {
   try {
     const file = await api.win.screenshot();
     const { notify } = await import('./ui.js');
+    (await import('./sound.js')).play('shot');
     notify('Bildschirmfoto gespeichert', file, { icon: 'image', kind: 'ok', onClick: () => import('./wm.js').then((m) => m.openApp('photos', { path: file })) });
     return file;
   } catch (e) { showError(e, 'Bildschirmfoto fehlgeschlagen'); return null; }

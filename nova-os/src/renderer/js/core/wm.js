@@ -202,6 +202,7 @@ class Win {
     try { this.instance && this.instance.destroy && this.instance.destroy(); } catch (e) { console.error(e); }
     this.el.classList.add('closing');
     windows.delete(this.id);
+    bus.emit('wm:close', this);
     if (activeId === this.id) {
       activeId = null;
       const next = topWindow();

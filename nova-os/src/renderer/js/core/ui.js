@@ -1,5 +1,6 @@
 // Gemeinsame UI-Bausteine: Kontextmenü, Dialoge, Toasts, Mitteilungen.
 
+import { play } from './sound.js';
 import { h, clear, bus, esc } from './dom.js';
 import { icon, appIconSvg } from './icons.js';
 import { store } from './store.js';
@@ -205,6 +206,7 @@ export function notify(title, text = '', opts = {}) {
   if (list.length > 60) list.length = 60;
   store.set('notifications', list);
   bus.emit('notifications');
+  if (!store.get('dnd')) play(opts.kind === 'error' ? 'error' : 'notify');
   toast(title, text, opts);
   return n;
 }
@@ -214,6 +216,7 @@ export function notifIconHtml(n) { return iconFor(n); }
 /** Fehler freundlich anzeigen */
 export function showError(err, title = 'Etwas ist schiefgelaufen') {
   const msg = String((err && err.message) || err || '').replace(/^Error invoking remote method '[^']+': (Error: )?/, '');
+  play('error');
   toast(title, msg, { kind: 'error', force: true, duration: 6000 });
   console.error(err);
 }

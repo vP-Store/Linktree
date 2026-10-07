@@ -122,7 +122,8 @@ dem Backlog.
 | R60 | Start aus dem Dock: Fenster fliegt räumlich aus dem Symbol auf | ✅ |
 | R61 | Minimieren fliegt ins Dock-Symbol der App (und von dort zurück) | ✅ |
 | R62 | Popover mit dichterem Glas; keine Toasts über dem offenen Mitteilungscenter | ✅ |
-| R63+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R63 | Systemklänge (Web Audio, synthetisch, abschaltbar, Lautstärke) | ✅ |
+| R64+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
