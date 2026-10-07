@@ -494,3 +494,16 @@ test('Alt+Umschalt+2 nimmt das Fenster mit, Alt+Bild↑ wechselt zurück', async
   expect(await page.evaluate(async () => (await import('/js/core/wm.js')).getWorkspace())).toBe(0);
   await expect(page.locator('.win[data-app="calc"].other-ws')).toHaveCount(1);
 });
+
+test('Rechner: Graph zeichnet Funktionen und meldet Fehler', async ({ page }) => {
+  await open(page, 'calc');
+  await page.locator('.seg-btn', { hasText: 'Graph' }).click();
+  await expect(page.locator('.graph-canvas')).toBeVisible();
+  await page.locator('.graph-fn').first().fill('foo(x)');
+  await expect(page.locator('.graph-err')).toContainText('Unbekannt');
+  await page.locator('.graph-fn').first().fill('x^3');
+  await expect(page.locator('.graph-err')).toHaveText('');
+  const b = await page.locator('.graph-canvas').boundingBox();
+  await page.mouse.move(b.x + b.width / 2 + 20, b.y + b.height / 2);
+  await expect(page.locator('.graph-tip')).toContainText('f1 =');
+});

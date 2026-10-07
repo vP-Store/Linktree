@@ -8,7 +8,7 @@ const FUNCS = {
 };
 const CONSTS = { pi: Math.PI, e: Math.E, π: Math.PI };
 
-export function tokenize(src) {
+export function tokenize(src, vars = null) {
   const s = String(src).replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/√/g, 'sqrt');
   const out = [];
   let i = 0;
@@ -31,6 +31,7 @@ export function tokenize(src) {
       while (j < s.length && /[a-zπ]/i.test(s[j])) j++;
       const w = s.slice(i, j).toLowerCase();
       if (w in FUNCS) out.push({ t: 'f', v: w });
+      else if (vars && Object.prototype.hasOwnProperty.call(vars, w)) out.push({ t: 'n', v: vars[w] });
       else if (w in CONSTS) out.push({ t: 'n', v: CONSTS[w] });
       else throw new Error('Unbekannt: ' + w);
       i = j;
@@ -42,8 +43,9 @@ export function tokenize(src) {
   return out;
 }
 
-export function evaluate(src) {
-  const toks = tokenize(src);
+/** Ausdruck berechnen; vars z. B. { x: 2 } für Funktionsgraphen */
+export function evaluate(src, vars = null) {
+  const toks = tokenize(src, vars);
   let pos = 0;
   const peek = () => toks[pos];
   const eat = (v) => { const t = toks[pos]; if (!t || (v && t.v !== v)) throw new Error('Syntaxfehler'); pos++; return t; };

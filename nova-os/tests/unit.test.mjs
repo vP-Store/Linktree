@@ -104,3 +104,12 @@ test('Dateiendungen wie .constructor sind normale Dateien', async () => {
     assert.ok(fileGlyph(e).includes('<svg'));
   }
 });
+
+test('Rechner: Variablen für Funktionsgraphen', async () => {
+  const { evaluate } = await import('../src/renderer/js/core/math.js');
+  assert.equal(evaluate('x^2 + 1', { x: 3 }), 10);
+  assert.equal(evaluate('2x', { x: 4 }), 8);
+  assert.ok(Math.abs(evaluate('sin(x)', { x: Math.PI / 2 }) - 1) < 1e-12);
+  assert.equal(evaluate('exp(0)', { x: 5 }), 1); // „exp“ ist kein x
+  assert.throws(() => evaluate('x + 1'), /Unbekannt/); // ohne Variablen weiterhin unbekannt
+});

@@ -31,7 +31,7 @@ export default {
     let justEvaluated = false;
     const history = store.get('calcHistory', []) || [];
 
-    const seg = h('div.seg', ...[['std', 'Standard'], ['sci', 'Wissenschaft'], ['conv', 'Umrechnen']].map(([m, l]) => h('button.seg-btn', { dataset: { m }, onclick: () => setMode(m) }, l)));
+    const seg = h('div.seg', ...[['std', 'Standard'], ['sci', 'Wissenschaft'], ['graph', 'Graph'], ['conv', 'Umrechnen']].map(([m, l]) => h('button.seg-btn', { dataset: { m }, onclick: () => setMode(m) }, l)));
     const body = h('div.calc-body');
     root.classList.add('calc-root');
     root.append(h('div.app-toolbar', { style: { justifyContent: 'center' } }, seg), body);
@@ -40,7 +40,8 @@ export default {
       mode = m;
       store.set('calcMode', m);
       seg.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('on', b.dataset.m === m));
-      if (m === 'conv') renderConv(); else renderCalc();
+      if (graphStop) { graphStop(); graphStop = null; }
+      if (m === 'conv') renderConv(); else if (m === 'graph') renderGraph(); else renderCalc();
     }
 
     // ---------- Rechner ----------
@@ -153,9 +154,121 @@ export default {
         h('div.calc-conv-row', inB, selB)));
     }
 
+    // ---------- Funktionsplotter ----------
+    let graphStop = null;
+    function renderGraph() {
+      clear(body);
+      const COLORS = ['var(--accent)', 'var(--accent-2)', '#f43f5e'];
+      const fns = store.get('calcGraphFns') || ['sin(x)', 'x^2/4', ''];
+      let view = { cx: 0, cy: 0, scale: 46 }; // Pixel pro Einheit
+      const canvas = h('canvas.graph-canvas');
+      const tip = h('div.graph-tip.hidden');
+      const inputs = fns.map((f, i) => {
+        const inp = h('input.input.graph-fn', { value: f, placeholder: i ? 'weitere Funktion …' : 'z. B. sin(x)*x', spellcheck: false });
+        inp.addEventListener('input', () => { fns[i] = inp.value; store.set('calcGraphFns', fns); draw(); });
+        return h('label.graph-row', h('i', { style: { background: COLORS[i] } }), h('span.faint', `f${i + 1}(x) =`), inp);
+      });
+      const err = h('div.graph-err.faint');
+      body.append(h('div.graph-wrap',
+        h('div.graph-side', ...inputs, err,
+          h('div.graph-hint.faint', 'Ziehen verschiebt · Mausrad zoomt · Doppelklick zentriert'),
+          h('button.btn.sm', { onclick: () => { view = { cx: 0, cy: 0, scale: 46 }; draw(); } }, 'Ansicht zurücksetzen')),
+        h('div.graph-plot', canvas, tip)));
+
+      const css = (v) => getComputedStyle(root).getPropertyValue(v).trim();
+      function colorOf(i) { const c = COLORS[i]; return c.startsWith('var(') ? css(c.slice(4, -1)) || '#7c5cff' : c; }
+      let hoverX = null;
+      function draw() {
+        const W = canvas.clientWidth, H = canvas.clientHeight;
+        if (!W || !H) return;
+        const dpr = devicePixelRatio || 1;
+        if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        const sx = (x) => W / 2 + (x - view.cx) * view.scale, sy = (y) => H / 2 - (y - view.cy) * view.scale;
+        const wx = (px) => view.cx + (px - W / 2) / view.scale;
+        // Rasterweite: 1, 2, 5 × 10^n, sodass Linien ~60 px auseinander liegen
+        const raw = 60 / view.scale, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+        const step = [1, 2, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+        ctx.font = '10.5px ' + (css('--font') || 'sans-serif');
+        ctx.lineWidth = 1;
+        const grid = css('--border') || 'rgba(255,255,255,.08)', muted = css('--text-3') || '#888';
+        const fmt = (v) => String(+v.toFixed(6)).replace('.', ',');
+        for (let x = Math.ceil(wx(0) / step) * step; sx(x) <= W; x += step) {
+          ctx.strokeStyle = grid; ctx.beginPath(); ctx.moveTo(Math.round(sx(x)) + .5, 0); ctx.lineTo(Math.round(sx(x)) + .5, H); ctx.stroke();
+          if (Math.abs(x) > step / 2) { ctx.fillStyle = muted; ctx.fillText(fmt(x), sx(x) + 3, Math.min(H - 4, Math.max(12, sy(0) + 13))); }
+        }
+        const top = view.cy + (H / 2) / view.scale;
+        for (let y = Math.floor(top / step) * step; sy(y) <= H; y -= step) {
+          ctx.strokeStyle = grid; ctx.beginPath(); ctx.moveTo(0, Math.round(sy(y)) + .5); ctx.lineTo(W, Math.round(sy(y)) + .5); ctx.stroke();
+          if (Math.abs(y) > step / 2) { ctx.fillStyle = muted; ctx.fillText(fmt(y), Math.min(W - 30, Math.max(4, sx(0) + 4)), sy(y) - 3); }
+        }
+        // Achsen
+        ctx.strokeStyle = css('--text-2') || '#aaa'; ctx.lineWidth = 1.3;
+        ctx.beginPath(); ctx.moveTo(0, sy(0)); ctx.lineTo(W, sy(0)); ctx.moveTo(sx(0), 0); ctx.lineTo(sx(0), H); ctx.stroke();
+        // Kurven
+        const errors = [];
+        fns.forEach((f, i) => {
+          if (!f.trim()) return;
+          try { evaluate(f, { x: 1.2345 }); } catch (e) { if (!/Division|ungültig/.test(e.message)) { errors.push(`f${i + 1}: ${e.message}`); return; } }
+          ctx.strokeStyle = colorOf(i); ctx.lineWidth = 2.2; ctx.lineJoin = 'round';
+          ctx.beginPath();
+          let pen = false, lastY = null;
+          for (let px = 0; px <= W; px += 1) {
+            let y;
+            try { y = evaluate(f, { x: wx(px) }); } catch (_) { pen = false; continue; }
+            const py = sy(y);
+            // Sprungstellen (z. B. tan, 1/x) nicht verbinden
+            if (!pen || (lastY !== null && Math.abs(py - lastY) > H * 2)) { ctx.moveTo(px, py); pen = true; } else ctx.lineTo(px, py);
+            lastY = py;
+          }
+          ctx.stroke();
+        });
+        err.textContent = errors.join(' · ');
+        // Fadenkreuz mit Werten
+        if (hoverX != null) {
+          const x = wx(hoverX);
+          ctx.strokeStyle = 'rgba(127,127,127,.45)'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(hoverX, 0); ctx.lineTo(hoverX, H); ctx.stroke(); ctx.setLineDash([]);
+          const parts = [`x = ${fmt(x)}`];
+          fns.forEach((f, i) => {
+            if (!f.trim()) return;
+            try { const y = evaluate(f, { x }); parts.push(`f${i + 1} = ${fmt(y)}`); ctx.fillStyle = colorOf(i); ctx.beginPath(); ctx.arc(hoverX, sy(y), 4, 0, Math.PI * 2); ctx.fill(); } catch (_) { /* undefiniert */ }
+          });
+          tip.textContent = parts.join('   ');
+          tip.classList.remove('hidden');
+        } else tip.classList.add('hidden');
+      }
+
+      canvas.addEventListener('pointermove', (e) => { const r = canvas.getBoundingClientRect(); hoverX = e.clientX - r.left; if (!e.buttons) draw(); });
+      canvas.addEventListener('pointerleave', () => { hoverX = null; draw(); });
+      canvas.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        const sx0 = e.clientX, sy0 = e.clientY, c0 = { ...view };
+        const mv = (ev) => { view.cx = c0.cx - (ev.clientX - sx0) / view.scale; view.cy = c0.cy + (ev.clientY - sy0) / view.scale; draw(); };
+        const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); };
+        addEventListener('pointermove', mv); addEventListener('pointerup', up);
+      });
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const r = canvas.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top;
+        const W = canvas.clientWidth, H = canvas.clientHeight;
+        const before = { x: view.cx + (px - W / 2) / view.scale, y: view.cy - (py - H / 2) / view.scale };
+        view.scale = Math.max(2, Math.min(5000, view.scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+        // Punkt unter dem Mauszeiger bleibt stehen
+        view.cx = before.x - (px - W / 2) / view.scale; view.cy = before.y + (py - H / 2) / view.scale;
+        draw();
+      }, { passive: false });
+      canvas.addEventListener('dblclick', (e) => { const r = canvas.getBoundingClientRect(); view.cx += (e.clientX - r.left - canvas.clientWidth / 2) / view.scale; view.cy -= (e.clientY - r.top - canvas.clientHeight / 2) / view.scale; draw(); });
+      const ro = new ResizeObserver(() => draw());
+      ro.observe(canvas);
+      graphStop = () => ro.disconnect();
+      requestAnimationFrame(draw);
+    }
+
     root.tabIndex = 0;
     root.addEventListener('keydown', (e) => {
-      if (mode === 'conv' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      if (mode === 'conv' || mode === 'graph' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       const k = e.key;
       if ((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'c') { const v = lastResult || preview(); if (v) { api.clip.write(v); toast('Kopiert', v, { icon: 'copy', duration: 1200 }); } return; }
       if ((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'v') { api.clip.read().then((t) => { expr += t.trim(); update(); }); return; }

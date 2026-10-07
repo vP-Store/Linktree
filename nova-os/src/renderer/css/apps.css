@@ -745,3 +745,18 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .ed-mini-code { position: absolute; left: 6px; top: 12px; margin: 0; width: calc((92px - 8px) / .14); transform-origin: 0 0; font: var(--ed-font)/1.6 var(--font-mono); white-space: pre; pointer-events: none; opacity: .85; }
 .ed-mini-view { position: absolute; left: 0; right: 0; top: 0; background: rgba(var(--accent-rgb), .14); border-top: 1px solid rgba(var(--accent-rgb), .35); border-bottom: 1px solid rgba(var(--accent-rgb), .35); pointer-events: none; transition: background .15s; margin-top: 12px; }
 .ed-mini:hover .ed-mini-view { background: rgba(var(--accent-rgb), .22); }
+
+/* Rechner: Funktionsplotter */
+.graph-wrap { flex: 1; min-height: 0; display: flex; gap: 0; }
+.graph-side { width: 250px; flex: none; padding: 12px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--border); }
+.graph-row { display: flex; align-items: center; gap: 7px; }
+.graph-row i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.graph-row span { font-size: 12px; white-space: nowrap; }
+.graph-fn { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 13px; }
+.graph-err { color: var(--danger); font-size: 12px; min-height: 0; }
+.graph-hint { font-size: 11.5px; margin-top: auto; }
+.graph-plot { position: relative; flex: 1; min-width: 0; }
+.graph-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.graph-canvas:active { cursor: grabbing; }
+.graph-tip { position: absolute; left: 10px; top: 10px; padding: 5px 10px; border-radius: 8px; background: var(--glass-strong); border: 1px solid var(--border); font: 12px var(--font-mono); pointer-events: none; white-space: pre; }
+.calc-root.narrow .graph-side { width: 190px; }

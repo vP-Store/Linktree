@@ -63,7 +63,7 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Browser** | Tabs, Lesezeichen, Startseite, Zoom (echtes Chromium) |
 | **Programme** | Alle installierten Windows-Programme mit Icons starten, Favoriten |
 | **System** | CPU/RAM/Netzwerk live, Laufwerke, Prozesse beenden |
-| **Rechner** | Standard, wissenschaftlich, Einheiten-Umrechner, Verlauf |
+| **Rechner** | Standard, wissenschaftlich, **Funktionsplotter**, Einheiten-Umrechner, Verlauf |
 | **Musik** | Lokale Musik abspielen, Zufall/Wiederholen, Medientasten |
 | **Bilder** | Galerie, Zoom, Drehen, Diashow, als Hintergrund setzen |
 | **Fokus** | Pomodoro, Timer, Stoppuhr – mit Anzeige in der Statusleiste |

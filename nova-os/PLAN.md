@@ -135,7 +135,8 @@ dem Backlog.
 | R73 | Weltuhr-Globus im hellen Design hell | ✅ |
 | R74 | Mitteilungscenter mit „Heute“ (Termine + fällige Aufgaben, Klick öffnet) | ✅ |
 | R75 | Tastenkürzel: Fenster auf Arbeitsfläche mitnehmen (Alt+Umschalt+Zahl), vorige/nächste Arbeitsfläche (Alt+Bild↑/↓) | ✅ |
-| R76+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R76 | Rechner: Funktionsplotter (3 Kurven, Verschieben/Zoomen, Fadenkreuz mit Werten, Sprungstellen) | ✅ |
+| R77+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
