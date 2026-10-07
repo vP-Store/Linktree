@@ -53,7 +53,10 @@ function sticky(n) {
     h('div.grow'),
     h('button.st-btn', { title: 'Löschen', html: icon('x'), onclick: () => { setAll(all().filter((x) => x.id !== n.id)); render(); } }));
   const grip = h('div.st-grip');
-  const el = h('div.sticky', { dataset: { id: n.id }, style: { left: n.x + 'px', top: n.y + 'px', width: n.w + 'px', height: n.h + 'px', '--st': COLORS[n.color] || COLORS.gelb } }, head, ta, grip);
+  // jede Notiz hängt in einem eigenen, festen Winkel (aus der ID abgeleitet)
+  let hsh = 0; for (const ch of String(n.id)) hsh = (hsh * 31 + ch.charCodeAt(0)) | 0;
+  const rot = ((Math.abs(hsh) % 50) / 10 - 2.5).toFixed(1) + 'deg';
+  const el = h('div.sticky', { dataset: { id: n.id }, style: { left: n.x + 'px', top: n.y + 'px', width: n.w + 'px', height: n.h + 'px', '--st': COLORS[n.color] || COLORS.gelb, '--rot': rot } }, head, ta, grip);
 
   head.addEventListener('pointerdown', (e) => {
     if (e.target.closest('button')) return;

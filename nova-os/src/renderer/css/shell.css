@@ -405,9 +405,13 @@ body.overview-open #windows .win { pointer-events: none; }
 
 /* ---------- Haftnotizen ---------- */
 #stickies { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
-.sticky { position: absolute; pointer-events: auto; display: flex; flex-direction: column; background: var(--st); color: #2b2a23; border-radius: 4px 4px 14px 4px; box-shadow: 0 2px 4px rgba(0,0,0,.15), 0 12px 28px rgba(0,0,0,.28); transform: rotate(-.6deg); transition: box-shadow .15s, transform .15s; }
-.sticky:hover, .sticky:focus-within { transform: rotate(0); box-shadow: 0 4px 8px rgba(0,0,0,.18), 0 18px 40px rgba(0,0,0,.32); }
-.sticky.drag { transform: rotate(1.5deg) scale(1.02); opacity: .95; }
+.sticky { position: absolute; pointer-events: auto; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(255,255,255,.18), transparent 18%), linear-gradient(170deg, transparent 70%, rgba(0,0,0,.06)), var(--st); color: #2b2a23; border-radius: 3px 3px 16px 3px; box-shadow: 0 2px 4px rgba(0,0,0,.15), 0 12px 28px rgba(0,0,0,.28); transform: perspective(900px) rotate(var(--rot, -.6deg)); transform-origin: 50% 0; transition: box-shadow .25s, transform .35s cubic-bezier(.2, 1.3, .4, 1); }
+/* gewölbter Schatten an der unteren Kante (Papier hebt sich leicht ab) */
+.sticky::after { content: ''; position: absolute; left: 10%; right: 4%; bottom: 6px; height: 18px; z-index: -1; border-radius: 50%; box-shadow: 0 14px 14px rgba(0,0,0,.38); transform: rotate(2deg); }
+/* Klebestreifen oben */
+.sticky::before { content: ''; position: absolute; left: 50%; top: -9px; width: 74px; height: 20px; margin-left: -37px; background: rgba(255,255,255,.42); border: 1px solid rgba(255,255,255,.35); box-shadow: 0 1px 3px rgba(0,0,0,.12); transform: rotate(calc(var(--rot, 0deg) * -2)); pointer-events: none; }
+.sticky:hover, .sticky:focus-within { transform: perspective(900px) rotate(0) rotateX(4deg) translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,.18), 0 26px 50px rgba(0,0,0,.34); }
+.sticky.drag { transform: perspective(900px) rotate(1.5deg) rotateX(8deg) scale(1.03); opacity: .95; transition: none; }
 .st-head { display: flex; align-items: center; height: 26px; padding: 0 4px; cursor: grab; background: rgba(0,0,0,.05); border-radius: 4px 4px 0 0; opacity: .25; transition: opacity .15s; }
 .sticky:hover .st-head, .sticky:focus-within .st-head { opacity: 1; }
 .st-btn { width: 22px; height: 22px; border: 0; border-radius: 5px; background: transparent; color: #4a473a; display: grid; place-items: center; font-size: 13px; }
