@@ -518,3 +518,9 @@ body.focus-mode #stickies { opacity: 0; pointer-events: none; }
 @keyframes saverFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
 /* alles außer Hintergrund und Schoner ausblenden (auch Menüs, Dialoge, Meldungen, Palette) */
 body.saver-on #os > :not(#wallpaper):not(#saver) { opacity: 0; transition: opacity .8s; pointer-events: none; }
+
+/* Popover: dichteres Glas (Text dahinter darf nicht durchscheinen) */
+.popover.glass { background: var(--glass-strong); }
+/* Mitteilungscenter offen → neue Meldungen erscheinen nur dort, nicht als Toast darüber */
+#toasts { transition: opacity .2s; }
+#os:has(> .popover.nc) #toasts { opacity: 0; pointer-events: none; }

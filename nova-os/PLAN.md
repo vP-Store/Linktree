@@ -121,7 +121,8 @@ dem Backlog.
 | R59 | Einstellungen: echte Standbild-Vorschau der 3D-Hintergründe | ✅ |
 | R60 | Start aus dem Dock: Fenster fliegt räumlich aus dem Symbol auf | ✅ |
 | R61 | Minimieren fliegt ins Dock-Symbol der App (und von dort zurück) | ✅ |
-| R62+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R62 | Popover mit dichterem Glas; keine Toasts über dem offenen Mitteilungscenter | ✅ |
+| R63+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
