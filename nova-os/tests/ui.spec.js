@@ -436,3 +436,18 @@ test('Downloads-Stapel im Dock fächert auf und öffnet Dateien', async ({ page 
   await expect(page.locator('.stack-fan')).toHaveCount(0);
   await expect(page.locator('.win[data-app="editor"]')).toHaveCount(1);
 });
+
+test('Editor-Minimap: Klick springt an die Stelle', async ({ page }) => {
+  await page.evaluate(async () => {
+    const { api } = await import('/js/core/api.js'); const pl = await api.fs.places();
+    await api.fs.writeText(pl.documents + '/lang.txt', Array.from({ length: 400 }, (_, i) => 'Zeile ' + i).join('\n'));
+    const m = await import('/js/core/wm.js'); await m.openApp('editor', { path: pl.documents + '/lang.txt' });
+  });
+  const mini = page.locator('.ed-mini');
+  await expect(mini).toBeVisible();
+  await expect(page.locator('.ed-mini-code')).toContainText('Zeile 399');
+  await page.waitForTimeout(500); // Öffnungsanimation abwarten (Fenster ist sonst noch gekippt)
+  const b = await mini.boundingBox();
+  await page.mouse.click(b.x + b.width / 2, b.y + b.height * 0.6);
+  await expect.poll(() => page.locator('.ed-scroll').evaluate((el) => el.scrollTop)).toBeGreaterThan(500);
+});

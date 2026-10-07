@@ -738,3 +738,10 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .set-hero .set-orb .r2 { inset: 11px; }
 .set-hero .set-orb .r3 { inset: 22px; }
 :root[data-reduce-motion="true"] .set-orb > i, :root[data-reduce-motion="true"] .set-orb::before { animation: none; }
+
+/* Editor-Minimap */
+.ed-mini { position: relative; flex: none; width: 92px; overflow: hidden; border-left: 1px solid var(--border); cursor: pointer; background: rgba(0,0,0,.08); }
+.ed-mini.hidden { display: none; }
+.ed-mini-code { position: absolute; left: 6px; top: 12px; margin: 0; width: calc((92px - 8px) / .14); transform-origin: 0 0; font: var(--ed-font)/1.6 var(--font-mono); white-space: pre; pointer-events: none; opacity: .85; }
+.ed-mini-view { position: absolute; left: 0; right: 0; top: 0; background: rgba(var(--accent-rgb), .14); border-top: 1px solid rgba(var(--accent-rgb), .35); border-bottom: 1px solid rgba(var(--accent-rgb), .35); pointer-events: none; transition: background .15s; margin-top: 12px; }
+.ed-mini:hover .ed-mini-view { background: rgba(var(--accent-rgb), .22); }

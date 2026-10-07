@@ -31,7 +31,12 @@ export default {
     const preview = h('div.ed-preview.md-body.hidden');
     const findBar = h('div.ed-find.hidden');
     const statusL = h('span'), statusR = h('span.grow', { style: { textAlign: 'right' } });
-    const editorWrap = h('div.ed-wrap', gutter, scroller);
+    // Minimap: verkleinerte Übersicht des Codes mit Sichtbereich, Klick/Ziehen springt dorthin
+    const miniCode = h('pre.ed-mini-code', { 'aria-hidden': 'true' });
+    const miniView = h('div.ed-mini-view');
+    const mini = h('div.ed-mini', { title: 'Übersicht – klicken oder ziehen zum Springen' }, miniCode, miniView);
+    const MINI = 0.14;
+    const editorWrap = h('div.ed-wrap', gutter, scroller, mini);
     root.classList.add('ed-root');
     root.append(
       h('div.app-toolbar.ed-toolbar',
@@ -187,7 +192,41 @@ export default {
       }
       updateStatus();
       if (cur.preview) preview.innerHTML = renderMarkdown(text);
+      scheduleMini();
     }
+
+    let miniT = 0;
+    function scheduleMini() { clearTimeout(miniT); miniT = setTimeout(renderMini, 160); }
+    function renderMini() {
+      const big = ta.value.length > 400000; // sehr große Dateien: keine Minimap
+      mini.classList.toggle('hidden', big || wrapOn);
+      if (big || wrapOn) return;
+      miniCode.innerHTML = hl.innerHTML;
+      syncMini();
+    }
+    function syncMini() {
+      if (mini.classList.contains('hidden')) return;
+      const codeH = miniCode.scrollHeight * MINI, boxH = mini.clientHeight;
+      const maxScroll = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
+      const off = Math.max(0, codeH - boxH) * (scroller.scrollTop / maxScroll); // Minimap scrollt mit, wenn sie überläuft
+      miniCode.style.transform = `translateY(${-off}px) scale(${MINI})`;
+      miniView.style.top = (scroller.scrollTop * MINI - off) + 'px';
+      miniView.style.height = Math.max(12, scroller.clientHeight * MINI) + 'px';
+    }
+    mini.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const jump = (ev) => {
+        const r = mini.getBoundingClientRect();
+        const codeH = miniCode.scrollHeight * MINI, boxH = mini.clientHeight;
+        const maxScroll = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
+        const off = Math.max(0, codeH - boxH) * (scroller.scrollTop / maxScroll);
+        const y = ev.clientY - r.top + off; // Position im verkleinerten Code
+        scroller.scrollTop = Math.max(0, y / MINI - scroller.clientHeight / 2);
+      };
+      jump(e);
+      const up = () => { removeEventListener('pointermove', jump); removeEventListener('pointerup', up); };
+      addEventListener('pointermove', jump); addEventListener('pointerup', up);
+    });
 
     function updateStatus() {
       if (!cur) return;
@@ -203,12 +242,14 @@ export default {
 
     function syncScroll() {
       gutter.scrollTop = scroller.scrollTop;
+      syncMini();
     }
 
     function setWrap(on) {
       wrapOn = on;
       store.set('editorWrap', on);
       root.classList.toggle('ed-wrapped', on);
+      scheduleMini();
       ta.setAttribute('wrap', on ? 'soft' : 'off');
       btns.wrapBtn.classList.toggle('on', on);
       gutter.classList.toggle('hidden', on);

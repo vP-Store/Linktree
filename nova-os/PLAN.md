@@ -129,7 +129,8 @@ dem Backlog.
 | R67 | Benannte Fenster-Anordnungen speichern/öffnen/löschen (Befehlspalette) | ✅ |
 | R68 | Downloads-Stapel im Dock (3D-Bogen mit den neuesten Dateien, Bildvorschau) | ✅ |
 | R69 | 3D-Orb in Einstellungen; eigene Hintergrundbilder mit Parallaxe und Ken-Burns-Zoom | ✅ |
-| R70+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R70 | Code-Editor mit Minimap (Übersicht, Sichtbereich, Klick/Ziehen springt) | ✅ |
+| R71+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
