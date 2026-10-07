@@ -92,15 +92,15 @@
 .win.max > .win-edge, :root[data-perf="true"] .win > .win-edge { display: none; }
 
 /* Start aus dem Dock: Fenster fliegt aus dem Symbol auf */
-.win.launch { animation: winLaunch calc(.48s * var(--speed)) cubic-bezier(.2, .9, .25, 1); }
+.win.launch:not(.closing):not(.minimizing) { animation: winLaunch calc(.48s * var(--speed)) cubic-bezier(.2, .9, .25, 1); }
 @keyframes winLaunch {
   from { opacity: 0; transform: perspective(1400px) translate(var(--lx), var(--ly)) rotateX(28deg) scale(.06); }
   35% { opacity: 1; }
   to { opacity: 1; transform: perspective(1400px) translate(0, 0) rotateX(0) scale(1); }
 }
-[data-fx3d="false"] .win.launch { animation-name: winLaunchFlat; }
+[data-fx3d="false"] .win.launch:not(.closing):not(.minimizing) { animation-name: winLaunchFlat; }
 @keyframes winLaunchFlat { from { opacity: 0; transform: translate(var(--lx), var(--ly)) scale(.06); } 35% { opacity: 1; } to { opacity: 1; transform: none; } }
-[data-reduce-motion="true"] .win.launch { animation-name: fadeIn; }
+[data-reduce-motion="true"] .win.launch:not(.closing):not(.minimizing) { animation-name: fadeIn; }
 
 /* Snap-Layouts */
 .snap-pop { position: fixed; z-index: 7000; display: grid; grid-template-columns: repeat(3, 84px); gap: 10px; padding: 12px; border-radius: 16px; box-shadow: var(--shadow-lg); animation: popIn .16s var(--ease); background: var(--glass-strong); }

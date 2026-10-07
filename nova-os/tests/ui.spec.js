@@ -451,3 +451,8 @@ test('Editor-Minimap: Klick springt an die Stelle', async ({ page }) => {
   await page.mouse.click(b.x + b.width / 2, b.y + b.height * 0.6);
   await expect.poll(() => page.locator('.ed-scroll').evaluate((el) => el.scrollTop)).toBeGreaterThan(500);
 });
+
+test('Systemklänge bei Lautstärke 0: Meldung erscheint trotzdem', async ({ page }) => {
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('uiSounds', true); store.set('uiSoundVolume', 0); const ui = await import('/js/core/ui.js'); ui.notify('Leise', 'Test'); });
+  await expect(page.locator('.toast', { hasText: 'Leise' })).toBeVisible();
+});

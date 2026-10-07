@@ -238,7 +238,7 @@ const EXT = {
   slides: 'ppt pptx odp',
   link: 'lnk url',
 };
-const EXT_MAP = {};
+const EXT_MAP = Object.create(null); // ohne Prototyp: Endungen wie .constructor sind normale Dateien
 for (const [k, list] of Object.entries(EXT)) for (const e of list.split(' ')) EXT_MAP[e] = k;
 
 export function fileKind(ext, isDir) {

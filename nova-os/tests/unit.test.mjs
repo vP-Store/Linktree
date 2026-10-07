@@ -96,3 +96,11 @@ test('Weiche Trennstellen nur in langen Wörtern', async () => {
   assert.equal(softHyphens('Rechner'), 'Rechner');
   assert.equal(softHyphens('Systemsteuerung').replace(/­/g, ''), 'Systemsteuerung');
 });
+
+test('Dateiendungen wie .constructor sind normale Dateien', async () => {
+  const { fileKind, fileGlyph } = await import('../src/renderer/js/core/icons.js');
+  for (const e of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+    assert.equal(fileKind(e), 'file');
+    assert.ok(fileGlyph(e).includes('<svg'));
+  }
+});

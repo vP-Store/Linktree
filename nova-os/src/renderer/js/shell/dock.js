@@ -145,6 +145,7 @@ let winPop = null;
 function closeWinList() { if (winPop) { winPop.remove(); winPop = null; dock.classList.remove('pop-open'); } }
 async function toggleWinList(btn) {
   if (winPop) return closeWinList();
+  closeStack();
   const r = btn.getBoundingClientRect();
   winPop = h('div.glass.dock-pop', { style: { left: Math.max(10, r.left + r.width / 2 - 170) + 'px', bottom: innerHeight - r.top + 14 + 'px' } },
     h('div.section-title', 'Geöffnet in Windows'), h('div.empty', h('div.spinner')));
@@ -168,12 +169,19 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWinList(); });
 // ---------- Downloads-Stapel: neueste Dateien fächern sich als 3D-Bogen auf ----------
 let stack = null;
 function closeStack() { if (stack) { const s = stack; stack = null; dock.classList.remove('stack-open'); s.classList.add('out'); setTimeout(() => s.remove(), 220); } }
+let stackToken = 0;
 async function toggleStack(btn) {
-  if (stack) return closeStack();
-  const places = await api.fs.places();
-  const dir = places.downloads || places.home;
-  let files = [];
-  try { files = (await api.fs.list(dir)).filter((f) => !f.dir).sort((a, b) => b.mtime - a.mtime).slice(0, 8); } catch (_) { /* Ordner fehlt */ }
+  if (stack || stackToken) { stackToken = 0; return closeStack(); }
+  closeWinList();
+  const token = stackToken = Date.now(); // schneller Doppelklick: nur ein Fächer
+  let dir = '', files = [];
+  try {
+    const places = await api.fs.places();
+    dir = places.downloads || places.home;
+    files = (await api.fs.list(dir)).filter((f) => !f.dir).sort((a, b) => b.mtime - a.mtime).slice(0, 8);
+  } catch (_) { /* Ordner fehlt */ }
+  if (token !== stackToken) return;
+  stackToken = 0;
   const r = btn.getBoundingClientRect();
   const el = h('div.stack-fan', { style: { left: r.left + r.width / 2 + 'px', bottom: innerHeight - r.top + 8 + 'px' } });
   const items = [

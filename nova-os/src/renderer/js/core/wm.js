@@ -5,7 +5,7 @@ import { h, bus, clamp, debounce } from './dom.js';
 import { icon } from './icons.js';
 import { store } from './store.js';
 import { getApp, appIconHtml } from './registry.js';
-import { showError, contextMenu } from './ui.js';
+import { showError, contextMenu, toast } from './ui.js';
 
 const windows = new Map(); // id → Win
 let zTop = 20;
@@ -56,8 +56,11 @@ const SNAP_GROUPS = [['left', 'right'], ['l23', 'r3'], ['l3', 'c3', 'r3'], ['tl'
 let snapPop = null, snapHideT = 0;
 function hideSnapLayouts() { clearTimeout(snapHideT); if (snapPop) { snapPop.remove(); snapPop = null; } }
 function scheduleHideSnap() { clearTimeout(snapHideT); snapHideT = setTimeout(hideSnapLayouts, 260); }
+addEventListener('keydown', (e) => { if (snapPop && e.key === 'Escape') hideSnapLayouts(); }, true);
+addEventListener('pointerdown', (e) => { if (snapPop && !snapPop.contains(e.target)) hideSnapLayouts(); }, true);
 function showSnapLayouts(win) {
   hideSnapLayouts();
+  if (!windows.has(win.id) || !win.maxBtn.isConnected || win.min) return; // Fenster inzwischen weg
   const a = area();
   const pop = h('div.snap-pop.glass', { onpointerenter: () => clearTimeout(snapHideT), onpointerleave: scheduleHideSnap });
   for (const group of SNAP_GROUPS) {
@@ -101,11 +104,11 @@ class Win {
     const ctrl = (cls, ic, title, fn) => h('button.win-ctrl.' + cls, { title, html: icon(ic), onclick: (e) => { e.stopPropagation(); fn(); } });
     this.titleEl = h('div.win-title', this.title);
     this.tools = h('div.win-tools');
-    this.maxBtn = ctrl('max', 'maximize', 'Maximieren (Alt+↑) – Maus halten für Anordnungen', () => { hideSnapLayouts(); this.toggleMax(); });
+    this.maxBtn = ctrl('max', 'maximize', 'Maximieren (Alt+↑) – Maus halten für Anordnungen', () => { this.cancelSnapHover(); hideSnapLayouts(); this.toggleMax(); });
     // Snap-Layouts: kurz auf dem Knopf verweilen → Menü mit Anordnungen
-    let hoverT = 0;
-    this.maxBtn.addEventListener('pointerenter', () => { hoverT = setTimeout(() => showSnapLayouts(this), 420); });
-    this.maxBtn.addEventListener('pointerleave', () => { clearTimeout(hoverT); scheduleHideSnap(); });
+    this.snapHoverT = 0;
+    this.maxBtn.addEventListener('pointerenter', () => { clearTimeout(this.snapHoverT); this.snapHoverT = setTimeout(() => showSnapLayouts(this), 420); });
+    this.maxBtn.addEventListener('pointerleave', () => { this.cancelSnapHover(); scheduleHideSnap(); });
     this.titlebar = h('div.win-titlebar',
       h('span.app-icon', { html: appIconHtml(this.app, true) }),
       this.titleEl,
@@ -195,6 +198,8 @@ class Win {
     this.setBounds(snapRect(zone), true);
   }
 
+  cancelSnapHover() { clearTimeout(this.snapHoverT); }
+
   // Ziel für Minimieren: das Dock-Symbol der App (relativ zur Fenstermitte)
   aimAtDock() {
     const item = document.querySelector(`#dock .dock-item[data-app="${CSS.escape(this.appId)}"]`);
@@ -207,6 +212,8 @@ class Win {
   minimize() {
     if (this.min) return;
     this.min = true;
+    this.cancelSnapHover();
+    this.el.classList.remove('launch');
     this.aimAtDock();
     this.el.classList.add('anim', 'minimizing');
     setTimeout(() => {
@@ -243,6 +250,9 @@ class Win {
       } catch (e) { console.error(e); }
     }
     try { this.instance && this.instance.destroy && this.instance.destroy(); } catch (e) { console.error(e); }
+    this.cancelSnapHover();
+    if (snapPop) hideSnapLayouts();
+    this.el.classList.remove('launch');
     this.el.classList.add('closing');
     windows.delete(this.id);
     bus.emit('wm:close', this);
@@ -414,6 +424,9 @@ export function setLaunchOrigin(rect) {
 }
 
 export async function openApp(appId, args = {}, opts = {}) {
+  // Startpunkt (Dock) gilt nur für genau diesen Aufruf
+  const origin = launchOrigin && Date.now() - launchOrigin.t < 1500 ? launchOrigin : null;
+  launchOrigin = null;
   const app = getApp(appId);
   if (!app) { showError(`App „${appId}“ nicht gefunden.`); return null; }
 
@@ -435,14 +448,13 @@ export async function openApp(appId, args = {}, opts = {}) {
   const b = opts.bounds || placement(app);
   win.setBounds(b);
   // Start aus dem Dock: Fenster wächst räumlich aus dem angeklickten Symbol heraus
-  if (launchOrigin && Date.now() - launchOrigin.t < 1500) {
-    const o = launchOrigin;
+  if (origin) {
+    const o = origin;
     win.el.style.setProperty('--lx', Math.round(o.x - (b.x + b.w / 2)) + 'px');
     win.el.style.setProperty('--ly', Math.round(o.y - (b.y + b.h / 2)) + 'px');
     win.el.classList.add('launch');
     setTimeout(() => win.el.classList.remove('launch'), 700);
   }
-  launchOrigin = null;
   if (win.ws !== currentWs) win.el.classList.add('other-ws');
   focus(win.id);
   bus.emit('wm:open', win);
@@ -584,13 +596,25 @@ export function deleteLayout(name) { store.set('layouts', getLayouts().filter((l
 export async function applyLayout(name) {
   const l = getLayouts().find((x) => x.name === name);
   if (!l) return false;
-  for (const w of [...windows.values()]) await w.close();
-  if (windows.size) return false; // ein Fenster wollte nicht geschlossen werden
-  for (const s of l.wins) {
-    if (!getApp(s.app)) continue;
-    const w = await openApp(s.app, s.args || {}, { bounds: s.bounds, ws: s.ws || 0, max: s.max, snap: s.snap });
-    if (w && s.min) w.minimize();
+  // erst alle fragen (ungespeicherte Änderungen), dann schließen – sonst wäre bei „Abbrechen“
+  // schon die Hälfte zu
+  for (const w of [...windows.values()]) {
+    if (w.instance && w.instance.onClose) {
+      let ok = true;
+      try { ok = (await w.instance.onClose()) !== false; } catch (_) { /* weiter */ }
+      if (!ok) { toast('Anordnung nicht geöffnet', `„${w.title}“ wurde nicht geschlossen.`, { icon: 'layers', kind: 'warn' }); return false; }
+    }
   }
+  const { quietly } = await import('./sound.js');
+  await quietly(async () => {
+    for (const w of [...windows.values()]) await w.close(true);
+    const maxWs = (store.get('workspaces') || 1) - 1;
+    for (const s of l.wins) {
+      if (!getApp(s.app)) continue;
+      const w = await openApp(s.app, s.args || {}, { bounds: s.bounds, ws: Math.min(s.ws || 0, maxWs), max: s.max, snap: s.snap });
+      if (w && s.min) w.minimize();
+    }
+  });
   saveSession();
   return true;
 }
@@ -599,10 +623,14 @@ export { saveSession };
 
 export async function restoreSession() {
   const list = store.get('session', []) || [];
-  for (const s of list) {
-    if (!getApp(s.app)) continue;
-    const w = await openApp(s.app, s.args || {}, { bounds: s.bounds, ws: s.ws || 0, max: s.max, snap: s.snap });
-    if (w && s.min) w.minimize();
-  }
+  const maxWs = (store.get('workspaces') || 1) - 1;
+  const { quietly } = await import('./sound.js');
+  await quietly(async () => {
+    for (const s of list) {
+      if (!getApp(s.app)) continue;
+      const w = await openApp(s.app, s.args || {}, { bounds: s.bounds, ws: Math.min(s.ws || 0, maxWs), max: s.max, snap: s.snap });
+      if (w && s.min) w.minimize();
+    }
+  });
   return list.length;
 }

@@ -22,7 +22,7 @@ const SOUNDS = {
 
 let lastPlay = 0;
 export function play(kind) {
-  if (!store.get('uiSounds')) return;
+  if (!store.get('uiSounds') || muted) return;
   const now = performance.now();
   if (now - lastPlay < 60) return; // nicht stapeln
   lastPlay = now;
@@ -30,6 +30,8 @@ export function play(kind) {
   const ac = notes && audio();
   if (!ac) return;
   const vol = Math.max(0, Math.min(1, (store.get('uiSoundVolume') ?? 40) / 100)) * 0.18;
+  if (vol < 0.0005) return; // exponentielle Rampe kann nicht auf 0 zielen
+  try {
   const t0 = ac.currentTime + 0.01;
   for (const [freq, at, dur] of notes) {
     const osc = ac.createOscillator(), gain = ac.createGain();
@@ -43,7 +45,12 @@ export function play(kind) {
     osc.start(t0 + at);
     osc.stop(t0 + at + dur + 0.02);
   }
+  } catch (_) { /* Klang ist nie wichtiger als die Meldung selbst */ }
 }
+
+// Beim Wiederherstellen von Sitzungen/Anordnungen keine Klang-Salven
+let muted = 0;
+export async function quietly(fn) { muted++; try { return await fn(); } finally { muted--; } }
 
 bus.on('wm:open', () => play('open'));
 bus.on('wm:close', () => play('close'));
