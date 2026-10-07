@@ -18,7 +18,7 @@
 .win.inactive .win-title { opacity: .6; }
 .win.max { border-radius: 0; border-left: 0; border-right: 0; }
 .win.anim { transition: left .24s var(--ease), top .24s var(--ease), width .24s var(--ease), height .24s var(--ease), border-radius .24s, opacity .2s, transform .24s var(--ease); }
-.win.minimizing { opacity: 0; transform: perspective(1200px) translateY(40vh) rotateX(38deg) scale(.3); pointer-events: none; }
+.win.minimizing { opacity: 0; transform: perspective(1200px) translate(var(--dx, 0px), var(--dy, 40vh)) rotateX(38deg) scale(.08); pointer-events: none; }
 .win.closing { animation: winClose calc(.16s * var(--speed)) ease forwards; pointer-events: none; }
 .win.min { display: none; }
 .win.other-ws { display: none; }
@@ -33,7 +33,7 @@
 @keyframes winClose { to { opacity: 0; transform: perspective(1400px) translateY(14px) rotateX(-12deg) scale(.92); } }
 [data-fx3d="false"] .win { animation-name: winOpenFlat; }
 [data-fx3d="false"] .win.closing { animation-name: winCloseFlat; }
-[data-fx3d="false"] .win.minimizing { transform: translateY(40vh) scale(.3); }
+[data-fx3d="false"] .win.minimizing { transform: translate(var(--dx, 0px), var(--dy, 40vh)) scale(.08); }
 [data-reduce-motion="true"] .win:not(.closing) { animation-name: fadeIn; }
 @keyframes winOpenFlat { from { opacity: 0; transform: scale(.95) translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes winCloseFlat { to { opacity: 0; transform: scale(.96); } }

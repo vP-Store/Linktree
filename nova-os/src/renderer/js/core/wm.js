@@ -152,9 +152,19 @@ class Win {
     this.setBounds(snapRect(zone), true);
   }
 
+  // Ziel für Minimieren: das Dock-Symbol der App (relativ zur Fenstermitte)
+  aimAtDock() {
+    const item = document.querySelector(`#dock .dock-item[data-app="${CSS.escape(this.appId)}"]`);
+    if (!item) { this.el.style.removeProperty('--dx'); this.el.style.removeProperty('--dy'); return; }
+    const r = item.getBoundingClientRect();
+    this.el.style.setProperty('--dx', Math.round(r.left + r.width / 2 - (this.x + this.w / 2)) + 'px');
+    this.el.style.setProperty('--dy', Math.round(r.top + r.height / 2 - (this.y + this.h / 2)) + 'px');
+  }
+
   minimize() {
     if (this.min) return;
     this.min = true;
+    this.aimAtDock();
     this.el.classList.add('anim', 'minimizing');
     setTimeout(() => {
       this.el.classList.remove('anim', 'minimizing');
@@ -171,6 +181,7 @@ class Win {
   unminimize() {
     if (!this.min) return;
     this.min = false;
+    this.aimAtDock();
     this.el.classList.remove('min');
     this.el.classList.add('minimizing');
     // Reflow erzwingen, dann zurück-animieren
