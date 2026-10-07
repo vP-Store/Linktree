@@ -173,3 +173,10 @@ export const bus = new Emitter();
 export function isoDate(d = new Date()) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
+
+/** Electron-Tastenkürzel lesbar auf Deutsch: "Control+Alt+Space" → "Strg + Alt + Leertaste" */
+export function prettyAccel(acc) {
+  if (!acc) return 'nicht belegt';
+  const map = { Control: 'Strg', CommandOrControl: 'Strg', Shift: 'Umschalt', Space: 'Leertaste', Super: 'Win', Up: '↑', Down: '↓', Left: '←', Right: '→', Esc: 'Esc' };
+  return acc.split('+').map((k) => map[k] || k).join(' + ');
+}

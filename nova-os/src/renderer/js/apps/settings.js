@@ -1,6 +1,6 @@
 // Einstellungen: Erscheinungsbild, Desktop & Dock, Tastenkürzel, System, Info.
 
-import { h, clear, esc } from '../core/dom.js';
+import { h, clear, esc, prettyAccel } from '../core/dom.js';
 import { icon, logoSvg } from '../core/icons.js';
 import { api, isElectron } from '../core/api.js';
 import { store, DEFAULTS } from '../core/store.js';
@@ -104,6 +104,16 @@ export default {
           h('div.set-hero', { html: logoSvg(84) }),
           h('h1', 'Willkommen bei NovaOS'),
           h('p.muted', 'Dein eigenes Betriebssystem – als Overlay über Windows. Ein Tastendruck holt es hervor, ein weiterer bringt dich zurück.'),
+          (() => {
+            const note = h('div.set-hotkey-note.hidden');
+            api.overlay.getHotkey().then((k) => {
+              const first = main.querySelector('.set-tile b');
+              if (first) first.textContent = prettyAccel(k);
+              if (k && k !== 'Alt+Space') { note.classList.remove('hidden'); note.innerHTML = `${icon('info')} <span>Alt + Leertaste ist bereits von einem anderen Programm belegt (z. B. PowerToys). NovaOS nutzt stattdessen <b>${esc(prettyAccel(k))}</b> – änderbar unter Tastenkürzel.</span>`; }
+              if (!k) { note.classList.remove('hidden'); note.innerHTML = `${icon('alert')} <span>Kein globales Tastenkürzel verfügbar. Lege eines unter Tastenkürzel fest oder nutze das Tray-Symbol.</span>`; }
+            });
+            return note;
+          })(),
           h('div.set-tiles',
             ...[['keyboard', 'Alt + Leertaste', 'NovaOS jederzeit ein- und ausblenden'], ['command', 'Strg + K', 'Alles finden: Apps, Dateien, Befehle, Rechnen'],
               ['columns', 'Fenster ziehen', 'An den Rand ziehen zum Einrasten (Hälfte/Viertel)'], ['apps', 'Programme', 'Starte alle installierten Windows-Programme'],
@@ -175,7 +185,7 @@ export default {
 
       if (page === 'keys') {
         const current = h('span.kbd.set-hotkey', '…');
-        api.overlay.getHotkey().then((k) => { current.textContent = k || 'nicht belegt'; });
+        api.overlay.getHotkey().then((k) => { current.textContent = prettyAccel(k); });
         const rec = h('button.btn', { html: `${icon('keyboard')} Neue Kombination aufnehmen` });
         rec.onclick = () => {
           rec.textContent = 'Drücke die neue Tastenkombination …';
@@ -187,8 +197,8 @@ export default {
             if (!acc) return;
             done();
             const res = await api.overlay.setHotkey(acc);
-            if (res === acc) { toast('Tastenkürzel gespeichert', acc, { kind: 'ok', icon: 'keyboard' }); current.textContent = acc; }
-            else { showError(`„${acc}“ ist bereits von einem anderen Programm belegt. Aktiv: ${res || 'keins'}`); current.textContent = res || 'nicht belegt'; }
+            if (res === acc) { toast('Tastenkürzel gespeichert', prettyAccel(acc), { kind: 'ok', icon: 'keyboard' }); current.textContent = prettyAccel(acc); }
+            else { showError(`„${prettyAccel(acc)}“ ist bereits von einem anderen Programm belegt. Aktiv: ${prettyAccel(res)}`); current.textContent = prettyAccel(res); }
           };
           const done = () => { removeEventListener('keydown', onKey, true); rec.innerHTML = `${icon('keyboard')} Neue Kombination aufnehmen`; rec.classList.remove('primary'); };
           addEventListener('keydown', onKey, true);

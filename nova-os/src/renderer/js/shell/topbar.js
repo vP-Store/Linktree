@@ -1,6 +1,6 @@
 // Statusleiste oben + Popover (Schnelleinstellungen, Mitteilungen, Kalender).
 
-import { h, clear, bus, pad, rate, timeAgo, esc } from '../core/dom.js';
+import { h, clear, bus, pad, rate, timeAgo, esc, prettyAccel } from '../core/dom.js';
 import { icon, logoSvg } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { api } from '../core/api.js';
@@ -43,6 +43,7 @@ export function initTopbar() {
   bellEl = item('.tb-dot', icon('bell'), 'Mitteilungen', (e) => togglePop('nc', e.currentTarget));
   const qs = item('', icon('sliders'), 'Schnelleinstellungen', (e) => togglePop('qs', e.currentTarget));
   const hide = item('', icon('eyeOff'), 'NovaOS ausblenden (Alt+Leertaste)', () => overlayHide());
+  api.overlay.getHotkey().then((k) => { hide.title = `NovaOS ausblenden (${prettyAccel(k)})`; });
   const power = item('', icon('power'), 'Energie', (e) => powerMenu(e.currentTarget));
 
   bar.append(
