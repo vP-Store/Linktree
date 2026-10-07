@@ -331,3 +331,14 @@ test('Weltuhr 3D: Globus und Uhrzeiten', async ({ page }) => {
   await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('widgetList', ['clock']); });
   await expect(page.locator('.w-globe')).toHaveCount(0);
 });
+
+test('Kalender: Weiter vom 31. Januar führt in den Februar (blättert in 3D)', async ({ page }) => {
+  await open(page, 'calendar', { date: '2026-01-31' });
+  const win = page.locator('.win').last();
+  await expect(win.locator('.app-toolbar')).toContainText('Januar 2026');
+  await win.locator('button[title="Weiter"]').click();
+  await expect(win.locator('.app-toolbar')).toContainText('Februar 2026');
+  await expect(win.locator('.cal-grid')).toHaveClass(/flip-next/);
+  await win.locator('button[title="Weiter"]').click();
+  await expect(win.locator('.app-toolbar')).toContainText('März 2026');
+});

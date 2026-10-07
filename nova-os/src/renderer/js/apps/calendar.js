@@ -86,9 +86,14 @@ export default {
       h('div.app-split', h('div.app-main', grid), agenda));
 
     function step(dir) {
-      if (view === 'month') cursor.setMonth(cursor.getMonth() + dir);
+      // erst auf den 1. setzen: sonst wird aus dem 31.01. + 1 Monat der 03.03.
+      if (view === 'month') { cursor.setDate(1); cursor.setMonth(cursor.getMonth() + dir); }
       else cursor.setDate(cursor.getDate() + dir * 7);
       render();
+      // Umblättern wie ein Kalenderblatt (3D)
+      grid.classList.remove('flip-next', 'flip-prev');
+      void grid.offsetWidth;
+      grid.classList.add(dir > 0 ? 'flip-next' : 'flip-prev');
     }
 
     function eventsOn(date) {

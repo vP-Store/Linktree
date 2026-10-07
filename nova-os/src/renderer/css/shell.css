@@ -486,3 +486,19 @@ body.focus-mode #stickies { opacity: 0; pointer-events: none; }
 .globe-row b { font: 500 15px var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
 .globe-row.home span { color: var(--accent); font-weight: 600; }
 .globe-row.home span::before { content: '● '; font-size: 9px; vertical-align: 2px; }
+
+/* ---------- 3D-Mikroanimationen (nur mit „Räumliche 3D-Effekte“) ---------- */
+:root[data-fx3d="true"] #start { animation-name: startIn3d; transform-origin: 50% 100%; }
+@keyframes startIn3d { from { opacity: 0; transform: translateX(-50%) perspective(1200px) translateY(40px) rotateX(-14deg) scale(.96); } to { opacity: 1; transform: translateX(-50%) perspective(1200px); } }
+:root[data-fx3d="true"] #palette { animation-name: palIn3d; transform-origin: 50% 0; }
+@keyframes palIn3d { from { opacity: 0; transform: translateX(-50%) perspective(1000px) translateY(-14px) rotateX(16deg) scale(.97); } to { opacity: 1; transform: translateX(-50%) perspective(1000px); } }
+:root[data-fx3d="true"] .toast { animation-name: toastIn3d; transform-origin: 100% 50%; }
+@keyframes toastIn3d { from { opacity: 0; transform: perspective(800px) translateX(40px) rotateY(-38deg); } to { opacity: 1; transform: perspective(800px); } }
+:root[data-fx3d="true"] .ctx, :root[data-fx3d="true"] .popover, :root[data-fx3d="true"] .dock-pop { animation-name: unfold3d; }
+@keyframes unfold3d { from { opacity: 0; transform: perspective(700px) rotateX(-22deg) scale(.96); } to { opacity: 1; transform: perspective(700px); } }
+:root[data-fx3d="true"] .modal { animation-name: modalIn3d; }
+@keyframes modalIn3d { from { opacity: 0; transform: perspective(900px) translateY(18px) rotateX(12deg) scale(.94); } to { opacity: 1; transform: perspective(900px); } }
+:root[data-fx3d="true"] .cal-grid.flip-next { animation: calFlipNext .42s cubic-bezier(.2, .9, .3, 1); transform-origin: 50% 0; }
+:root[data-fx3d="true"] .cal-grid.flip-prev { animation: calFlipPrev .42s cubic-bezier(.2, .9, .3, 1); transform-origin: 50% 100%; }
+@keyframes calFlipNext { from { opacity: 0; transform: perspective(1100px) rotateX(-28deg); } to { opacity: 1; transform: perspective(1100px); } }
+@keyframes calFlipPrev { from { opacity: 0; transform: perspective(1100px) rotateX(28deg); } to { opacity: 1; transform: perspective(1100px); } }
