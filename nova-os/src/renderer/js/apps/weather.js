@@ -55,7 +55,10 @@ export default {
       clear(body);
       const c = data.current;
       const now = describe(c.weather_code, c.is_day);
-      root.dataset.sky = c.is_day ? (c.weather_code <= 1 ? 'clear' : c.weather_code >= 51 ? 'rain' : 'cloud') : 'night';
+      const wc = c.weather_code;
+      const precip = wc >= 95 ? 'storm' : (wc >= 71 && wc <= 77) || wc === 85 || wc === 86 ? 'snow' : wc >= 51 ? 'rain' : null;
+      root.dataset.sky = precip || (c.is_day ? (wc <= 1 ? 'clear' : 'cloud') : 'night');
+      renderSky(root.dataset.sky);
       win.setTitle(`${city.name} · ${Math.round(c.temperature_2m)}° – Wetter`);
 
       // Kopf
@@ -110,6 +113,17 @@ export default {
       });
       body.append(h('div.card.wx-card', h('div.section-title', '7-Tage-Vorhersage'), days),
         h('div.faint', { style: { fontSize: '11px', textAlign: 'center', padding: '4px 0 8px' } }, 'Daten: Open-Meteo.com'));
+    }
+
+    // Animierter Himmel hinter dem Inhalt: Ebenen mit unterschiedlicher Tiefe
+    const sky = h('div.wx-sky', { 'aria-hidden': 'true' });
+    root.prepend(sky);
+    function renderSky(kind) {
+      clear(sky);
+      sky.dataset.kind = kind;
+      const layers = { rain: ['r1', 'r2', 'r3'], storm: ['r1', 'r2', 'r3', 'flash'], snow: ['s1', 's2', 's3'], cloud: ['c1', 'c2', 'c3'], clear: ['sun', 'rays'], night: ['stars', 'moon'] }[kind] || [];
+      for (const l of layers) sky.append(h('i.' + l));
+      if (kind === 'rain' || kind === 'storm' || kind === 'cloud') sky.append(h('i.c1'), h('i.c2'));
     }
 
     load();
