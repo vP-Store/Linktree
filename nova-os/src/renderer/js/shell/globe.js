@@ -115,7 +115,9 @@ export function globeWidget() {
     ctx.fillStyle = atm; ctx.beginPath(); ctx.arc(cx, cy, R * 1.25, 0, Math.PI * 2); ctx.fill();
     // Kugelkörper
     const body = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
-    body.addColorStop(0, 'rgba(60,70,120,.55)'); body.addColorStop(1, 'rgba(8,10,24,.85)');
+    const light = document.documentElement.dataset.theme === 'light';
+    if (light) { body.addColorStop(0, 'rgba(226,232,255,.95)'); body.addColorStop(1, 'rgba(148,163,214,.9)'); }
+    else { body.addColorStop(0, 'rgba(60,70,120,.55)'); body.addColorStop(1, 'rgba(8,10,24,.85)'); }
     ctx.fillStyle = body; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
 
     const sun = subsolar();
@@ -127,7 +129,9 @@ export function globeWidget() {
       const day = p[0] * sv[0] + p[1] * sv[1] + p[2] * sv[2];
       const lit = Math.max(0, Math.min(1, day * 3 + 0.5));
       const a = (0.18 + lit * 0.7) * (0.35 + z * 0.65);
-      ctx.fillStyle = lit > 0.5 ? `rgba(255,236,190,${a.toFixed(3)})` : `rgba(140,160,255,${(a * 0.8).toFixed(3)})`;
+      ctx.fillStyle = light
+        ? (lit > 0.5 ? `rgba(234,140,20,${a.toFixed(3)})` : `rgba(60,70,160,${(a * 0.8).toFixed(3)})`)
+        : (lit > 0.5 ? `rgba(255,236,190,${a.toFixed(3)})` : `rgba(140,160,255,${(a * 0.8).toFixed(3)})`);
       const s = 2.2 + z * 2.6;
       ctx.fillRect(cx - x * R - s / 2, cy - y * R - s / 2, s, s);
     }
