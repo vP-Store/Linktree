@@ -6,9 +6,10 @@ import { api, isElectron } from '../core/api.js';
 import { store, DEFAULTS } from '../core/store.js';
 import { listApps, appIconSpan } from '../core/registry.js';
 import { ACCENTS, WALLPAPERS, wallpaperThumb } from '../shell/theme.js';
-import { toast, confirmDialog, promptDialog, showError } from '../core/ui.js';
+import { toast, confirmDialog, promptDialog, showError, notify } from '../core/ui.js';
 import { openApp } from '../core/wm.js';
 import { sysInfo } from '../shell/state.js';
+import { SHORTCUTS, keyChips } from '../core/shortcuts.js';
 
 const PAGES = [
   ['welcome', 'sparkles', 'Willkommen'],
@@ -18,9 +19,6 @@ const PAGES = [
   ['system', 'settings', 'System'],
   ['about', 'info', 'Über NovaOS'],
 ];
-
-import { SHORTCUTS } from '../core/shortcuts.js';
-export { SHORTCUTS };
 
 function toAccelerator(e) {
   const mods = [];
@@ -94,7 +92,9 @@ export default {
             api.overlay.getHotkey().then((k) => {
               const first = main.querySelector('.set-tile b');
               if (first) first.textContent = prettyAccel(k);
-              if (k && k !== 'Alt+Space') { note.classList.remove('hidden'); note.innerHTML = `${icon('info')} <span>Alt + Leertaste ist bereits von einem anderen Programm belegt (z. B. PowerToys). NovaOS nutzt stattdessen <b>${esc(prettyAccel(k))}</b> – änderbar unter Tastenkürzel.</span>`; }
+              // Nur melden, wenn die gewünschte Kombination (Standard oder selbst gewählt) nicht frei war
+              const wanted = store.get('hotkey') || 'Alt+Space';
+              if (k && k !== wanted) { note.classList.remove('hidden'); note.innerHTML = `${icon('info')} <span>${esc(prettyAccel(wanted))} ist bereits von einem anderen Programm belegt (z. B. PowerToys). NovaOS nutzt stattdessen <b>${esc(prettyAccel(k))}</b> – änderbar unter Tastenkürzel.</span>`; }
               if (!k) { note.classList.remove('hidden'); note.innerHTML = `${icon('alert')} <span>Kein globales Tastenkürzel verfügbar. Lege eines unter Tastenkürzel fest oder nutze das Tray-Symbol.</span>`; }
             });
             return note;
@@ -182,6 +182,7 @@ export default {
             if (!acc) return;
             done();
             const res = await api.overlay.setHotkey(acc);
+            if (res) store.set('hotkey', res); // Hauptprozess speichert das Ergebnis ebenso – lokalen Stand angleichen
             if (res === acc) { toast('Tastenkürzel gespeichert', prettyAccel(acc), { kind: 'ok', icon: 'keyboard' }); current.textContent = prettyAccel(acc); }
             else { showError(`„${prettyAccel(acc)}“ ist bereits von einem anderen Programm belegt. Aktiv: ${prettyAccel(res)}`); current.textContent = prettyAccel(res); }
           };
@@ -190,7 +191,7 @@ export default {
         };
         main.append(
           section('Globales Tastenkürzel', row('NovaOS ein-/ausblenden', 'Funktioniert überall in Windows', h('div.row', current, rec))),
-          section('Alle Tastenkürzel', ...SHORTCUTS.map(([t, k]) => row(t, '', h('span.set-keys', ...k.split(' ').map((p) => (p === '+' || p === '/' || p === '…' || p === '(halten)' || p === '(änderbar)' ? h('span.faint', ' ' + p + ' ') : h('span.kbd', p))))))));
+          section('Alle Tastenkürzel', ...SHORTCUTS.map(([t, k]) => row(t, '', keyChips(k)))));
       }
 
       if (page === 'system') {
@@ -237,7 +238,6 @@ export default {
         const stamp = new Date().toISOString().slice(0, 10);
         const file = (places.novaData || places.documents) + (places.sep || '/') + `Sicherung ${stamp}.json`;
         await api.fs.writeText(file, JSON.stringify({ app: 'NovaOS', version: 1, created: new Date().toISOString(), data }, null, 2));
-        const { notify } = await import('../core/ui.js');
         notify('Sicherung erstellt', file, { icon: 'download', kind: 'ok', onClick: () => api.fs.reveal(file) });
       } catch (e) { showError(e, 'Sicherung fehlgeschlagen'); }
     }
@@ -248,7 +248,7 @@ export default {
       if (!p) return;
       try {
         const json = JSON.parse(await api.fs.readText(p));
-        if (!json || json.app !== 'NovaOS' || typeof json.data !== 'object') throw new Error('Das ist keine NovaOS-Sicherung.');
+        if (!json || json.app !== 'NovaOS' || !json.data || typeof json.data !== 'object' || Array.isArray(json.data)) throw new Error('Das ist keine NovaOS-Sicherung.');
         const keys = Object.keys(json.data);
         if (!(await confirmDialog({ title: 'Sicherung einspielen?', message: `${keys.length} Einträge vom ${new Date(json.created).toLocaleString('de-DE')} überschreiben die aktuellen Daten. NovaOS lädt danach neu.`, ok: 'Wiederherstellen', danger: true }))) return;
         for (const k of keys) store.set(k, json.data[k]);

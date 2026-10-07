@@ -30,28 +30,40 @@ export function addTask(title, extra = {}) {
 
 export const REPEAT_LABEL = { daily: 'Täglich', weekly: 'Wöchentlich', monthly: 'Monatlich' };
 
-/** Nächstes Fälligkeitsdatum einer wiederkehrenden Aufgabe */
-export function nextDue(due, repeat) {
-  const d = due ? new Date(due + 'T00:00') : new Date();
+/** Einen Wiederholungsschritt weiter; Monatsende wird gekappt (31.01. → 28./29.02.) */
+function stepRepeat(d, repeat) {
   if (repeat === 'daily') d.setDate(d.getDate() + 1);
   else if (repeat === 'weekly') d.setDate(d.getDate() + 7);
-  else if (repeat === 'monthly') d.setMonth(d.getMonth() + 1);
+  else if (repeat === 'monthly') {
+    const day = d.getDate();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + 1);
+    d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
+  }
+  return d;
+}
+
+/** Nächstes Fälligkeitsdatum einer wiederkehrenden Aufgabe */
+export function nextDue(due, repeat) {
+  const d = stepRepeat(due ? new Date(due + 'T00:00') : new Date(), repeat);
   // nie in der Vergangenheit anlegen
   const today = isoDate();
-  let next = isoDate(d);
-  while (next < today && repeat) { const x = new Date(next + 'T00:00'); if (repeat === 'daily') x.setDate(x.getDate() + 1); else if (repeat === 'weekly') x.setDate(x.getDate() + 7); else x.setMonth(x.getMonth() + 1); next = isoDate(x); }
-  return next;
+  while (isoDate(d) < today && REPEAT_LABEL[repeat]) stepRepeat(d, repeat);
+  return isoDate(d);
 }
 
 export function updateTask(id, patch) {
   let list = getTasks();
   const t = list.find((x) => x.id === id);
-  list = list.map((x) => (x.id === id ? { ...x, ...patch, ...(patch.done ? { doneAt: Date.now() } : {}) } : x));
-  // Wiederkehrend: beim Abhaken die nächste Ausgabe anlegen
-  if (t && patch.done && !t.done && t.repeat) {
-    const { id: _old, done: _d, doneAt: _da, ...rest } = t;
-    list = [{ ...rest, id: uid('t'), done: false, due: nextDue(t.due, t.repeat), created: Date.now() }, ...list];
+  // Wiederkehrend: beim Abhaken die nächste Ausgabe anlegen – nur einmal pro Ausgabe,
+  // sonst entstünde bei Abhaken → Zurücknehmen → Abhaken jedes Mal eine weitere Kopie
+  let next = null;
+  if (t && patch.done && !t.done && t.repeat && !t.nextId) {
+    const { id: _old, done: _d, doneAt: _da, nextId: _n, ...rest } = t;
+    next = { ...rest, id: uid('t'), done: false, due: nextDue(t.due, t.repeat), created: Date.now() };
   }
+  list = list.map((x) => (x.id === id ? { ...x, ...patch, ...(patch.done ? { doneAt: Date.now() } : {}), ...(next ? { nextId: next.id } : {}) } : x));
+  if (next) list = [next, ...list];
   saveTasks(list);
 }
 

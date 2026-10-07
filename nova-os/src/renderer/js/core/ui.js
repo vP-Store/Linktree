@@ -52,15 +52,21 @@ function modal(build) {
     const root = document.getElementById('modal-root');
     const scrim = h('div.modal-scrim');
     const box = h('div.modal.glass', { role: 'dialog' });
-    const done = (v) => { scrim.remove(); resolve(v); };
+    // Esc schließt immer den obersten Dialog – auch wenn der Fokus (noch) woanders liegt
+    const onKey = (e) => {
+      if (e.key !== 'Escape' || root.lastElementChild !== scrim) return;
+      e.preventDefault();
+      e.stopPropagation();
+      done(null);
+    };
+    const done = (v) => { removeEventListener('keydown', onKey, true); scrim.remove(); resolve(v); };
     build(box, done);
     scrim.append(box);
     scrim.addEventListener('pointerdown', (e) => { if (e.target === scrim) done(null); });
-    scrim.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { e.stopPropagation(); done(null); }
-    });
+    addEventListener('keydown', onKey, true);
     root.append(scrim);
-    setTimeout(() => (box.querySelector('input, textarea, .btn.primary') || box).focus(), 30);
+    box.tabIndex = -1;
+    (box.querySelector('input, textarea, .btn.primary') || box).focus();
   });
 }
 
@@ -133,9 +139,10 @@ export function formDialog({ title, fields, ok = 'Speichern', extra = [] }) {
   });
 }
 
-export function alertDialog({ title, message = '' }) {
+export function alertDialog({ title, message = '', content = null, className = '' }) {
   return modal((box, done) => {
-    box.append(h('h3', title), message ? h('p', message) : null, h('div.actions', h('button.btn.primary', { onclick: () => done(true) }, 'OK')));
+    if (className) box.classList.add(className);
+    box.append(h('h3', title), message ? h('p', message) : null, content, h('div.actions', h('button.btn.primary', { onclick: () => done(true) }, 'OK')));
   });
 }
 

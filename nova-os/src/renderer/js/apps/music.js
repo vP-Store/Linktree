@@ -22,6 +22,7 @@ export default {
     let folder = args.folder || store.get('musicFolder', places.music || places.home);
     let tracks = [];
     let idx = -1;
+    let nowPlaying = null; // aktuell geladener Titel (für den Mini-Player)
     let shuffle = store.get('musicShuffle', false);
     let repeat = store.get('musicRepeat', 'all');
     let q = '';
@@ -96,6 +97,7 @@ export default {
       const url = fileUrl(t.path);
       if (!url) { toast('Vorschau-Modus', 'Musik wird in der Desktop-App abgespielt.', { icon: 'music' }); return; }
       idx = i;
+      nowPlaying = t;
       audio.src = url;
       audio.play().catch((e) => showError(e, 'Wiedergabe nicht möglich'));
       tTitle.textContent = t.title;
@@ -139,7 +141,8 @@ export default {
       scan();
     }
 
-    const announce = () => bus.emit('music:state', idx >= 0 ? { title: tracks[idx].title, artist: tracks[idx].artist, playing: !audio.paused } : null);
+    // Den geladenen Titel ansagen – nicht tracks[idx], das nach einem Ordnerwechsel veraltet sein kann
+    const announce = () => bus.emit('music:state', nowPlaying ? { title: nowPlaying.title, artist: nowPlaying.artist, playing: !audio.paused } : null);
     audio.addEventListener('play', () => { playBtn.innerHTML = icon('pause'); renderList(); announce(); });
     audio.addEventListener('pause', () => { playBtn.innerHTML = icon('play'); renderList(); announce(); });
     const offCtl = bus.on('music:control', (cmd) => { if (cmd === 'toggle') toggle(); if (cmd === 'next') next(true); if (cmd === 'prev') prev(); });

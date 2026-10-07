@@ -15,6 +15,8 @@ const persist = debounce(() => store.set('stickies', cache), 300);
 function setAll(list) { cache = list; persist(); }
 
 export function initStickies() {
+  // Verzögertes Speichern beim Neuladen/Beenden nicht verlieren
+  addEventListener('beforeunload', () => { if (cache) store.set('stickies', cache); });
   layer = h('div#stickies');
   document.getElementById('desktop').append(layer);
   render();

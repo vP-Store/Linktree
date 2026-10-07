@@ -1,5 +1,7 @@
 // Liste aller Tastenkürzel (Einstellungen + F1-Hilfe)
 
+import { h } from './dom.js';
+
 export const SHORTCUTS = [
   ['NovaOS ein-/ausblenden', 'Alt + Leertaste (änderbar)'],
   ['Befehlspalette / Suche', 'Strg + K'],
@@ -17,3 +19,8 @@ export const SHORTCUTS = [
   ['Arbeitsfläche wechseln', 'Alt + 1 … 4'],
   ['Menüs schließen', 'Esc'],
 ];
+
+/** „Alt + ← / →“ → Tasten-Chips; Verbinder und Hinweise in Klammern blass */
+export function keyChips(keys) {
+  return h('span.set-keys', ...keys.split(' ').map((p) => (/^[+/…]$|^\(/.test(p) ? h('span.faint', ' ' + p + ' ') : h('span.kbd', p))));
+}
