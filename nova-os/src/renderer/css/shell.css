@@ -389,3 +389,17 @@ body.overview-open #windows .win { pointer-events: none; }
 .dock-exe img { width: 100%; height: 100%; object-fit: contain; }
 .dock-item.win-app:hover .dock-exe { transform: translateY(-4px) scale(1.32); }
 .dock-item.win-app.bounce .dock-exe { animation: dockBounce .7s var(--ease); }
+
+/* ---------- Haftnotizen ---------- */
+#stickies { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.sticky { position: absolute; pointer-events: auto; display: flex; flex-direction: column; background: var(--st); color: #2b2a23; border-radius: 4px 4px 14px 4px; box-shadow: 0 2px 4px rgba(0,0,0,.15), 0 12px 28px rgba(0,0,0,.28); transform: rotate(-.6deg); transition: box-shadow .15s, transform .15s; }
+.sticky:hover, .sticky:focus-within { transform: rotate(0); box-shadow: 0 4px 8px rgba(0,0,0,.18), 0 18px 40px rgba(0,0,0,.32); }
+.sticky.drag { transform: rotate(1.5deg) scale(1.02); opacity: .95; }
+.st-head { display: flex; align-items: center; height: 26px; padding: 0 4px; cursor: grab; background: rgba(0,0,0,.05); border-radius: 4px 4px 0 0; opacity: .25; transition: opacity .15s; }
+.sticky:hover .st-head, .sticky:focus-within .st-head { opacity: 1; }
+.st-btn { width: 22px; height: 22px; border: 0; border-radius: 5px; background: transparent; color: #4a473a; display: grid; place-items: center; font-size: 13px; }
+.st-btn:hover { background: rgba(0,0,0,.08); }
+.sticky textarea { flex: 1; border: 0; outline: 0; resize: none; background: transparent; color: inherit; font: 500 14px/1.45 "Segoe Print", "Comic Sans MS", var(--font); padding: 4px 12px 12px; }
+.sticky textarea::placeholder { color: rgba(43,42,35,.45); }
+.st-grip { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,.15) 50%); border-radius: 0 0 14px 0; }
+body.focus-mode #stickies { opacity: 0; pointer-events: none; }

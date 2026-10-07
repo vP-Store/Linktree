@@ -229,3 +229,19 @@ test('Einstellungen: Sicherung erstellen', async ({ page }) => {
   });
   expect(content).toContain('Sicherungs-Test');
 });
+
+test('Haftnotiz behält Text beim Neuzeichnen; Termin-Notizen erscheinen beim Bearbeiten', async ({ page }) => {
+  await page.locator('#desktop').click({ button: 'right', position: { x: 600, y: 300 } });
+  await page.locator('.ctx-item', { hasText: 'Neue Haftnotiz' }).click();
+  await page.keyboard.type('Einkaufen');
+  await page.evaluate(async () => { const m = await import('/js/shell/stickies.js'); m.addSticky(900, 100); });
+  await expect(page.locator('.sticky textarea').first()).toHaveValue('Einkaufen');
+  await page.evaluate(async () => {
+    const { store } = await import('/js/core/store.js');
+    const { isoDate } = await import('/js/core/dom.js');
+    store.set('calendarEvents', [{ id: 'e1', title: 'Meeting', date: isoDate(), time: '10:00', notes: 'Raum 3' }]);
+  });
+  await open(page, 'calendar');
+  await page.locator('.cal-ag-ev', { hasText: 'Meeting' }).click();
+  await expect(page.locator('.modal textarea')).toHaveValue('Raum 3');
+});

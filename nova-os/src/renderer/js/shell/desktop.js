@@ -11,6 +11,7 @@ import { contextMenu, promptDialog, confirmDialog, showError, toast } from '../c
 import { getTasks, updateTask } from '../core/tasks.js';
 import { forecast, describe } from '../core/weather.js';
 import { sysInfo } from './state.js';
+import { initStickies, addSticky } from './stickies.js';
 
 let iconsEl, widgetsEl, places = null;
 let selected = new Set();
@@ -42,6 +43,7 @@ export async function initDesktop() {
     if (e.target === desk || e.target === iconsEl) startRubber(e);
   });
 
+  initStickies();
   renderIcons();
   renderWidgets();
   store.on('showWidgets', renderWidgets);
@@ -186,6 +188,7 @@ function deskMenu(x, y) {
       const n = await promptDialog({ title: 'Neue Textdatei', value: 'Neues Dokument.txt', ok: 'Erstellen' });
       if (n) { try { const p = await api.fs.newFile(dir, n); renderIcons(); openPath(p); } catch (e) { showError(e); } }
     } } : null,
+    { label: 'Neue Haftnotiz', icon: 'stickyNote', action: () => addSticky(x - 20, y - document.getElementById('desktop').getBoundingClientRect().top - 10) },
     { label: 'Aktualisieren', icon: 'refresh', action: renderIcons },
     '-',
     { label: 'Terminal hier öffnen', icon: 'terminal', action: () => openApp('terminal', { cwd: dir }) },
