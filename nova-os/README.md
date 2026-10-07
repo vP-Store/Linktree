@@ -72,6 +72,10 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Zwischenablage** | Verlauf aller kopierten Texte, Anheften |
 | **Einstellungen** | Design, Akzentfarbe, Hintergründe, Durchsichtigkeit, Dock, Hotkey, Autostart |
 
+## Erste Schritte
+
+Beim ersten Start führt eine kurze **Tour** durch Dock, Suche, Statusleiste, Arbeitsflächen und Widgets – jederzeit erneut über die Befehlspalette („Tour“) oder die Willkommensseite.
+
 ## 3D & Effekte
 
 - **Live-3D-Hintergründe:** *Galaxie 3D* (rotierende Spiralgalaxie, Standard), *Horizont 3D* (Flug über eine Gitterlandschaft), *Wellen 3D* (Meer aus Lichtpunkten). Sie folgen der Maus, drehen sich beim Wechsel der Arbeitsfläche mit, übernehmen die Akzentfarbe und pausieren, wenn NovaOS ausgeblendet ist oder ein maximiertes Fenster sie verdeckt

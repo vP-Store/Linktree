@@ -456,3 +456,15 @@ test('Systemklänge bei Lautstärke 0: Meldung erscheint trotzdem', async ({ pag
   await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('uiSounds', true); store.set('uiSoundVolume', 0); const ui = await import('/js/core/ui.js'); ui.notify('Leise', 'Test'); });
   await expect(page.locator('.toast', { hasText: 'Leise' })).toBeVisible();
 });
+
+test('Tour: Schritte vor/zurück, Esc beendet und merkt sich das', async ({ page }) => {
+  await page.keyboard.press('Control+k'); await page.keyboard.type('Tour durch'); await page.keyboard.press('Enter');
+  await expect(page.locator('#tour .tour-count')).toHaveText('1 / 6');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#tour .tour-count')).toHaveText('2 / 6');
+  await page.locator('#tour button', { hasText: 'Zurück' }).click();
+  await expect(page.locator('#tour .tour-count')).toHaveText('1 / 6');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#tour')).toHaveCount(0);
+  expect(await page.evaluate(async () => (await import('/js/core/store.js')).store.get('tourDone'))).toBe(true);
+});

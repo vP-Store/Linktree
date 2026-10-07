@@ -59,6 +59,7 @@ function commands() {
     c('Fensterübersicht', 'layers', () => import('./overview.js').then((m) => m.openOverview()), 'Alt+W', 'expose mission control alle fenster'),
     c('Bildschirmfoto aufnehmen', 'image', () => takeScreenshot(), '', 'screenshot foto bildschirm aufnahme'),
     c('NovaOS ausblenden', 'eyeOff', () => overlayHide(), 'Alt+Leer', 'hide verstecken'),
+    c('Einführung: Tour durch NovaOS', 'sparkles', () => import('./tour.js').then((m) => m.startTour()), '', 'tour hilfe einführung erklärung anfang tutorial'),
     c('Bildschirmschoner starten', 'sparkles', () => import('./screensaver.js').then((m) => m.startSaver()), '', 'bildschirmschoner screensaver ruhe uhr galaxie'),
     c('Neue Haftnotiz auf dem Desktop', 'stickyNote', () => import('./stickies.js').then((m) => m.addSticky()), '', 'haftnotiz zettel sticky post-it'),
     c('Neue Notiz', 'stickyNote', () => openApp('notes', { action: 'new' }), '', 'notiz erstellen'),

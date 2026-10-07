@@ -75,6 +75,8 @@ async function boot() {
       store.set('welcomed', true);
       notify('Willkommen bei NovaOS', 'Strg+K öffnet die Befehlspalette, Alt+Leertaste blendet NovaOS ein und aus.', { kind: 'info', icon: 'sparkles', duration: 7000 });
       if (!restored) openApp('settings', { page: 'welcome' });
+      // beim allerersten Start kurz durch die Oberfläche führen
+      if (!store.get('tourDone')) setTimeout(() => import('./shell/tour.js').then((m) => m.startTour()), 1400);
     }
   }, wait);
 }

@@ -107,7 +107,8 @@ export default {
           h('div.set-name', h('label.col', { style: { gap: '6px' } }, h('span.faint', 'Wie dürfen wir dich nennen?'),
             (() => { const i = h('input.input', { value: store.get('userName') || '', placeholder: (sysInfo() && sysInfo().user) || 'Dein Name' }); i.oninput = () => { store.set('userName', i.value.trim()); renderSide(); }; return i; })())),
           h('div.row', { style: { justifyContent: 'center', gap: '10px', marginTop: '10px' } },
-            h('button.btn.primary', { html: `${icon('palette')} Design anpassen`, onclick: () => go('look') }),
+            h('button.btn.primary', { html: `${icon('sparkles')} Tour starten`, onclick: () => import('../shell/tour.js').then((m) => m.startTour()) }),
+            h('button.btn', { html: `${icon('palette')} Design anpassen`, onclick: () => go('look') }),
             h('button.btn', { html: `${icon('folder')} Dateien öffnen`, onclick: () => openApp('files') }))));
         return;
       }

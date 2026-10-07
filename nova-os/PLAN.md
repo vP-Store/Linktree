@@ -131,7 +131,8 @@ dem Backlog.
 | R69 | 3D-Orb in Einstellungen; eigene Hintergrundbilder mit Parallaxe und Ken-Burns-Zoom | ✅ |
 | R70 | Code-Editor mit Minimap (Übersicht, Sichtbereich, Klick/Ziehen springt) | ✅ |
 | R71 | Zweiter Code-Review (R59–R70): 10 Befunde behoben (Lautstärke 0, Anordnung abbrechen, Stapel-Race, .constructor-Endung, Snap-Popup-Timer, Klang-Salven, Animationskonflikt u. a.) | ✅ |
-| R72+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R72 | Geführte Tour (Lichtkegel, 6 Schritte, beim ersten Start, Willkommensseite, Palette) | ✅ |
+| R73+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
