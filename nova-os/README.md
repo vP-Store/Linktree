@@ -72,11 +72,30 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Zwischenablage** | Verlauf aller kopierten Texte, Anheften |
 | **Einstellungen** | Design, Akzentfarbe, Hintergründe, Durchsichtigkeit, Dock, Hotkey, Autostart |
 
+## Weitere Funktionen
+
+- **Dock:** NovaOS-Apps und angeheftete Windows-Programme (Rechtsklick auf ein Programm → „Ans Dock heften“), Badge für fällige Aufgaben, Kalender-Symbol mit Tagesdatum, Knopf für laufende Windows-Fenster
+- **Desktop:** echte Dateien deines Windows-Desktops (Drag & Drop), Widgets (einzeln wählbar), **Haftnotizen** (Rechtsklick → „Neue Haftnotiz“)
+- **Statusleiste:** CPU/RAM/Netz, Fokus-Timer, **Mini-Player** während Musik läuft, Download-Fortschritt, Mitteilungen, Schnelleinstellungen
+- **Fensterübersicht** (`Alt + W` oder Maus in die Ecke oben links), **4 Arbeitsflächen** (`Alt + 1…4`)
+- **Dateien:** Vorschau (Bild, Text, PDF, Audio, Video), ZIP packen/entpacken, Mehrfachauswahl, Drag & Drop
+- **PDF-Export** aus Notizen und Code-Editor
+- **Bildschirmfoto** von Windows ohne Overlay (Schnelleinstellungen oder Befehlspalette)
+- **Sicherung & Wiederherstellung** aller NovaOS-Daten (Einstellungen → System)
+- **Leistungsmodus** für ältere PCs, helles/dunkles/automatisches Design, 8 Akzentfarben, eigene Hintergrundbilder, Durchsichtigkeit
+
+## Datenschutz
+
+Alles bleibt auf deinem PC: Einstellungen in `%APPDATA%\NovaOS`, Notizen als Dateien in `Dokumente\NovaOS`.
+Ins Internet geht nur, was du selbst auslöst: Webseiten im Browser, Wetter (Open-Meteo, nur der gewählte Ort) und – falls eingerichtet – Nova KI (deine Nachrichten an die Claude-API; der Schlüssel wird mit Windows-Verschlüsselung gespeichert).
+
 ## Entwicklung
 
 ```bash
 npm run preview   # Oberfläche im Browser (simuliertes System) → http://localhost:5173
 npm run check     # Syntax-Prüfung aller Dateien
+npm run test:unit # Unit-Tests (Rechner, Markdown, ANSI, Pfade …)
+npm test          # alles inkl. 37 Oberflächen-Tests (Playwright)
 npm run dev       # Electron mit Entwicklertools
 ```
 

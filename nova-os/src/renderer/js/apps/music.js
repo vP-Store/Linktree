@@ -6,6 +6,7 @@ import { api, fileUrl } from '../core/api.js';
 import { store } from '../core/store.js';
 import { fileKind } from '../core/icons.js';
 import { promptDialog, toast, showError } from '../core/ui.js';
+import { bus } from '../core/dom.js';
 
 function hue(s) { let x = 0; for (const c of s) x = (x * 31 + c.charCodeAt(0)) >>> 0; return x % 360; }
 function fmt(t) { if (!isFinite(t)) return '0:00'; return `${Math.floor(t / 60)}:${pad(Math.floor(t % 60))}`; }
@@ -138,8 +139,10 @@ export default {
       scan();
     }
 
-    audio.addEventListener('play', () => { playBtn.innerHTML = icon('pause'); renderList(); });
-    audio.addEventListener('pause', () => { playBtn.innerHTML = icon('play'); renderList(); });
+    const announce = () => bus.emit('music:state', idx >= 0 ? { title: tracks[idx].title, artist: tracks[idx].artist, playing: !audio.paused } : null);
+    audio.addEventListener('play', () => { playBtn.innerHTML = icon('pause'); renderList(); announce(); });
+    audio.addEventListener('pause', () => { playBtn.innerHTML = icon('play'); renderList(); announce(); });
+    const offCtl = bus.on('music:control', (cmd) => { if (cmd === 'toggle') toggle(); if (cmd === 'next') next(true); if (cmd === 'prev') prev(); });
     audio.addEventListener('ended', () => next());
     audio.addEventListener('timeupdate', () => {
       if (!seeking) { seek.value = audio.duration ? (audio.currentTime / audio.duration) * 1000 : 0; rangeFill(seek); }
@@ -183,7 +186,7 @@ export default {
         if (i < 0) { tracks.unshift({ path: a.path, name: pathx.base(a.path), ...splitArtist(cleanTitle(pathx.base(a.path))), album: pathx.base(pathx.dir(a.path)) }); i = 0; if (idx >= 0) idx++; }
         play(i);
       },
-      destroy() { destroyed = true; audio.pause(); audio.removeAttribute('src'); audio.load(); },
+      destroy() { destroyed = true; offCtl(); audio.pause(); audio.removeAttribute('src'); audio.load(); bus.emit('music:state', null); },
     };
   },
 };

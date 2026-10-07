@@ -75,6 +75,7 @@ function createWindow() {
       sandbox: true,
       webviewTag: true,
       plugins: true, // eingebauter PDF-Betrachter für die Datei-Vorschau
+      autoplayPolicy: 'no-user-gesture-required', // Musik startet auch beim Öffnen per Doppelklick
       spellcheck: false,
       backgroundThrottling: false,
     },

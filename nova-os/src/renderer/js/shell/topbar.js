@@ -32,6 +32,17 @@ export function initTopbar() {
   memEl = item('.tb-meter', '', 'Arbeitsspeicher – klicken für Systemmonitor', () => openApp('monitor'));
   netEl = item('.tb-meter', '', 'Netzwerk');
   batEl = item('.tb-meter.hidden', '', 'Akku');
+  const musicEl = h('div.tb-music.hidden');
+  bus.on('music:state', (st) => {
+    musicEl.classList.toggle('hidden', !st);
+    if (!st) return;
+    clear(musicEl);
+    musicEl.append(
+      h('button.tb-item', { title: 'Zurück', html: icon('skipBack'), onclick: () => bus.emit('music:control', 'prev') }),
+      h('button.tb-item', { title: st.playing ? 'Pause' : 'Abspielen', html: icon(st.playing ? 'pause' : 'play'), onclick: () => bus.emit('music:control', 'toggle') }),
+      h('button.tb-item', { title: 'Weiter', html: icon('skipFwd'), onclick: () => bus.emit('music:control', 'next') }),
+      h('button.tb-item.tb-music-title', { title: 'Musik öffnen', onclick: () => openApp('music') }, h('span.ellipsis', [st.title, st.artist].filter(Boolean).join(' – '))));
+  });
   const timerEl = item('.tb-timer.hidden', '', 'Fokus-Timer', () => openApp('timer'));
   bus.on('timer:tick', (st) => {
     const show = st.running || (st.mode !== 'stopwatch' && st.ms > 0 && st.ms < st.total);
@@ -49,7 +60,7 @@ export function initTopbar() {
   bar.append(
     h('div.tb-section.tb-left', logo, h('div.tb-sep'), ovBtn, appNameEl, wsEl),
     h('div.tb-section.tb-center', clockEl),
-    h('div.tb-section.tb-right', timerEl, cpuEl, memEl, netEl, batEl, h('div.tb-sep'), search, clip, bellEl, qs, hide, power),
+    h('div.tb-section.tb-right', musicEl, timerEl, cpuEl, memEl, netEl, batEl, h('div.tb-sep'), search, clip, bellEl, qs, hide, power),
   );
 
   bus.on('wm:focus', (w) => { appNameEl.textContent = w ? w.title : 'Schreibtisch'; });

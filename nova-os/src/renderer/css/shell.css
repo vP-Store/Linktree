@@ -403,3 +403,7 @@ body.overview-open #windows .win { pointer-events: none; }
 .sticky textarea::placeholder { color: rgba(43,42,35,.45); }
 .st-grip { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,.15) 50%); border-radius: 0 0 14px 0; }
 body.focus-mode #stickies { opacity: 0; pointer-events: none; }
+.tb-music { display: flex; align-items: center; gap: 0; padding: 0 4px; margin-right: 4px; border-radius: 9px; background: var(--surface); }
+.tb-music .tb-item { padding: 0 6px; }
+.tb-music-title { max-width: 200px; font-size: 12px; color: var(--text-2); }
+.tb-music-title span { display: block; max-width: 180px; }
