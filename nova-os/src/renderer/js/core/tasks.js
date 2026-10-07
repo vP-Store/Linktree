@@ -1,7 +1,7 @@
 // Gemeinsames Datenmodell für Aufgaben (App + Widget).
 
 import { store } from './store.js';
-import { bus, uid } from './dom.js';
+import { bus, uid, isoDate } from './dom.js';
 
 export const DEFAULT_LISTS = [
   { id: 'inbox', name: 'Eingang', color: '#60a5fa' },
@@ -28,8 +28,31 @@ export function addTask(title, extra = {}) {
   return t;
 }
 
+export const REPEAT_LABEL = { daily: 'Täglich', weekly: 'Wöchentlich', monthly: 'Monatlich' };
+
+/** Nächstes Fälligkeitsdatum einer wiederkehrenden Aufgabe */
+export function nextDue(due, repeat) {
+  const d = due ? new Date(due + 'T00:00') : new Date();
+  if (repeat === 'daily') d.setDate(d.getDate() + 1);
+  else if (repeat === 'weekly') d.setDate(d.getDate() + 7);
+  else if (repeat === 'monthly') d.setMonth(d.getMonth() + 1);
+  // nie in der Vergangenheit anlegen
+  const today = isoDate();
+  let next = isoDate(d);
+  while (next < today && repeat) { const x = new Date(next + 'T00:00'); if (repeat === 'daily') x.setDate(x.getDate() + 1); else if (repeat === 'weekly') x.setDate(x.getDate() + 7); else x.setMonth(x.getMonth() + 1); next = isoDate(x); }
+  return next;
+}
+
 export function updateTask(id, patch) {
-  saveTasks(getTasks().map((t) => (t.id === id ? { ...t, ...patch, ...(patch.done ? { doneAt: Date.now() } : {}) } : t)));
+  let list = getTasks();
+  const t = list.find((x) => x.id === id);
+  list = list.map((x) => (x.id === id ? { ...x, ...patch, ...(patch.done ? { doneAt: Date.now() } : {}) } : x));
+  // Wiederkehrend: beim Abhaken die nächste Ausgabe anlegen
+  if (t && patch.done && !t.done && t.repeat) {
+    const { id: _old, done: _d, doneAt: _da, ...rest } = t;
+    list = [{ ...rest, id: uid('t'), done: false, due: nextDue(t.due, t.repeat), created: Date.now() }, ...list];
+  }
+  saveTasks(list);
 }
 
 export function removeTask(id) {

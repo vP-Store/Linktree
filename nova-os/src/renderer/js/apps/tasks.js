@@ -2,7 +2,7 @@
 
 import { h, clear, esc, bus, uid, isoDate } from '../core/dom.js';
 import { icon } from '../core/icons.js';
-import { getTasks, getLists, addTask, updateTask, removeTask, saveLists, saveTasks } from '../core/tasks.js';
+import { getTasks, getLists, addTask, updateTask, removeTask, saveLists, saveTasks, REPEAT_LABEL } from '../core/tasks.js';
 import { contextMenu, promptDialog, confirmDialog, notify } from '../core/ui.js';
 import { store } from '../core/store.js';
 
@@ -39,6 +39,9 @@ function parseQuick(text, lists) {
   take(/(^|\s)!(hoch|high|3)(?=\s|$)/i, () => { extra.prio = 3; });
   take(/(^|\s)!(mittel|medium|2)(?=\s|$)/i, () => { extra.prio = 2; });
   take(/(^|\s)!(niedrig|low|1)(?=\s|$)/i, () => { extra.prio = 1; });
+  take(/(^|\s)(täglich|jeden tag)(?=\s|$)/i, () => { extra.repeat = 'daily'; if (!extra.due) extra.due = today(); });
+  take(/(^|\s)(wöchentlich|jede woche)(?=\s|$)/i, () => { extra.repeat = 'weekly'; if (!extra.due) extra.due = today(); });
+  take(/(^|\s)(monatlich|jeden monat)(?=\s|$)/i, () => { extra.repeat = 'monthly'; if (!extra.due) extra.due = today(); });
   take(/(^|\s)#([\wäöüß-]+)(?=\s|$)/i, (m) => {
     const l = lists.find((x) => x.name.toLowerCase() === m[2].toLowerCase() || x.id === m[2].toLowerCase());
     if (l) extra.list = l.id;
@@ -53,7 +56,7 @@ export default {
 
     const side = h('div.app-sidebar');
     const listHead = h('div.tasks-head');
-    const input = h('input.input.tasks-input', { placeholder: 'Neue Aufgabe … (z. B. „Morgen Bericht abgeben !hoch #arbeit“)', spellcheck: false });
+    const input = h('input.input.tasks-input', { placeholder: 'Neue Aufgabe … (z. B. „Morgen Bericht abgeben !hoch #arbeit“ oder „Pflanzen gießen wöchentlich“)', spellcheck: false });
     const listEl = h('div.app-scroll.tasks-list');
     root.append(h('div.app-split', side, h('div.app-main', listHead, h('div.tasks-add', { html: icon('plus') }, input), listEl)));
 
@@ -159,6 +162,7 @@ export default {
       if (t.due) metaParts.push(`<span class="${overdue ? 'overdue' : ''}">${icon('calendar')} ${dueLabel(t.due)}</span>`);
       if (list && !view.startsWith('list:')) metaParts.push(`<span><i class="dot" style="background:${list.color}"></i> ${esc(list.name)}</span>`);
       if (t.prio) metaParts.push(`<span style="color:${prio.color}">${icon('flag')} ${prio.label}</span>`);
+      if (t.repeat) metaParts.push(`<span>${icon('repeat')} ${REPEAT_LABEL[t.repeat]}</span>`);
       if (t.notes) metaParts.push(`<span>${icon('fileText')} Notiz</span>`);
       const el = h('div.task-row', { class: t.done ? 'done' : '' }, check, h('div.grow', title, metaParts.length ? h('div.task-meta', { html: metaParts.join('') }) : null));
       el.addEventListener('dblclick', () => edit(t));
@@ -174,6 +178,9 @@ export default {
         { label: 'Morgen fällig', icon: 'sunrise', action: () => updateTask(t.id, { due: addDays(1) }) },
         { label: 'Nächste Woche', icon: 'calendar', action: () => updateTask(t.id, { due: addDays(7) }) },
         t.due ? { label: 'Fälligkeit entfernen', icon: 'x', action: () => updateTask(t.id, { due: null }) } : null,
+        '-',
+        { label: 'Wiederholen', header: true },
+        ...Object.entries(REPEAT_LABEL).map(([k, l]) => ({ label: l + (t.repeat === k ? ' ✓' : ''), icon: 'repeat', action: () => updateTask(t.id, { repeat: t.repeat === k ? null : k, due: t.due || today() }) })),
         '-',
         { label: 'Priorität', header: true },
         ...PRIO.map((p) => ({ label: p.label + (t.prio === p.v ? ' ✓' : ''), icon: 'flag', action: () => updateTask(t.id, { prio: p.v }) })),

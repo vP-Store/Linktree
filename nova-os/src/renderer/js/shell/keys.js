@@ -145,7 +145,7 @@ let helpOpen = false;
 async function showShortcuts() {
   if (helpOpen) return;
   helpOpen = true;
-  const [{ SHORTCUTS }, { alertDialog }] = await Promise.all([import('../apps/settings.js'), import('../core/ui.js')]);
+  const [{ SHORTCUTS }, { alertDialog }] = await Promise.all([import('../core/shortcuts.js'), import('../core/ui.js')]);
   const p = alertDialog({ title: 'Tastenkürzel', message: '' });
   const box = document.querySelector('#modal-root .modal:last-child');
   if (box) {

@@ -253,3 +253,15 @@ test('F1 zeigt die Tastenkürzel', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.locator('.help-modal')).toHaveCount(0);
 });
+
+test('Aufgaben: wiederkehrend – Abhaken legt die nächste an', async ({ page }) => {
+  await open(page, 'tasks');
+  const input = page.locator('.tasks-input');
+  await input.fill('Pflanzen gießen wöchentlich');
+  await input.press('Enter');
+  await expect(page.locator('.task-meta')).toContainText('Wöchentlich');
+  await page.locator('.task-row', { hasText: 'Pflanzen gießen' }).locator('.task-check').click();
+  await page.locator('.side-item', { hasText: 'Geplant' }).click();
+  await expect(page.locator('.task-row:not(.done)', { hasText: 'Pflanzen gießen' })).toHaveCount(1);
+  await expect(page.locator('.task-row:not(.done) .task-meta')).toContainText('Wöchentlich');
+});
