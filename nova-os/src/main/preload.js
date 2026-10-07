@@ -101,6 +101,8 @@ contextBridge.exposeInMainWorld('nova', {
     abort: call('ai:abort'),
     onDelta: on('ai:delta'),
     onDone: on('ai:done'),
+    onTool: on('ai:tool'),
+    toolResult: call('ai:toolResult'),
   },
   browser: {
     onNewWindow: on('browser:new-window'),

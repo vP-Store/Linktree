@@ -1,7 +1,7 @@
 // Nova KI: Chat mit Claude – Unterhaltungen, Streaming, Dateien als Kontext,
 // Antworten als Notiz speichern oder in den Editor übernehmen.
 
-import { h, clear, esc, uid, timeAgo, pathx } from '../core/dom.js';
+import { h, clear, esc, uid, timeAgo, pathx, bus } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { api } from '../core/api.js';
 import { store } from '../core/store.js';
@@ -10,9 +10,10 @@ import { toast, promptDialog, confirmDialog, showError, contextMenu } from '../c
 import { openApp } from '../core/wm.js';
 
 const SUGGESTIONS = [
+  ['listChecks', 'Erinnere mich morgen daran, die Steuerunterlagen abzuschicken.'],
+  ['calendar', 'Was steht in den nächsten zwei Wochen in meinem Kalender?'],
   ['edit', 'Schreib mir eine höfliche E-Mail, mit der ich einen Termin verschiebe.'],
   ['code', 'Erkläre mir, was ein PowerShell-Skript zum Aufräumen des Download-Ordners tun müsste, und schreib es.'],
-  ['listChecks', 'Mach mir einen Wochenplan, um für eine Prüfung zu lernen.'],
   ['sparkles', 'Gib mir 10 kreative Namensideen für einen Online-Shop.'],
 ];
 const EFFORTS = [['low', 'Schnell'], ['medium', 'Ausgewogen'], ['high', 'Gründlich']];
@@ -159,9 +160,16 @@ export default {
         act('copy', 'Kopieren', () => { api.clip.write(m.content); toast('Kopiert', '', { icon: 'copy', duration: 1200 }); }),
         act('stickyNote', 'Als Notiz', () => openApp('notes', { action: 'new', text: m.content })),
         act('code', 'Im Editor', () => openApp('editor', { action: 'new', text: m.content })));
-      const el = h('div.ai-msg.bot', h('div.ai-avatar', { html: icon('sparkles') }), h('div.ai-content', body, m.error ? h('div.ai-error', m.error) : null, m.content ? actions : null));
+      const toolsEl = h('div.ai-toolrow');
+      (m.tools || []).forEach((t) => toolsEl.append(toolChip(t)));
+      const el = h('div.ai-msg.bot', h('div.ai-avatar', { html: icon('sparkles') }), h('div.ai-content', toolsEl, body, m.error ? h('div.ai-error', m.error) : null, m.content ? actions : null));
       el._body = body;
+      el._tools = toolsEl;
       return el;
+    }
+
+    function toolChip(t) {
+      return h('div.ai-tool', { class: t.ok ? '' : 'err', html: `${icon(t.ok ? 'checkCircle' : 'alert')}<b>${esc(t.label)}</b><span>${esc(t.summary || '')}</span>` });
     }
 
     function act(ic, title, fn) { return h('button.icon-btn.sm', { title, html: icon(ic), onclick: fn }); }
@@ -220,9 +228,14 @@ export default {
           });
         }
       });
+      const offTool = bus.on('ai:tool', (t) => {
+        if (t.id !== id) return;
+        (botMsg.tools = botMsg.tools || []).push({ label: t.label, summary: t.summary, ok: t.ok });
+        botEl._tools.append(toolChip(t));
+      });
       const offDone = api.ai.onDone((d) => {
         if (d.id !== id) return;
-        offDelta(); offDone();
+        offDelta(); offDone(); offTool();
         busy = null;
         setBusy(false);
         if (d.error) botMsg.error = d.error;

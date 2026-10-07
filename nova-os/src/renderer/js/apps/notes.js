@@ -1,6 +1,6 @@
 // Notizen: Markdown-Notizen als echte .md-Dateien in Dokumente/NovaOS/Notizen.
 
-import { h, clear, esc, timeAgo, debounce, pathx } from '../core/dom.js';
+import { h, clear, esc, timeAgo, debounce, pathx, bus } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { api } from '../core/api.js';
 import { store } from '../core/store.js';
@@ -224,6 +224,7 @@ export default {
       renderList();
     }
 
+    const offNotes = bus.on('notes:changed', () => load());
     setMode(mode);
     await load();
     if (args.action === 'new') create(args.text || '');
@@ -236,7 +237,7 @@ export default {
       },
       onFocus() { if (cur && mode !== 'view') setTimeout(() => ta.focus(), 10); },
       onClose() { flush(); return true; },
-      destroy() { flush(); },
+      destroy() { flush(); offNotes(); },
     };
   },
 };

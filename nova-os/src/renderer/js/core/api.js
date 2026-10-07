@@ -163,7 +163,8 @@ function createMock() {
       pdf: async (html, dest) => { const p = unique(dest); add(p, 'PDF'); return p; },
     },
     ai: (() => {
-      const deltas = new Set(), dones = new Set();
+      const deltas = new Set(), dones = new Set(), tools = new Set();
+      const waiting = new Map();
       let key = null;
       const timers = new Map();
       return {
@@ -172,6 +173,17 @@ function createMock() {
         model: async () => 'claude-opus-5-5',
         chat: async (id, messages) => {
           const q = (messages[messages.length - 1] || {}).content || '';
+          // Vorschau: „erinnere mich …“ löst einen echten Werkzeug-Aufruf aus
+          if (/erinnere/i.test(q)) {
+            const toolId = 'mock-tool-' + Date.now();
+            const d = new Date(); d.setDate(d.getDate() + 1);
+            const due = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            const res = await new Promise((resolve) => { waiting.set(toolId, resolve); tools.forEach((cb) => cb({ id, toolId, name: 'add_task', input: { title: q.replace(/^.*erinnere mich( daran)?,?\s*/i, '').slice(0, 60) || 'Erinnerung', due } })); });
+            const text = res && res.result ? 'Erledigt – ich habe die Aufgabe für morgen angelegt. ✅' : 'Das hat leider nicht geklappt.';
+            deltas.forEach((cb) => cb({ id, text }));
+            dones.forEach((cb) => cb({ id, stop: 'end_turn' }));
+            return true;
+          }
           const text = `**Vorschau-Modus** – in der Desktop-App antwortet hier Claude.\n\nDu hast gefragt:\n\n> ${q.slice(0, 200)}\n\nBeispiel für Code:\n\n\`\`\`js\nconsole.log('Hallo aus NovaOS');\n\`\`\`\n\n- Punkt eins\n- Punkt zwei`;
           let i = 0;
           const t = setInterval(() => {
@@ -185,6 +197,8 @@ function createMock() {
         abort: async (id) => { clearInterval(timers.get(id)); timers.delete(id); dones.forEach((cb) => cb({ id, aborted: true })); return true; },
         onDelta: (cb) => { deltas.add(cb); return () => deltas.delete(cb); },
         onDone: (cb) => { dones.add(cb); return () => dones.delete(cb); },
+        onTool: (cb) => { tools.add(cb); return () => tools.delete(cb); },
+        toolResult: async (toolId, r) => { const f = waiting.get(toolId); if (f) { waiting.delete(toolId); f(r); } return !!f; },
       };
     })(),
     win: {

@@ -276,3 +276,14 @@ test('Kalender: .ics importieren (Doppelklick öffnet im Kalender)', async ({ pa
   await expect(page.locator('.toast')).toContainText('1 neue Termine');
   await expect(page.locator('.cal-ag-title')).toHaveText('Projektstart');
 });
+
+test('Nova KI legt per Werkzeug eine Aufgabe an', async ({ page }) => {
+  await page.evaluate(() => localStorage.setItem('nova-mock:mockAiKey', 'true'));
+  await open(page, 'assistant');
+  await page.locator('.ai-input').fill('Erinnere mich daran, Milch zu kaufen');
+  await page.locator('.ai-input').press('Enter');
+  await expect(page.locator('.ai-tool')).toContainText('Aufgabe angelegt');
+  await expect(page.locator('.ai-msg.bot .ai-md')).toContainText('Erledigt');
+  const tasks = await page.evaluate(async () => (await import('/js/core/tasks.js')).getTasks().map((t) => t.title));
+  expect(tasks.join()).toContain('Milch zu kaufen');
+});

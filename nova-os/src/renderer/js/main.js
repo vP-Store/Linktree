@@ -17,6 +17,7 @@ import { loadSysInfo } from './shell/state.js';
 import { initClipboardHistory } from './apps/clipboard.js';
 import { startReminders } from './apps/calendar.js';
 import { initBrowserHooks } from './shell/browserhooks.js';
+import { initAiTools } from './core/aitools.js';
 
 // Unerwartete Fehler sichtbar machen statt sie still zu verschlucken (höchstens einmal je Meldung)
 const seenErrors = new Set();
@@ -48,6 +49,7 @@ async function boot() {
   initClipboardHistory();
   startReminders(notify);
   initBrowserHooks();
+  initAiTools();
   await initDesktop();
 
   api.overlay.onVisibility((visible) => {
