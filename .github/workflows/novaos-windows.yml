@@ -25,7 +25,7 @@ jobs:
       - name: Syntax-Prüfung
         run: node scripts/check.js
       - name: Unit-Tests
-        run: node --test tests/unit.test.mjs
+        run: node --test tests/unit.test.mjs tests/ai-loop.test.cjs
       - name: Abhängigkeiten installieren
         run: npm install --no-audit --no-fund
         env:
