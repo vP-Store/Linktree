@@ -105,7 +105,8 @@ dem Backlog.
 | R43 | 3D-Fenster: perspektivisches Öffnen/Schließen/Minimieren, Neigung beim Ziehen | ✅ |
 | R44 | 3D-Karten mit Glanzlicht (Widgets, App-Kacheln, Vorschauen), Dock-Spiegelung | ✅ |
 | R45 | Strg+Tab als 3D-Karussell mit Spiegelung, 3D-Startbildschirm (Orb mit Ringen, Flug hinein) | ✅ |
-| R46+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R46 | Arbeitsflächen-Wechsel als 3D-Drehung, Anzeige der Arbeitsfläche, 3D-Hintergrund dreht mit | ✅ |
+| R47+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

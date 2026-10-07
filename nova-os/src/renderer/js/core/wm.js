@@ -440,13 +440,35 @@ export function getWorkspace() { return currentWs; }
 export function switchWorkspace(i) {
   i = clamp(i, 0, store.get('workspaces') - 1);
   if (i === currentWs) return;
+  const dir = i > currentWs ? 'next' : 'prev';
   currentWs = i;
   for (const w of windows.values()) w.el.classList.toggle('other-ws', w.ws !== i);
+  // 3D-Drehung der Fensterebene in Wechselrichtung + Anzeige der Arbeitsfläche
+  const layer = document.getElementById('windows');
+  if (layer && document.documentElement.dataset.reduceMotion !== 'true') {
+    layer.classList.remove('ws-next', 'ws-prev');
+    void layer.offsetWidth;
+    layer.classList.add('ws-' + dir);
+    clearTimeout(layer._wsT);
+    layer._wsT = setTimeout(() => layer.classList.remove('ws-next', 'ws-prev'), 500);
+  }
+  showWsHud(i);
   activeId = null;
   const top = topWindow();
   if (top) focus(top.id); else bus.emit('wm:focus', null);
   bus.emit('wm:workspace', i);
   bus.emit('wm:change');
+}
+
+function showWsHud(i) {
+  const n = store.get('workspaces');
+  let hud = document.getElementById('ws-hud');
+  if (!hud) { hud = h('div#ws-hud.glass'); document.getElementById('os').append(hud); }
+  hud.innerHTML = `<b>Arbeitsfläche ${i + 1}</b><div class="ws-hud-dots">${Array.from({ length: n }, (_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>`;
+  hud.classList.remove('out');
+  hud.classList.add('show');
+  clearTimeout(hud._t);
+  hud._t = setTimeout(() => hud.classList.add('out'), 900);
 }
 
 export function moveToWorkspace(id, i) {

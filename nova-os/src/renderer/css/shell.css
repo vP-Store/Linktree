@@ -461,3 +461,16 @@ body.focus-mode #stickies { opacity: 0; pointer-events: none; }
 #boot.done .boot-name, #boot.done .boot-bar { opacity: 0; transition: opacity .3s; }
 .boot-orb::before { content: ''; position: absolute; inset: 30px; border-radius: 50%; background: radial-gradient(circle, rgba(124,92,255,.55), rgba(76,201,240,.18) 45%, transparent 70%); filter: blur(10px); animation: bootPulse 1.6s ease-in-out infinite; }
 .boot-orb .boot-logo { position: relative; }
+
+/* Arbeitsflächen-Wechsel: Fensterebene dreht wie ein Würfel herein */
+#windows.ws-next { animation: wsNext .45s cubic-bezier(.2, .9, .3, 1); transform-origin: 0% 50%; }
+#windows.ws-prev { animation: wsPrev .45s cubic-bezier(.2, .9, .3, 1); transform-origin: 100% 50%; }
+@keyframes wsNext { from { opacity: 0; transform: perspective(1600px) translateX(22%) rotateY(-32deg); } to { opacity: 1; transform: none; } }
+@keyframes wsPrev { from { opacity: 0; transform: perspective(1600px) translateX(-22%) rotateY(32deg); } to { opacity: 1; transform: none; } }
+#ws-hud { position: absolute; left: 50%; top: 58px; z-index: 3500; transform: translateX(-50%) scale(.9); opacity: 0; pointer-events: none; padding: 14px 22px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: opacity .2s, transform .25s var(--ease); }
+#ws-hud.show { opacity: 1; transform: translateX(-50%) scale(1); }
+#ws-hud.show.out { opacity: 0; transform: translateX(-50%) scale(.96); transition: opacity .4s, transform .4s; }
+#ws-hud b { font-size: 15px; font-weight: 600; }
+.ws-hud-dots { display: flex; gap: 7px; }
+.ws-hud-dots i { width: 26px; height: 6px; border-radius: 3px; background: var(--border-strong); transition: background .2s; }
+.ws-hud-dots i.on { background: var(--accent); box-shadow: 0 0 10px rgba(var(--accent-rgb), .7); }

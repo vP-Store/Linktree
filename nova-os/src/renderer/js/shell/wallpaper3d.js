@@ -4,7 +4,12 @@
 // Beide folgen der Maus mit sanfter Parallaxe. Läuft nur, solange NovaOS
 // sichtbar ist; bei „Bewegung reduzieren“ / Leistungsmodus ein Standbild.
 
+import { bus } from '../core/dom.js';
+
 let current = null; // { stop() }
+// Beim Wechsel der Arbeitsfläche dreht sich die Szene ein Stück weiter (Raumgefühl)
+let wsTarget = 0;
+bus.on('wm:workspace', (i) => { wsTarget = i; });
 
 export function stopScene() {
   if (current) current.stop();
@@ -46,7 +51,7 @@ export function startScene(host, kind, { still = false } = {}) {
   resize();
 
   // Maus-Parallaxe (geglättet)
-  const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
+  const mouse = { x: 0, y: 0, sx: 0, sy: 0, ws: wsTarget * 0.6 };
   const onMove = (e) => { mouse.x = (e.clientX / innerWidth) * 2 - 1; mouse.y = (e.clientY / innerHeight) * 2 - 1; };
   window.addEventListener('pointermove', onMove, { passive: true });
   window.addEventListener('resize', resize);
@@ -71,6 +76,7 @@ export function startScene(host, kind, { still = false } = {}) {
       t += dt;
       mouse.sx += (mouse.x - mouse.sx) * Math.min(1, dt * 2.5);
       mouse.sy += (mouse.y - mouse.sy) * Math.min(1, dt * 2.5);
+      mouse.ws += (wsTarget * 0.6 - mouse.ws) * Math.min(1, dt * 2.2);
       ctx.clearRect(0, 0, W, H);
       scene(ctx, W, H, t, mouse, colors);
       if (++frames % 30 === 0) canvas.dataset.frames = String(frames);
@@ -128,7 +134,7 @@ function galaxyScene() {
     const cx = W * 0.5 + m.sx * 22, cy = H * 0.48 + m.sy * 16;
     const R = Math.min(W * 0.5, H * 0.95);
     const tilt = 0.52 + m.sy * 0.08; // kleiner = flacher (Seitenansicht) // Neigung um die X-Achse
-    const yaw = m.sx * 0.18;
+    const yaw = m.sx * 0.18 + m.ws;
     const ct = Math.cos(tilt), st = Math.sin(tilt);
 
     // Hintergrundsterne (leichte Gegen-Parallaxe)
@@ -212,7 +218,7 @@ function horizonScene() {
 
   return (ctx, W, H, t, m, col) => {
     const horizon = H * (0.56 + m.sy * 0.03);
-    const cx = W / 2 + m.sx * 40;
+    const cx = W / 2 + m.sx * 40 - Math.sin(m.ws) * W * 0.12;
 
     // Sterne
     for (const s of sky) {
