@@ -9,6 +9,8 @@ import { openApp } from '../core/wm.js';
 import { openPath } from '../core/open.js';
 import { contextMenu, promptDialog, confirmDialog, showError, toast } from '../core/ui.js';
 import { recentFiles } from '../core/winapps.js';
+import { renderMarkdown } from '../core/markdown.js';
+import { highlight, langFor } from '../core/highlight.js';
 
 // gemeinsame Zwischenablage aller Dateien-Fenster
 const fileClip = { mode: null, paths: [] };
@@ -129,6 +131,42 @@ export default {
         h('button.btn.sm.primary', { html: `${icon('external')} Öffnen`, onclick: () => openEntry(e) }),
         !e.dir ? h('button.btn.sm', { html: `${icon('box')} Mit Windows`, onclick: () => openPath(e.path, { external: true }) }) : null,
         h('button.btn.sm', { html: `${icon('copy')} Pfad`, onclick: copyPaths })));
+    }
+
+    // ---------- Schnellansicht (Leertaste) ----------
+    let ql = null;
+    function closeQuickLook() { if (!ql) return; const q = ql; ql = null; q.classList.add('out'); setTimeout(() => q.remove(), 200); content.focus(); }
+    async function quickLook() {
+      const sel = selectedEntries();
+      if (sel.length !== 1 || sel[0].dir) return;
+      const e = sel[0];
+      const kind = fileKind(e.ext, e.dir);
+      const stage = h('div.fm-ql-stage');
+      const box = h('div.fm-ql-box',
+        h('div.fm-ql-bar', h('span', { html: fileGlyph(e.ext) }), h('b.ellipsis', e.name), h('span.faint', bytes(e.size)), h('div.grow'),
+          h('button.btn.sm', { html: `${icon('external')} Öffnen`, onclick: () => { closeQuickLook(); openEntry(e); } }),
+          h('button.icon-btn.sm', { title: 'Schließen (Leertaste)', html: icon('x'), onclick: closeQuickLook })),
+        stage);
+      const fresh = !ql;
+      if (ql) ql.remove();
+      ql = h('div.fm-ql' + (fresh ? '' : '.no-anim'), { onclick: (ev) => { if (ev.target === ql) closeQuickLook(); } }, box);
+      root.append(ql);
+      const url = fileUrl(e.path);
+      if (kind === 'image' && url) stage.append(h('img', { src: url, alt: '' }));
+      else if (kind === 'pdf' && url) stage.append(h('iframe', { src: url + '#view=FitH', title: e.name }));
+      else if (kind === 'video' && url) stage.append(h('video', { src: url, controls: true, autoplay: true }));
+      else if (kind === 'audio' && url) stage.append(h('div.fm-ql-audio', h('div', { html: fileGlyph(e.ext) }), h('audio', { src: url, controls: true, autoplay: true })));
+      else if ((kind === 'text' || kind === 'code') && e.size < 2e6) {
+        const pre = h('pre.fm-ql-text');
+        stage.append(pre);
+        try {
+          const t = (await api.fs.readText(e.path)).slice(0, 200000);
+          const ext = (e.ext || '').toLowerCase();
+          if (ext === 'md' || ext === 'markdown') pre.replaceWith(h('div.fm-ql-text.md-body', { html: renderMarkdown(t, { remoteImages: false }) }));
+          else if (kind === 'code') pre.innerHTML = highlight(t, langFor(ext));
+          else pre.textContent = t;
+        } catch (err) { pre.textContent = String(err.message || err); }
+      } else stage.append(h('div.fm-ql-other', h('div', { html: fileGlyph(e.ext) }), h('b', e.name), h('span.faint', `${KIND_LABEL[kind] || 'Datei'} · ${bytes(e.size)}`)));
     }
 
     // ---------- Seitenleiste ----------
@@ -617,6 +655,9 @@ export default {
       if (e.target.tagName === 'INPUT') return;
       const ctrl = e.ctrlKey || e.metaKey;
       const k = e.key;
+      // Schnellansicht: Leertaste öffnet/schließt, Pfeile blättern, Esc schließt
+      if (ql && (k === ' ' || k === 'Escape')) { e.preventDefault(); e.stopPropagation(); closeQuickLook(); return; }
+      if (k === ' ' && !ctrl && !e.altKey && e.target.tagName !== 'VIDEO' && e.target.tagName !== 'AUDIO') { e.preventDefault(); quickLook(); return; }
       if (k === 'Enter') { selectedEntries().forEach(openEntry); }
       else if (k === 'Backspace' || (e.altKey && k === 'ArrowUp')) { e.preventDefault(); if (!upBtn.disabled) go(pathx.dir(st.path)); }
       else if (e.altKey && k === 'ArrowLeft') { e.preventDefault(); back(); }
@@ -644,6 +685,7 @@ export default {
         const next = Math.max(0, Math.min(rendered.length - 1, cur + delta));
         select(next, { shiftKey: e.shiftKey });
         content.querySelector(`[data-i="${next}"]`)?.scrollIntoView({ block: 'nearest' });
+        if (ql) quickLook();
       } else if (k.length === 1 && !ctrl && !e.altKey) {
         // Tippen springt zum ersten passenden Namen
         const i = rendered.findIndex((x) => x.name.toLowerCase().startsWith(k.toLowerCase()));

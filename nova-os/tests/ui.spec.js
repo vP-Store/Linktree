@@ -507,3 +507,21 @@ test('Rechner: Graph zeichnet Funktionen und meldet Fehler', async ({ page }) =>
   await page.mouse.move(b.x + b.width / 2 + 20, b.y + b.height / 2);
   await expect(page.locator('.graph-tip')).toContainText('f1 =');
 });
+
+test('Dateien: Leertaste öffnet die Schnellansicht, Pfeil blättert, Leertaste schließt', async ({ page }) => {
+  await page.evaluate(async () => {
+    const { api } = await import('/js/core/api.js'); const pl = await api.fs.places();
+    await api.fs.mkdir(pl.documents + '/QL');
+    await api.fs.writeText(pl.documents + '/QL/a.txt', 'Inhalt A');
+    await api.fs.writeText(pl.documents + '/QL/b.txt', 'Inhalt B');
+    const m = await import('/js/core/wm.js'); await m.openApp('files', { path: pl.documents + '/QL' });
+  });
+  const win = page.locator('.win[data-app="files"]');
+  await win.locator('.fm-item', { hasText: 'a.txt' }).click();
+  await page.keyboard.press('Space');
+  await expect(win.locator('.fm-ql .fm-ql-text')).toHaveText('Inhalt A');
+  await page.keyboard.press('ArrowDown');
+  await expect(win.locator('.fm-ql .fm-ql-text')).toHaveText('Inhalt B');
+  await page.keyboard.press('Space');
+  await expect(win.locator('.fm-ql')).toHaveCount(0);
+});

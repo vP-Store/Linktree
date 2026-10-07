@@ -760,3 +760,20 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .graph-canvas:active { cursor: grabbing; }
 .graph-tip { position: absolute; left: 10px; top: 10px; padding: 5px 10px; border-radius: 8px; background: var(--glass-strong); border: 1px solid var(--border); font: 12px var(--font-mono); pointer-events: none; white-space: pre; }
 .calc-root.narrow .graph-side { width: 190px; }
+
+/* Dateien: Schnellansicht */
+.fm-ql { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px; background: rgba(4, 6, 14, .45); backdrop-filter: blur(10px); animation: fadeIn .18s; perspective: 1200px; }
+.fm-ql.out { opacity: 0; transition: opacity .18s; }
+.fm-ql-box { width: min(100%, 980px); height: 100%; max-height: 760px; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; background: var(--glass-strong); border: 1px solid var(--border-strong); box-shadow: 0 40px 100px rgba(0,0,0,.6); animation: qlIn .32s cubic-bezier(.2, 1.1, .3, 1); }
+.fm-ql.no-anim, .fm-ql.no-anim .fm-ql-box { animation: none; }
+@keyframes qlIn { from { opacity: 0; transform: translateY(18px) rotateX(10deg) scale(.9); } to { opacity: 1; transform: none; } }
+.fm-ql-bar { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 14px; border-bottom: 1px solid var(--border); flex: none; }
+.fm-ql-bar .file-glyph { width: 22px; height: 22px; }
+.fm-ql-bar b { max-width: 50%; }
+.fm-ql-stage { flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; background: rgba(0,0,0,.2); }
+.fm-ql-stage img, .fm-ql-stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
+.fm-ql-stage iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+.fm-ql-text { align-self: stretch; justify-self: stretch; margin: 0; padding: 16px 20px; overflow: auto; font: 13px/1.55 var(--font-mono); white-space: pre-wrap; word-break: break-word; user-select: text; }
+.fm-ql-other, .fm-ql-audio { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.fm-ql-other .file-glyph, .fm-ql-audio .file-glyph { width: 120px; height: 120px; }
+.fm-ql-text.md-body { white-space: normal; font: 14px/1.6 var(--font); }

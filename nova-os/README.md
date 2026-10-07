@@ -93,7 +93,7 @@ Beim ersten Start führt eine kurze **Tour** durch Dock, Suche, Statusleiste, Ar
 - **Snap-Layouts:** Maus auf dem Maximieren-Knopf halten → Hälften, Drittel, Viertel, Mitte
 - **Fenster-Anordnungen:** Befehlspalette → „Fenster-Anordnung speichern …“ merkt alle offenen Fenster; „Anordnung öffnen: Name“ stellt sie wieder her
 - **Fensterübersicht** (`Alt + W` oder Maus in die Ecke oben links), **Arbeitsflächen** (`Alt + 1…9`, `Alt + Bild↑/Bild↓`, Fenster mitnehmen mit `Alt + Umschalt + Zahl`)
-- **Dateien:** Vorschau (Bild, Text, PDF, Audio, Video), ZIP packen/entpacken, Mehrfachauswahl, Drag & Drop
+- **Dateien:** Schnellansicht mit der **Leertaste**, Vorschau (Bild, Text, PDF, Audio, Video), ZIP packen/entpacken, Mehrfachauswahl, Drag & Drop
 - **PDF-Export** aus Notizen und Code-Editor
 - **Bildschirmfoto** von Windows ohne Overlay (Schnelleinstellungen oder Befehlspalette)
 - **Sicherung & Wiederherstellung** aller NovaOS-Daten (Einstellungen → System)
