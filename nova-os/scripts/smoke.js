@@ -5,6 +5,8 @@ module.exports = `(async () => {
   const r = {};
   const t = async (k, f) => { try { r[k] = await f(); } catch (e) { r[k] = 'FEHLER: ' + e.message; } };
   await t('platform', () => n.platform);
+  await t('startzeitMs', () => window.__novaBootMs);
+  await t('speicherMB', () => (performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null));
   await t('apps', async () => (await n.apps.list()).length);
   await t('fenster', async () => (await n.win.list()).map((w) => w.name).slice(0, 8));
   await t('prozesse', async () => (await n.sys.processes()).length);

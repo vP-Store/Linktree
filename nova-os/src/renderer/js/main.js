@@ -59,6 +59,7 @@ async function boot() {
 
   const restored = await restoreSession().catch(() => 0);
 
+  window.__novaBootMs = Math.round(performance.now());
   const minBoot = store.get('bootAnimation') ? 900 : 0;
   const wait = Math.max(0, minBoot - (performance.now() - started));
   setTimeout(() => {
