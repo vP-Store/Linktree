@@ -2,7 +2,7 @@
 
 import { h, clear, esc } from '../core/dom.js';
 import { appIconSpan } from '../core/registry.js';
-import { activeWindow, allWindows, focus, getWorkspace, switchWorkspace, openApp, minimizeAll } from '../core/wm.js';
+import { activeWindow, allWindows, focus, getWorkspace, switchWorkspace, openApp, minimizeAll, moveToWorkspace } from '../core/wm.js';
 import { store } from '../core/store.js';
 import { openPalette, isPaletteOpen, closePalette } from './palette.js';
 import { toggleStart, isStartOpen, closeStart } from './start.js';
@@ -82,8 +82,25 @@ function onKey(e) {
     return;
   }
 
+  // Strg + Alt + ← / →: vorige / nächste Arbeitsfläche (wie unter Windows)
+  if (e.ctrlKey && e.altKey && !e.shiftKey && (k === 'ArrowLeft' || k === 'ArrowRight')) {
+    e.preventDefault();
+    const n = store.get('workspaces');
+    switchWorkspace((getWorkspace() + (k === 'ArrowRight' ? 1 : n - 1)) % n);
+    return;
+  }
   // Alt-Kürzel (AltGr = Strg+Alt wird ignoriert, damit @ € usw. funktionieren)
   if (e.altKey && !e.ctrlKey && !e.metaKey) {
+    // Alt + Umschalt + Zahl: aktives Fenster auf diese Arbeitsfläche mitnehmen
+    const digit = /^Digit([1-9])$/.exec(e.code || '');
+    if (e.shiftKey && digit && win && +digit[1] <= store.get('workspaces')) {
+      e.preventDefault();
+      const ws = +digit[1] - 1;
+      moveToWorkspace(win.id, ws);
+      switchWorkspace(ws);
+      focus(win.id);
+      return;
+    }
     const lower = k.toLowerCase();
     if (lower === 'q' && win) { e.preventDefault(); win.close(); return; }
     if (k === 'ArrowUp' && win) { e.preventDefault(); win.toggleMax(); return; }

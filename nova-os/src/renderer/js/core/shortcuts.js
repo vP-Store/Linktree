@@ -16,7 +16,9 @@ export const SHORTCUTS = [
   ['Alle Fenster minimieren', 'Alt + D'],
   ['Terminal öffnen', 'Alt + T'],
   ['Dateien öffnen', 'Alt + E'],
-  ['Arbeitsfläche wechseln', 'Alt + 1 … 4'],
+  ['Arbeitsfläche wechseln', 'Alt + 1 … 9'],
+  ['Vorige / nächste Arbeitsfläche', 'Strg + Alt + ← / →'],
+  ['Fenster auf Arbeitsfläche mitnehmen', 'Alt + Umschalt + 1 … 9'],
   ['Menüs schließen', 'Esc'],
 ];
 
