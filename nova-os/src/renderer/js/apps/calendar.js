@@ -3,7 +3,10 @@
 import { h, clear, esc, bus, uid, pad, isoDate } from '../core/dom.js';
 import { icon } from '../core/icons.js';
 import { store } from '../core/store.js';
-import { formDialog, contextMenu } from '../core/ui.js';
+import { formDialog, contextMenu, promptDialog, notify, showError, toast } from '../core/ui.js';
+import { parseIcs, toIcs } from '../core/ics.js';
+import { api } from '../core/api.js';
+import { pathx } from '../core/dom.js';
 import { getTasks } from '../core/tasks.js';
 
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -59,6 +62,7 @@ export function startReminders(notify) {
 
 export default {
   mount(root, win, args = {}) {
+    if (args.ics) setTimeout(() => importIcs(args.ics), 0);
     let view = store.get('calView', 'month');
     let cursor = args.date ? new Date(args.date + 'T00:00') : new Date();
     let selected = args.date || isoDate();
@@ -74,6 +78,10 @@ export default {
         h('button.icon-btn', { html: icon('chevronLeft'), title: 'Zurück', onclick: () => step(-1) }),
         h('button.icon-btn', { html: icon('chevronRight'), title: 'Weiter', onclick: () => step(1) }),
         title, h('div.grow'), seg,
+        h('button.icon-btn', { title: 'Importieren / Exportieren (.ics)', html: icon('moreV'), onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); contextMenu(r.right - 240, r.bottom + 4, [
+          { label: 'Kalender importieren (.ics) …', icon: 'upload', action: () => importIcs() },
+          { label: 'Alle Termine exportieren (.ics)', icon: 'download', action: () => exportIcs() },
+        ]); } }),
         h('button.btn.sm.primary', { html: `${icon('plus')} Termin`, onclick: () => editEvent(null, selected) })),
       h('div.app-split', h('div.app-main', grid), agenda));
 
@@ -206,11 +214,45 @@ export default {
       render();
     }
 
+    async function importIcs(path) {
+      const places = await api.fs.places();
+      const p = path || await promptDialog({ title: 'Kalender importieren', message: 'Pfad zu einer .ics-Datei (Export aus Outlook, Google Kalender, Apple …):', value: (places.downloads || places.home) + (places.sep || '/'), ok: 'Importieren', select: false });
+      if (!p) return;
+      try {
+        const list = parseIcs(await api.fs.readText(p));
+        if (!list.length) { toast('Keine Termine gefunden', pathx.base(p), { kind: 'warn' }); return; }
+        const existing = getEvents();
+        const known = new Set(existing.map((e) => e.uid || `${e.date}|${e.time}|${e.title}`));
+        const fresh = list.filter((e) => !known.has(e.uid || `${e.date}|${e.time}|${e.title}`)).map((e) => ({ id: uid('ev'), ...e, color: COLORS[1] }));
+        saveEvents([...existing, ...fresh]);
+        notify('Kalender importiert', `${fresh.length} neue Termine${list.length - fresh.length ? `, ${list.length - fresh.length} bereits vorhanden` : ''}`, { icon: 'calendar', kind: 'ok' });
+        if (fresh[0]) { selected = fresh[0].date; cursor = new Date(fresh[0].date + 'T00:00'); render(); }
+      } catch (e) { showError(e, 'Import fehlgeschlagen'); }
+    }
+
+    async function exportIcs() {
+      try {
+        const places = await api.fs.places();
+        const file = pathx.join(places.documents || places.home, `NovaOS Kalender ${isoDate()}.ics`);
+        await api.fs.writeText(file, toIcs(getEvents()));
+        notify('Kalender exportiert', file, { icon: 'download', kind: 'ok', onClick: () => api.fs.reveal(file) });
+      } catch (e) { showError(e, 'Export fehlgeschlagen'); }
+    }
+
+    // .ics-Datei aus dem Dateimanager hierher ziehen
+    root.addEventListener('dragover', (e) => { if (e.dataTransfer.types.includes('application/x-nova-paths')) e.preventDefault(); });
+    root.addEventListener('drop', (e) => {
+      const raw = e.dataTransfer.getData('application/x-nova-paths');
+      if (!raw) return;
+      e.preventDefault();
+      JSON.parse(raw).filter((p) => /\.ics$/i.test(p)).forEach((p) => importIcs(p));
+    });
+
     const off = bus.on('calendar', render);
     const off2 = bus.on('tasks', render);
     render();
     return {
-      onArgs(a) { if (a.date) { selected = a.date; cursor = new Date(a.date + 'T00:00'); render(); } },
+      onArgs(a) { if (a.ics) importIcs(a.ics); if (a.date) { selected = a.date; cursor = new Date(a.date + 'T00:00'); render(); } },
       destroy() { off(); off2(); },
     };
   },

@@ -89,7 +89,15 @@ dem Backlog.
 | R23 | **Echter Rauchtest der EXE auf Windows in der CI** | ✅ |
 | R24 | Terminal: 256 Farben/Truecolor/Fortschrittszeilen; Unit-Tests | ✅ |
 | R25 | Kalender-Icon mit Datum, Dock-Badges | ✅ |
-| R26+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R26 | Palette durchsucht Notizentexte, Aufgaben, Termine | ✅ |
+| R27 | Windows-Programme ins Dock heften | ✅ |
+| R28 | Zweiter Code-Review: **Windows-Terminal zeigte Leerzeilen (CRLF)** + 9 weitere | ✅ |
+| R29 | Sicherung & Wiederherstellung | ✅ |
+| R30 | Haftnotizen; Kernfehler: `<textarea>`-Inhalte wurden nicht gesetzt | ✅ |
+| R31–R33 | Startzeit-Messung, aktiver Hotkey im Willkommen, Mini-Player | ✅ |
+| R34–R36 | F1-Hilfe, Wetter-Vorschlag, wiederkehrende Aufgaben | ✅ |
+| R37 | Dritter Code-Review: 10 Fehler, Dialog-Fokus | ✅ |
+| R38+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 
@@ -127,6 +135,8 @@ Offen:
 | R13 | Leerer Ordner zerbrach Raster, doppelte Favoriten | Layout + Deduplizierung |
 | R13 | Programme öffneten sich hinter dem Overlay | NovaOS tritt nach dem Öffnen automatisch zur Seite |
 | R16 | Heiße Ecke löste aus, wenn der Zeiger schon in der Ecke lag (CI) | Nur Hineinfahren zählt |
+| R28 | Windows-Terminal: CRLF-Zeilen wurden leer – nur durch Review gefunden, jetzt per Windows-Rauchtest abgesichert | `\r\n` → `\n` vor der Ausgabe |
+| R30 | `<textarea>`-Inhalte (Schnellnotiz, Termin-Notizen) erschienen leer | `value` immer als Eigenschaft |
 | R18 | Umbenennen überschrieb Dateien, „Speichern unter“ ohne Rückfrage, `cd -` legte Terminal lahm, u. v. m. | siehe Commit „10 Fehler aus dem Code-Review“ |
 
 ## 8. Prüfstand (jede Runde)

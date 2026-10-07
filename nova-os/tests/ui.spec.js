@@ -265,3 +265,14 @@ test('Aufgaben: wiederkehrend – Abhaken legt die nächste an', async ({ page }
   await expect(page.locator('.task-row:not(.done)', { hasText: 'Pflanzen gießen' })).toHaveCount(1);
   await expect(page.locator('.task-row:not(.done) .task-meta')).toContainText('Wöchentlich');
 });
+
+test('Kalender: .ics importieren (Doppelklick öffnet im Kalender)', async ({ page }) => {
+  await page.evaluate(async () => {
+    const { api } = await import('/js/core/api.js');
+    await api.fs.writeText('/home/nova/Downloads/termine.ics', 'BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nUID:x1\r\nDTSTART:20261105T140000\r\nSUMMARY:Projektstart\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n');
+    const { openPath } = await import('/js/core/open.js');
+    openPath('/home/nova/Downloads/termine.ics');
+  });
+  await expect(page.locator('.toast')).toContainText('1 neue Termine');
+  await expect(page.locator('.cal-ag-title')).toHaveText('Projektstart');
+});

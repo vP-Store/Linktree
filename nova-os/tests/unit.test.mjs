@@ -65,3 +65,14 @@ test('Pfade: Windows und Unix', () => {
   assert.equal(bytes(1536), '1,5 KB');
   assert.match(isoDate(new Date(2026, 0, 5)), /^2026-01-05$/);
 });
+
+import { parseIcs, toIcs } from '../src/renderer/js/core/ics.js';
+test('iCalendar: Import, Export und Rundreise', () => {
+  const ics = 'BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nUID:a1\r\nDTSTART:20261020T093000\r\nDTEND:20261020T103000\r\nSUMMARY:Zahnarzt\\, Kontrolle\r\nDESCRIPTION:Zeile 1\\nZeile 2\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20261224\r\nSUMMARY:Heilig\r\n abend\r\nEND:VEVENT\r\nEND:VCALENDAR';
+  const ev = parseIcs(ics);
+  assert.equal(ev.length, 2);
+  assert.deepEqual([ev[0].title, ev[0].date, ev[0].time, ev[0].end, ev[0].notes], ['Zahnarzt, Kontrolle', '2026-10-20', '09:30', '10:30', 'Zeile 1\nZeile 2']);
+  assert.deepEqual([ev[1].title, ev[1].date, ev[1].time], ['Heiligabend', '2026-12-24', '']);
+  const again = parseIcs(toIcs(ev));
+  assert.deepEqual(again.map((e) => [e.title, e.date, e.time]), ev.map((e) => [e.title, e.date, e.time]));
+});

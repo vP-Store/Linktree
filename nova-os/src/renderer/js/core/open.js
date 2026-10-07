@@ -11,6 +11,7 @@ const INTERNAL = { code: 'editor', text: 'editor', image: 'photos', audio: 'musi
 
 export async function openPath(path, { isDir = false, external = false } = {}) {
   if (isDir) return openApp('files', { path });
+  if (/\.ics$/i.test(path) && !external) return openApp('calendar', { ics: path });
   const kind = fileKind(pathx.ext(path), false);
   addRecentFile(path);
   if (!external && INTERNAL[kind]) {
