@@ -97,7 +97,10 @@ dem Backlog.
 | R31–R33 | Startzeit-Messung, aktiver Hotkey im Willkommen, Mini-Player | ✅ |
 | R34–R36 | F1-Hilfe, Wetter-Vorschlag, wiederkehrende Aufgaben | ✅ |
 | R37 | Dritter Code-Review: 10 Fehler, Dialog-Fokus | ✅ |
-| R38+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R38 | Kalender-Import/Export (.ics) | ✅ |
+| R39 | **Nova KI handelt**: Werkzeuge für Aufgaben, Termine, Notizen, Dateisuche | ✅ |
+| R40 | Nova KI aus Editor und Notizen (erklären, verbessern, zusammenfassen) | ✅ |
+| R41+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

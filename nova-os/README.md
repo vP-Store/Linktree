@@ -58,8 +58,8 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Terminal** | PowerShell / CMD / Bash, Tabs, Verlauf, Tab-Vervollständigung, `open .`, `edit datei` |
 | **Code** | Editor mit Syntax-Highlighting, Tabs, Suchen & Ersetzen, Markdown-Vorschau, Speichern |
 | **Notizen** | Markdown-Notizen als echte `.md`-Dateien in `Dokumente\NovaOS\Notizen` |
-| **Aufgaben** | Listen, Fälligkeit, Priorität, Schnelleingabe („Morgen Bericht !hoch #arbeit“) |
-| **Kalender** | Monat/Woche, Termine, Erinnerungen, deutsche Feiertage |
+| **Aufgaben** | Listen, Fälligkeit, Priorität, wiederkehrend, Schnelleingabe („Morgen Bericht !hoch #arbeit“, „Pflanzen gießen wöchentlich“) |
+| **Kalender** | Monat/Woche, Termine, Erinnerungen, deutsche Feiertage, Import/Export als .ics (Outlook, Google, Apple) |
 | **Browser** | Tabs, Lesezeichen, Startseite, Zoom (echtes Chromium) |
 | **Programme** | Alle installierten Windows-Programme mit Icons starten, Favoriten |
 | **System** | CPU/RAM/Netzwerk live, Laufwerke, Prozesse beenden |
@@ -68,7 +68,7 @@ Rechtsklick funktioniert überall: Desktop, Dateien, Dock, Titelleisten, Notizen
 | **Bilder** | Galerie, Zoom, Drehen, Diashow, als Hintergrund setzen |
 | **Fokus** | Pomodoro, Timer, Stoppuhr – mit Anzeige in der Statusleiste |
 | **Wetter** | Aktuell, 24 Stunden, 7 Tage (Open-Meteo, ohne Anmeldung) |
-| **Nova KI** | KI-Assistent mit Claude: Chats, Dateien als Kontext, Antworten als Notiz (eigener API-Schlüssel) |
+| **Nova KI** | KI-Assistent mit Claude (eigener API-Schlüssel): Chats, Dateien als Kontext – und **handelt** für dich: „Erinnere mich morgen an …“, „Trag Freitag 14 Uhr Meeting ein“, „Was steht diese Woche an?“, „Finde meine Rechnung“. Im Editor und in Notizen: Auswahl erklären, verbessern, zusammenfassen, übersetzen |
 | **Zwischenablage** | Verlauf aller kopierten Texte, Anheften |
 | **Einstellungen** | Design, Akzentfarbe, Hintergründe, Durchsichtigkeit, Dock, Hotkey, Autostart |
 

@@ -45,6 +45,7 @@ export default {
         tb('zoomIn', 'Größer (Strg++)', () => setFont(fontSize + 1)),
         tb('eye', 'Markdown-Vorschau (Strg+Umschalt+V)', () => togglePreview(), 'prevBtn'),
         tb('download', 'Als PDF exportieren', () => exportPdf()),
+        tb('sparkles', 'Mit Nova KI bearbeiten (Auswahl oder ganzes Dokument)', (e) => askNova(e.currentTarget)),
         h('div.grow'),
         tb('terminal', 'Terminal im Ordner der Datei', () => cur && openApp('terminal', { cwd: cur.path ? pathx.dir(cur.path) : places.home })),
       ),
@@ -236,6 +237,22 @@ export default {
       const a = e.target.closest('a[data-ext]');
       if (a) { e.preventDefault(); openApp('browser', { url: a.getAttribute('href') }); }
     });
+
+    function askNova(btn) {
+      if (!cur) return;
+      const sel = ta.value.slice(ta.selectionStart, ta.selectionEnd);
+      const text = (sel || ta.value).slice(0, 150000);
+      const fence = '```' + (cur.lang !== 'text' ? cur.lang : '');
+      const ask = (instr) => openApp('assistant', { prompt: `${instr}\n\n${fence}\n${text}\n\`\`\`` });
+      const r = btn.getBoundingClientRect();
+      contextMenu(r.left, r.bottom + 4, [
+        { label: sel ? 'Auswahl erklären' : 'Dokument erklären', icon: 'info', action: () => ask('Erkläre mir verständlich, was das macht bzw. worum es geht:') },
+        { label: 'Verbessern', icon: 'sparkles', action: () => ask(cur.lang === 'text' || cur.lang === 'md' ? 'Verbessere Stil, Rechtschreibung und Klarheit dieses Textes. Gib die verbesserte Fassung vollständig aus:' : 'Verbessere diesen Code (Lesbarkeit, Fehler, Randfälle). Gib die verbesserte Fassung vollständig aus und erkläre kurz die Änderungen:') },
+        { label: 'Fehler finden', icon: 'alert', action: () => ask('Finde Fehler und Probleme in diesem Inhalt und schlage Korrekturen vor:') },
+        { label: 'Zusammenfassen', icon: 'list', action: () => ask('Fasse das Wichtigste kurz in Stichpunkten zusammen:') },
+        { label: 'Ins Englische übersetzen', icon: 'globe', action: () => ask('Übersetze ins Englische:') },
+      ]);
+    }
 
     async function exportPdf() {
       if (!cur) return;

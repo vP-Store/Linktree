@@ -45,6 +45,18 @@ export default {
     const main = h('div.app-main',
       h('div.app-toolbar', modeBar, h('div.grow'), meta,
         h('button.icon-btn', { title: 'Notiz anheften', html: icon('pin'), onclick: () => cur && togglePin(cur) }),
+        h('button.icon-btn', { title: 'Mit Nova KI überarbeiten', html: icon('sparkles'), onclick: (e) => {
+          if (!cur) return;
+          const sel = ta.value.slice(ta.selectionStart, ta.selectionEnd) || ta.value;
+          const ask = (instr) => openApp('assistant', { prompt: `${instr}\n\n${sel.slice(0, 150000)}` });
+          const r = e.currentTarget.getBoundingClientRect();
+          contextMenu(r.right - 240, r.bottom + 4, [
+            { label: 'Verbessern', icon: 'sparkles', action: () => ask('Verbessere Stil, Rechtschreibung und Klarheit dieser Notiz und gib sie vollständig in Markdown aus:') },
+            { label: 'Zusammenfassen', icon: 'list', action: () => ask('Fasse diese Notiz in Stichpunkten zusammen:') },
+            { label: 'Aufgaben daraus anlegen', icon: 'listChecks', action: () => ask('Lies diese Notiz und lege für jeden konkreten nächsten Schritt eine Aufgabe an (mit Fälligkeit, wenn erkennbar):') },
+            { label: 'Weiterschreiben', icon: 'edit', action: () => ask('Schreibe diese Notiz sinnvoll weiter:') },
+          ]);
+        } }),
         h('button.icon-btn', { title: 'Als PDF exportieren', html: icon('download'), onclick: () => cur && exportPdf(cur) }),
         h('button.icon-btn', { title: 'Als Datei im Editor öffnen', html: icon('code'), onclick: () => cur && openApp('editor', { path: cur.path }) }),
         h('button.icon-btn', { title: 'Löschen', html: icon('trash'), onclick: () => cur && remove(cur) })),
