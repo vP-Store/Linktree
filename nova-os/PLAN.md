@@ -133,7 +133,8 @@ dem Backlog.
 | R71 | Zweiter Code-Review (R59–R70): 10 Befunde behoben (Lautstärke 0, Anordnung abbrechen, Stapel-Race, .constructor-Endung, Snap-Popup-Timer, Klang-Salven, Animationskonflikt u. a.) | ✅ |
 | R72 | Geführte Tour (Lichtkegel, 6 Schritte, beim ersten Start, Willkommensseite, Palette) | ✅ |
 | R73 | Weltuhr-Globus im hellen Design hell | ✅ |
-| R74+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R74 | Mitteilungscenter mit „Heute“ (Termine + fällige Aufgaben, Klick öffnet) | ✅ |
+| R75+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

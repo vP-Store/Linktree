@@ -468,3 +468,17 @@ test('Tour: Schritte vor/zurück, Esc beendet und merkt sich das', async ({ page
   await expect(page.locator('#tour')).toHaveCount(0);
   expect(await page.evaluate(async () => (await import('/js/core/store.js')).store.get('tourDone'))).toBe(true);
 });
+
+test('Mitteilungscenter zeigt „Heute“ mit Terminen und Aufgaben', async ({ page }) => {
+  await page.evaluate(async () => {
+    const { store } = await import('/js/core/store.js'); const { isoDate } = await import('/js/core/dom.js');
+    store.set('calendarEvents', [{ id: 'x', date: isoDate(), time: '10:00', title: 'Standup' }]);
+    (await import('/js/core/tasks.js')).addTask('Rechnung zahlen', { due: isoDate() });
+  });
+  await page.locator('#topbar [title="Mitteilungen"]').click();
+  const card = page.locator('.nc-today');
+  await expect(card).toContainText('Standup');
+  await expect(card).toContainText('Rechnung zahlen');
+  await card.locator('.nc-today-row', { hasText: 'Standup' }).click();
+  await expect(page.locator('.win[data-app="calendar"]')).toHaveCount(1);
+});

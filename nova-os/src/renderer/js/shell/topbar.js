@@ -1,6 +1,7 @@
 // Statusleiste oben + Popover (Schnelleinstellungen, Mitteilungen, Kalender).
 
-import { h, clear, bus, pad, rate, timeAgo, esc, prettyAccel } from '../core/dom.js';
+import { h, clear, bus, pad, rate, timeAgo, esc, prettyAccel, isoDate } from '../core/dom.js';
+import { getTasks } from '../core/tasks.js';
 import { icon, logoSvg } from '../core/icons.js';
 import { store } from '../core/store.js';
 import { api } from '../core/api.js';
@@ -242,6 +243,28 @@ function renderQs(el) {
   );
 }
 
+/** „Heute“: Termine und fällige Aufgaben des Tages, kompakt über den Mitteilungen */
+function todayCard() {
+  const today = isoDate();
+  const events = (store.get('calendarEvents', []) || []).filter((e) => e.date === today).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  const tasks = getTasks().filter((t) => !t.done && t.due && t.due <= today);
+  const card = h('div.nc-today.card');
+  const head = h('div.nc-today-head', h('b', new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })),
+    h('span.faint', `${events.length} ${events.length === 1 ? 'Termin' : 'Termine'} · ${tasks.length} ${tasks.length === 1 ? 'Aufgabe' : 'Aufgaben'}`));
+  card.append(head);
+  const go = (app, args) => { closePop(); openApp(app, args); };
+  for (const e of events.slice(0, 3)) {
+    card.append(h('button.nc-today-row', { onclick: () => go('calendar', { date: today }) },
+      h('span.nc-dot.ev', { style: { background: e.color || '' } }), h('span.nc-time', e.time || 'ganztägig'), h('span.ellipsis', e.title)));
+  }
+  for (const t of tasks.slice(0, 3)) {
+    card.append(h('button.nc-today-row', { onclick: () => go('tasks') },
+      h('span.nc-dot.tk'), h('span.nc-time', t.due < today ? 'überfällig' : 'heute'), h('span.ellipsis', t.title)));
+  }
+  if (!events.length && !tasks.length) card.append(h('div.faint', { style: { fontSize: '12.5px', padding: '2px 2px 4px' } }, 'Heute steht nichts an – genieß den Tag.'));
+  return card;
+}
+
 function renderNc(el) {
   clear(el);
   const list = getNotifications();
@@ -250,6 +273,7 @@ function renderNc(el) {
     h('div.row',
       h('button.btn.sm.ghost', { onclick: () => { store.set('dnd', !store.get('dnd')); updateBell(); renderNc(el); }, html: `${icon(store.get('dnd') ? 'bellOff' : 'bell')} ${store.get('dnd') ? 'Nicht stören an' : 'Nicht stören'}` }),
       list.length ? h('button.btn.sm', { onclick: () => clearNotifications() }, 'Alle löschen') : null)));
+  el.append(todayCard());
   if (!list.length) {
     el.append(h('div.empty', { html: `${icon('inbox')}<b>Alles erledigt</b><span>Keine neuen Mitteilungen</span>` }));
     return;
