@@ -585,3 +585,5 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 .ai-tool span { color: var(--text-2); }
 .ai-tool.err { background: rgba(248, 113, 113, .1); border-color: rgba(248, 113, 113, .3); }
 .ai-tool.err .icon { color: var(--danger); }
+.wp-thumb .wp-3d { position: absolute; right: 6px; bottom: 5px; font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 1px 6px; border-radius: 6px; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.wp-thumb.is-3d::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 62% 48%, rgba(255,236,210,.55) 0, rgba(var(--accent-rgb),.35) 12%, transparent 40%); }

@@ -210,8 +210,22 @@ class Win {
     let moved = false;
     let zone = null;
     const a = area();
+    // 3D-Neigung beim Ziehen: Fenster kippt leicht in Bewegungsrichtung
+    const tiltOn = document.documentElement.dataset.reduceMotion !== 'true' && document.documentElement.dataset.perf !== 'true';
+    let lastX = startX, lastY = startY, lastT = performance.now(), vx = 0, vy = 0, settle = 0;
+    const tilt = (rx, ry) => { this.el.style.setProperty('--tilt-x', rx.toFixed(2) + 'deg'); this.el.style.setProperty('--tilt-y', ry.toFixed(2) + 'deg'); };
     const onMove = (ev) => {
       const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (tiltOn) {
+        const now = performance.now(), dt = Math.max(8, now - lastT);
+        vx = vx * 0.6 + ((ev.clientX - lastX) / dt) * 0.4;
+        vy = vy * 0.6 + ((ev.clientY - lastY) / dt) * 0.4;
+        lastX = ev.clientX; lastY = ev.clientY; lastT = now;
+        const lim = (v) => Math.max(-9, Math.min(9, v));
+        tilt(lim(-vy * 5), lim(vx * 5));
+        clearTimeout(settle);
+        settle = setTimeout(() => tilt(0, 0), 90);
+      }
       if (!moved) {
         if (Math.abs(dx) + Math.abs(dy) < 4) return;
         moved = true;
@@ -244,6 +258,8 @@ class Win {
     const onUp = () => {
       removeEventListener('pointermove', onMove);
       removeEventListener('pointerup', onUp);
+      clearTimeout(settle);
+      tilt(0, 0);
       this.el.classList.remove('dragging');
       showSnap(null);
       if (moved && zone) {

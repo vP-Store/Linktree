@@ -3,6 +3,7 @@
 import { store } from '../core/store.js';
 import { api, fileUrl } from '../core/api.js';
 import { h, clear } from '../core/dom.js';
+import { startScene, stopScene } from './wallpaper3d.js';
 
 export const ACCENTS = [
   { name: 'Nova', color: '#7c5cff', alt: '#4cc9f0' },
@@ -17,6 +18,10 @@ export const ACCENTS = [
 
 // Jede Vorlage: Grundfarbe + weiche, treibende Farbflecken
 export const WALLPAPERS = {
+  galaxy3d: { name: 'Galaxie 3D', bg: 'radial-gradient(ellipse at 50% 48%,#160f33 0%,#0a0820 45%,#04040c 100%)', scene: 'galaxy',
+    blobs: [['#4c1d95', 50, 30, 40], ['#0c4a6e', 10, 70, 34]] },
+  horizon3d: { name: 'Horizont 3D', bg: 'linear-gradient(180deg,#05030f 0%,#1a0b33 48%,#2a0d3a 58%,#05030c 100%)', scene: 'horizon',
+    blobs: [['#6d28d9', 50, 30, 30]] },
   aurora: { name: 'Aurora', bg: 'linear-gradient(160deg,#0b0b1f 0%,#120d2e 45%,#06161f 100%)', stars: true,
     blobs: [['#7c3aed', 8, 12, 46], ['#0ea5e9', 62, 4, 42], ['#10b981', 40, 60, 38], ['#db2777', 78, 62, 34]] },
   nebula: { name: 'Nebel', bg: 'linear-gradient(140deg,#120318 0%,#1d0b2e 50%,#0a0616 100%)', stars: true,
@@ -68,6 +73,7 @@ export async function renderWallpaper() {
   if (!host) return;
   const key = store.get('wallpaper');
   const wp = WALLPAPERS[key] || WALLPAPERS.aurora;
+  stopScene();
   clear(host);
   host.classList.toggle('animated', !!store.get('animatedWallpaper') && !store.get('reduceMotion') && !store.get('perfMode'));
   const opacity = store.get('overlayOpacity') / 100;
@@ -90,6 +96,10 @@ export async function renderWallpaper() {
       host.append(h('div.blob', { style: { background: color, left: x + '%', top: y + '%', width: size + 'vmax', height: size + 'vmax', marginLeft: -size / 4 + 'vmax', marginTop: -size / 4 + 'vmax' } }));
     }
     if (wp.stars) host.append(h('div.stars'));
+    if (wp.scene) {
+      const still = !!store.get('reduceMotion') || !!store.get('perfMode') || !store.get('animatedWallpaper');
+      startScene(host, wp.scene, { still });
+    }
   }
   const dim = store.get('wallpaperDim');
   if (dim) host.append(h('div.wp-layer', { style: { background: `rgba(0,0,0,${dim / 100})` } }));
@@ -105,7 +115,8 @@ function mimeFor(p) {
 /** Kleine Vorschau-Kachel eines Wallpapers (für Einstellungen/Schnellmenü) */
 export function wallpaperThumb(key) {
   const wp = WALLPAPERS[key];
-  const el = h('div.wp-thumb', { style: { background: wp.see ? 'repeating-conic-gradient(#555 0 25%, #333 0 50%) 0 0/14px 14px' : wp.bg } });
+  const el = h('div.wp-thumb', { class: wp.scene ? 'is-3d' : '', style: { background: wp.see ? 'repeating-conic-gradient(#555 0 25%, #333 0 50%) 0 0/14px 14px' : wp.bg } });
+  if (wp.scene) el.append(h('b.wp-3d', '3D'));
   for (const [color, x, y, size] of wp.blobs) {
     el.append(h('i', { style: { background: color, left: x + '%', top: y + '%', width: size * 1.4 + '%', paddingTop: size * 1.4 + '%' } }));
   }

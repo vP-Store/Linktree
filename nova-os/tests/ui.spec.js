@@ -287,3 +287,17 @@ test('Nova KI legt per Werkzeug eine Aufgabe an', async ({ page }) => {
   const tasks = await page.evaluate(async () => (await import('/js/core/tasks.js')).getTasks().map((t) => t.title));
   expect(tasks.join()).toContain('Milch zu kaufen');
 });
+
+test('3D-Hintergründe: Galaxie läuft, Horizont umschaltbar, Standbild bei reduzierter Bewegung', async ({ page }) => {
+  const canvas = page.locator('#wallpaper canvas.wp-canvas');
+  await expect(canvas).toHaveCount(1);
+  await expect.poll(async () => Number(await canvas.getAttribute('data-frames')), { timeout: 15000 }).toBeGreaterThan(0);
+  // Umschalten ersetzt die Szene (kein zweites Canvas, keine Fehler)
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('wallpaper', 'horizon3d'); });
+  await expect(canvas).toHaveCount(1);
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('wallpaper', 'aurora'); });
+  await expect(canvas).toHaveCount(0);
+  // Bewegung reduzieren → Standbild
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('reduceMotion', true); store.set('wallpaper', 'galaxy3d'); });
+  await expect(canvas).toHaveAttribute('data-frames', '1');
+});

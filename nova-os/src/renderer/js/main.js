@@ -8,6 +8,7 @@ import { initWM, restoreSession, openApp } from './core/wm.js';
 import { notify } from './core/ui.js';
 import { initTheme } from './shell/theme.js';
 import { initTopbar } from './shell/topbar.js';
+import { initTilt } from './shell/tilt.js';
 import { initDock } from './shell/dock.js';
 import { initDesktop } from './shell/desktop.js';
 import { initStart } from './shell/start.js';
@@ -43,6 +44,7 @@ async function boot() {
   initWM();
   initTopbar();
   initDock();
+  initTilt();
   initStart();
   initPalette();
   initKeys();

@@ -101,7 +101,10 @@ dem Backlog.
 | R39 | **Nova KI handelt**: Werkzeuge für Aufgaben, Termine, Notizen, Dateisuche | ✅ |
 | R40 | Nova KI aus Editor und Notizen (erklären, verbessern, zusammenfassen) | ✅ |
 | R41 | Sicherheits-Review: Markdown-Attribut-Ausbruch, KI-Bilder als Link, Navigationssperre | ✅ |
-| R42+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R42 | Live-3D-Hintergründe (Galaxie, Horizont) mit Maus-Parallaxe, pausieren wenn verdeckt | ✅ |
+| R43 | 3D-Fenster: perspektivisches Öffnen/Schließen/Minimieren, Neigung beim Ziehen | ✅ |
+| R44 | 3D-Karten mit Glanzlicht (Widgets, App-Kacheln, Vorschauen), Dock-Spiegelung | ✅ |
+| R45+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

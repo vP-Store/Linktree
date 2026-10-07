@@ -6,7 +6,7 @@ import { Emitter } from './dom.js';
 export const DEFAULTS = {
   theme: 'dark',
   accent: '#7c5cff',
-  wallpaper: 'aurora',
+  wallpaper: 'galaxy3d',
   wallpaperImage: null,
   wallpaperDim: 0,
   overlayOpacity: 100,
