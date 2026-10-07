@@ -322,3 +322,12 @@ test('3D-Effekte lassen sich abschalten', async ({ page }) => {
   const anim = await page.locator('.win').first().evaluate((el) => getComputedStyle(el).animationName);
   expect(anim).toBe('winOpenFlat');
 });
+
+test('Weltuhr 3D: Globus und Uhrzeiten', async ({ page }) => {
+  await expect(page.locator('.w-globe canvas.globe-canvas')).toBeVisible();
+  await expect(page.locator('.w-globe .globe-row')).toHaveCount(4);
+  await expect(page.locator('.w-globe .globe-row b').first()).toHaveText(/^\d\d:\d\d$/);
+  // Widget abwählbar
+  await page.evaluate(async () => { const { store } = await import('/js/core/store.js'); store.set('widgetList', ['clock']); });
+  await expect(page.locator('.w-globe')).toHaveCount(0);
+});

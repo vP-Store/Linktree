@@ -477,3 +477,12 @@ body.focus-mode #stickies { opacity: 0; pointer-events: none; }
 .ws-hud-dots { display: flex; gap: 7px; }
 .ws-hud-dots i { width: 26px; height: 6px; border-radius: 3px; background: var(--border-strong); transition: background .2s; }
 .ws-hud-dots i.on { background: var(--accent); box-shadow: 0 0 10px rgba(var(--accent-rgb), .7); }
+
+/* Weltuhr 3D */
+.globe-body { display: flex; align-items: center; gap: 12px; }
+.globe-canvas { flex: none; filter: drop-shadow(0 8px 24px rgba(0,0,0,.4)); }
+.globe-list { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.globe-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--text-2); }
+.globe-row b { font: 500 15px var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
+.globe-row.home span { color: var(--accent); font-weight: 600; }
+.globe-row.home span::before { content: '● '; font-size: 9px; vertical-align: 2px; }

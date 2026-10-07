@@ -1,5 +1,6 @@
 // Desktop: echte Dateien vom Windows-Desktop, Nova-Verknüpfungen, Widgets.
 
+import { globeWidget, stopGlobe } from './globe.js';
 import { h, clear, bus, pad, esc, debounce } from '../core/dom.js';
 import { icon, fileGlyph } from '../core/icons.js';
 import { store } from '../core/store.js';
@@ -256,6 +257,10 @@ async function renderWidgets() {
   };
   if (on('clock')) widgetsEl.append(h('div.widget.glass.w-clock', clockW.time, clockW.date, clockW.greet));
   tickWidgetClock();
+
+  // Weltuhr mit 3D-Globus
+  stopGlobe();
+  if (on('globe')) widgetsEl.append(globeWidget());
 
   // System
   ringEls.cpu = ring('CPU');

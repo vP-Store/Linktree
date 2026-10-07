@@ -149,7 +149,7 @@ export default {
           const on = pinned.includes(a.id);
           return h('button.set-dockapp', { class: on ? 'on' : '', title: on ? 'Vom Dock lösen' : 'Ans Dock heften', onclick: () => { store.set('dockPinned', on ? store.get('dockPinned').filter((x) => x !== a.id) : [...store.get('dockPinned'), a.id]); render(); }, html: `${appIconSpan(a)}<span>${esc(a.name)}</span>${on ? `<i>${icon('check')}</i>` : ''}` });
         }));
-        const WIDGETS = [['clock', 'clock', 'Uhr'], ['system', 'activity', 'System'], ['tasks', 'listChecks', 'Aufgaben'], ['weather', 'cloudSun', 'Wetter'], ['note', 'edit', 'Schnellnotiz']];
+        const WIDGETS = [['clock', 'clock', 'Uhr'], ['globe', 'globe', 'Weltuhr 3D'], ['system', 'activity', 'System'], ['tasks', 'listChecks', 'Aufgaben'], ['weather', 'cloudSun', 'Wetter'], ['note', 'edit', 'Schnellnotiz']];
         const wl = store.get('widgetList') || [];
         const widgetPick = h('div.set-dockapps', ...WIDGETS.map(([id, ic, label]) => {
           const isOn = wl.includes(id);

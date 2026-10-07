@@ -32,7 +32,7 @@ export const DEFAULTS = {
   workspaces: 4,
   uiScale: 100,
   hotCorner: true,
-  widgetList: ['clock', 'system', 'tasks', 'weather', 'note'],
+  widgetList: ['clock', 'globe', 'system', 'tasks', 'weather'],
   perfMode: false,
   doubleEscHide: true,
 };
