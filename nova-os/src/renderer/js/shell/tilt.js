@@ -38,6 +38,9 @@ export function initTilt() {
     const icons = document.getElementById('desk-icons'), widgets = document.getElementById('widgets');
     if (icons) icons.style.translate = on ? `${(depthX * -5).toFixed(1)}px ${(depthY * -4).toFixed(1)}px` : '';
     if (widgets) widgets.style.translate = on ? `${(depthX * -10).toFixed(1)}px ${(depthY * -7).toFixed(1)}px` : '';
+    // eigenes Hintergrundbild: tiefste Ebene, bewegt sich gegenläufig
+    const img = document.querySelector('#wallpaper .wp-image');
+    if (img) img.style.translate = on ? `${(depthX * 14).toFixed(1)}px ${(depthY * 10).toFixed(1)}px` : '';
   };
   const unlight = () => { if (litWin) litWin.classList.remove('lit'); litWin = null; };
   document.addEventListener('pointermove', (e) => {

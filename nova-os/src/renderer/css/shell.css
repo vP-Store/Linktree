@@ -542,3 +542,8 @@ body.saver-on #os > :not(#wallpaper):not(#saver) { opacity: 0; transition: opaci
 .stack-fan.out .stack-item { animation: stackOut .2s ease forwards; }
 @keyframes stackOut { to { opacity: 0; transform: translate(0, 0) scale(.4); } }
 #dock.stack-open .dock-tip { opacity: 0 !important; }
+
+/* Eigenes Hintergrundbild: Rand für die Parallaxe, langsamer Zoom bei bewegtem Hintergrund */
+#wallpaper .wp-image { inset: -24px; transition: translate .6s ease-out; }
+#wallpaper.animated .wp-image { animation: kenBurns 60s ease-in-out infinite alternate; }
+@keyframes kenBurns { from { transform: scale(1); } to { transform: scale(1.08); } }
