@@ -335,7 +335,7 @@
 .sw-card {
   position: absolute; inset: 0; border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 18px;
   pointer-events: auto; cursor: pointer; transition: transform .38s cubic-bezier(.2, 1.15, .35, 1), opacity .3s, box-shadow .3s;
-  background: linear-gradient(160deg, rgba(40,42,62,.92), rgba(18,19,30,.95)); border: 1px solid rgba(255,255,255,.1);
+  background: linear-gradient(160deg, rgba(40,42,62,.92), rgba(18,19,30,.95)); border: 1px solid rgba(255,255,255,.1); color: #f2f4fa;
   box-shadow: 0 30px 70px rgba(0,0,0,.5); overflow: hidden; -webkit-box-reflect: below 14px linear-gradient(transparent 70%, rgba(255,255,255,.18));
 }
 .sw-card .app-icon { width: 104px; height: 104px; position: relative; }
