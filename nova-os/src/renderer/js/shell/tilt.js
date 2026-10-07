@@ -11,10 +11,14 @@ function edgeLight(e) {
   if (litWin && litWin !== win) litWin.classList.remove('lit');
   litWin = win;
   if (!win) return;
+  // Variablen auf einem eigenen, leeren Kind-Element setzen – auf .win gesetzt würden sie
+  // bei jeder Mausbewegung den Stil des ganzen Fensterinhalts neu berechnen lassen
+  let edge = win._edge;
+  if (!edge || edge.parentNode !== win) { edge = win._edge = document.createElement('i'); edge.className = 'win-edge'; win.append(edge); }
   const r = win.getBoundingClientRect();
-  win.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px');
-  win.style.setProperty('--my', (e.clientY - r.top).toFixed(0) + 'px');
-  win.classList.add('lit');
+  edge.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px');
+  edge.style.setProperty('--my', (e.clientY - r.top).toFixed(0) + 'px');
+  if (!win.classList.contains('lit')) win.classList.add('lit');
 }
 
 function reset(el) {
@@ -26,20 +30,22 @@ function reset(el) {
 export function initTilt() {
   const root = document.documentElement;
   // Raumtiefe: Desktop-Ebenen verschieben sich je nach Mausposition unterschiedlich stark
-  const desk = document.getElementById('desktop');
+  // (direkt als translate auf die Ebenen – geerbte Variablen würden den ganzen Desktop neu berechnen)
   let depthX = 0, depthY = 0, queued = false;
   const applyDepth = () => {
     queued = false;
-    if (!desk) return;
     const on = root.dataset.fx3d !== 'false' && root.dataset.perf !== 'true';
-    desk.style.setProperty('--px', on ? depthX.toFixed(3) : '0');
-    desk.style.setProperty('--py', on ? depthY.toFixed(3) : '0');
+    const icons = document.getElementById('desk-icons'), widgets = document.getElementById('widgets');
+    if (icons) icons.style.translate = on ? `${(depthX * -5).toFixed(1)}px ${(depthY * -4).toFixed(1)}px` : '';
+    if (widgets) widgets.style.translate = on ? `${(depthX * -10).toFixed(1)}px ${(depthY * -7).toFixed(1)}px` : '';
   };
+  const unlight = () => { if (litWin) litWin.classList.remove('lit'); litWin = null; };
   document.addEventListener('pointermove', (e) => {
     depthX = (e.clientX / innerWidth) * 2 - 1; depthY = (e.clientY / innerHeight) * 2 - 1;
     if (!queued) { queued = true; requestAnimationFrame(applyDepth); }
     if (root.dataset.fx3d === 'false' || root.dataset.perf === 'true' || e.buttons) {
       if (current) { reset(current); current = null; }
+      unlight();
       return;
     }
     edgeLight(e);
@@ -57,5 +63,6 @@ export function initTilt() {
     el.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
     el.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
   }, { passive: true });
-  document.addEventListener('pointerleave', () => { if (current) reset(current); current = null; if (litWin) litWin.classList.remove('lit'); litWin = null; });
+  // Maus verlässt das Fenster (pointerleave feuert auf document nicht)
+  document.documentElement.addEventListener('mouseleave', () => { if (current) reset(current); current = null; unlight(); });
 }

@@ -242,6 +242,7 @@ function updateRings(s) {
 
 async function renderWidgets() {
   clear(widgetsEl);
+  stopGlobe();
   clockW = null;
   ringEls = {};
   widgetsEl.classList.toggle('hide', !store.get('showWidgets'));

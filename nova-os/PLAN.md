@@ -117,7 +117,8 @@ dem Backlog.
 | R55 | Terminal-Designs: Nova, Retro-CRT (Phosphor + Scanlines), Bernstein, Papier | ✅ |
 | R56 | Aufgaben: Fortschrittsring im Kopf, 3D-Konfetti wenn alles erledigt ist | ✅ |
 | R57 | Wetter: animierter Himmel (Regen in Tiefenebenen, Gewitter, Schnee, Wolken, Sonnenstrahlen, Mond + Sterne) | ✅ |
-| R58+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
+| R58 | Code-Review der 3D-Runden: 14 Befunde behoben (Papier-Terminal, Schoner + Webview/Video, Toast-Ausblendung, Standbild nach Resize, Leistung Lichtkante/Parallaxe, Globus-Schleife, Karussell-Tasten u. a.) | ✅ |
+| R59+ | Politur-Schleife: Rubrik-Bewertung → schwächste Stelle verbessern → wiederholen | 🔁 |
 
 ## 5. Bewertungsrubrik (Station 4)
 

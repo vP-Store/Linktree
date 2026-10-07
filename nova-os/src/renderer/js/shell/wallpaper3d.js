@@ -42,12 +42,14 @@ export function startScene(host, kind, { still = false } = {}) {
   host.append(canvas);
   const ctx = canvas.getContext('2d', { alpha: true });
   if (!ctx) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   let W = 0, H = 0;
+  let drawStill = null; // im Standbild-Modus: nach Größen-/Farbänderung neu zeichnen
   const resize = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // ändert sich mit der Skalierung
     W = host.clientWidth || innerWidth; H = host.clientHeight || innerHeight;
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); // leert die Fläche
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (drawStill) drawStill();
   };
   resize();
 
@@ -58,7 +60,12 @@ export function startScene(host, kind, { still = false } = {}) {
   window.addEventListener('resize', resize);
 
   let colors = accentColors();
-  const colorTimer = setInterval(() => { colors = accentColors(); }, 1500);
+  const colorTimer = setInterval(() => {
+    const next = accentColors();
+    const changed = String(next.a) !== String(colors.a) || String(next.b) !== String(colors.b);
+    colors = next;
+    if (changed && drawStill) drawStill();
+  }, 1500);
 
   const scene = kind === 'horizon' ? horizonScene() : kind === 'waves' ? wavesScene() : galaxyScene();
   let raf = 0, last = performance.now(), t = 0, stopped = false;
@@ -84,7 +91,12 @@ export function startScene(host, kind, { still = false } = {}) {
     }
     if (!still) raf = requestAnimationFrame(frame);
   };
-  if (still) { t = 12; scene(ctx, W, H, t, mouse, colors); canvas.dataset.frames = '1'; }
+  if (still) {
+    t = 12;
+    drawStill = () => { ctx.clearRect(0, 0, W, H); scene(ctx, W, H, t, mouse, colors); };
+    drawStill();
+    canvas.dataset.frames = '1';
+  }
   else raf = requestAnimationFrame(frame);
 
   current = {
@@ -320,8 +332,8 @@ function wavesScene() {
       const z = Z0 + r * DZ;
       const wz = z + drift; // Weltkoordinate für die Wellen
       // nur den sichtbaren Ausschnitt dieser Reihe berechnen
-      const half = ((W / 2 + 40) / f) * z;
-      const c0 = Math.ceil((-half - m.sx) / DX), c1 = Math.floor((half - m.sx) / DX);
+      // sichtbarer Bereich in Bildschirmkoordinaten (cx verschiebt sich mit der Maus)
+      const c0 = Math.ceil((((-40 - cx) * z) / f) / DX), c1 = Math.floor((((W + 40 - cx) * z) / f) / DX);
       for (let c = c0; c <= c1; c++) {
         const x = c * DX;
         const hgt = Math.sin(x * 0.45 + wz * 0.35 + t * 0.9) * 0.45 + Math.cos(wz * 0.8 - t * 1.3 + x * 0.25) * 0.35 + Math.sin((x - wz) * 0.22 + t * 0.5) * 0.3;

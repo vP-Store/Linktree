@@ -72,18 +72,25 @@ export function globeWidget() {
 
   let rot = Math.PI / 2 - rad(me.lon), raf = 0, last = performance.now(), stopped = false, color = accent(), n = 0;
   const tilt = rad(22); // Nordhalbkugel leicht zum Betrachter
+  let slow = 0;
   const draw = (now) => {
-    raf = 0;
+    raf = 0; slow = 0;
     if (stopped) return;
+    if (!el.isConnected) { stopped = true; return; } // Widget entfernt → Schleife beenden (nur diese)
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    const hidden = document.hidden || document.body.classList.contains('overlay-hidden') || !el.isConnected;
-    const still = document.documentElement.dataset.reduceMotion === 'true';
+    const b = document.body;
+    const hidden = document.hidden || b.classList.contains('overlay-hidden') || b.classList.contains('saver-on') || b.classList.contains('focus-mode')
+      || !!document.querySelector('#windows .win.max:not(.min):not(.other-ws):not(.closing)');
+    const root = document.documentElement;
+    // Bewegung reduzieren / Leistungsmodus: nur alle 2 s ein Standbild (Uhrzeit, Tag/Nacht)
+    const still = root.dataset.reduceMotion === 'true' || root.dataset.perf === 'true';
     if (!hidden) {
       if (!still) rot += dt * 0.18;
-      if (++n % 120 === 1) { color = accent(); rows.forEach((r) => { r.t.textContent = timeIn(r.c.tz); }); }
+      if (still || ++n % 120 === 1) { n = Math.max(n, 1); color = accent(); rows.forEach((r) => { r.t.textContent = timeIn(r.c.tz); }); }
       render();
     }
-    raf = requestAnimationFrame(draw);
+    if (still || hidden) slow = setTimeout(() => { last = performance.now(); draw(last); }, still ? 2000 : 500);
+    else raf = requestAnimationFrame(draw);
   };
 
   function project(x, y, z) {
@@ -144,6 +151,6 @@ export function globeWidget() {
   rows.forEach((r) => { r.t.textContent = timeIn(r.c.tz); });
   render();
   raf = requestAnimationFrame(draw);
-  running = () => { stopped = true; if (raf) cancelAnimationFrame(raf); };
+  running = () => { stopped = true; if (raf) cancelAnimationFrame(raf); clearTimeout(slow); };
   return el;
 }

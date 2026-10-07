@@ -15,6 +15,7 @@ module.exports = `(async () => {
   await t('netz1', async () => (await n.sys.net()).ifaces.length);
   await new Promise((res) => setTimeout(res, 4500));
   await t('netzrate', async () => (await n.sys.net()).rate);
+  await t('leerlauf', async () => { const s = await n.sys.idle(); if (typeof s !== 'number') throw new Error('keine Zahl'); return s; });
   await t('terminal', () => new Promise((res) => {
     let out = '';
     const off = n.term.onData((d) => { if (d.id === 'smoke') out += d.data; });

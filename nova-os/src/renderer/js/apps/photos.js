@@ -103,7 +103,7 @@ export default {
       flowIdx = Math.min(flowIdx, images.length - 1);
       const stageEl = h('div.ph-flow-stage');
       const label = h('div.ph-flow-label');
-      flowCards = images.slice(0, 400).map((f, i) => {
+      flowCards = images.map((f, i) => {
         const im = h('img', { alt: '', draggable: false });
         const card = h('button.ph-flow-card', { title: f.name, onclick: () => (i === flowIdx ? show(i) : setFlow(i)) }, im);
         card._img = im; card._loaded = false;
@@ -197,7 +197,9 @@ export default {
     img.addEventListener('dblclick', () => setZoom(zoom > 1 ? 1 : 2));
     root.tabIndex = 0;
     root.addEventListener('keydown', (e) => {
-      if (idx < 0 && view === 'flow' && images.length) {
+      // Tasten von Knöpfen (Werkzeugleiste, Karten) nicht abfangen – Enter/Leertaste klicken sie selbst
+      const fromButton = e.target !== root && e.target.closest && e.target.closest('button');
+      if (idx < 0 && view === 'flow' && images.length && !(fromButton && (e.key === 'Enter' || e.key === ' ')) && (e.target === root || gallery.contains(e.target))) {
         if (e.key === 'ArrowRight') setFlow(flowIdx + 1);
         else if (e.key === 'ArrowLeft') setFlow(flowIdx - 1);
         else if (e.key === 'Enter' || e.key === ' ') show(flowIdx);

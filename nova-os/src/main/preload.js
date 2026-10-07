@@ -58,6 +58,7 @@ contextBridge.exposeInMainWorld('nova', {
     stats: call('sys:stats'),
     net: call('sys:net'),
     processes: call('sys:processes'),
+    idle: call('sys:idle'),
     kill: call('sys:kill'),
   },
   term: {

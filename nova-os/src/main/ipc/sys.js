@@ -154,6 +154,15 @@ module.exports = function register(ipcMain) {
       .flatMap(([name, list]) => list.filter((a) => !a.internal && a.family === 'IPv4').map((a) => ({ name, address: a.address })));
     return { rate, ifaces };
   });
+  // Leerlaufzeit des ganzen Systems in Sekunden (zählt auch Eingaben in Webseiten/anderen Programmen)
+  // Spielt irgendwo Ton/Video (z. B. YouTube im Browser-Tab), gilt das System als aktiv
+  const playing = new Set();
+  require('electron').app.on('web-contents-created', (_e, wc) => {
+    wc.on('media-started-playing', () => playing.add(wc.id));
+    wc.on('media-paused', () => playing.delete(wc.id));
+    wc.on('destroyed', () => playing.delete(wc.id));
+  });
+  ipcMain.handle('sys:idle', () => (playing.size ? 0 : require('electron').powerMonitor.getSystemIdleTime()));
   ipcMain.handle('sys:processes', () => processes());
   ipcMain.handle('sys:kill', (_e, pid) => {
     process.kill(Number(pid));

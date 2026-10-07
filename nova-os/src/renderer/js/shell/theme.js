@@ -64,7 +64,7 @@ export function applyTheme() {
   root.style.setProperty('--dock-size', ds + 'px');
   root.style.setProperty('--dock-reserve', (ds + 36) + 'px');
   root.dataset.reduceMotion = String(!!store.get('reduceMotion'));
-  root.dataset.fx3d = String(store.get('fx3d') !== false && !store.get('reduceMotion'));
+  root.dataset.fx3d = String(store.get('fx3d') !== false && !store.get('reduceMotion') && !perf);
   if (api.setZoom) api.setZoom((store.get('uiScale') || 100) / 100);
   document.body.classList.toggle('focus-mode', !!store.get('focusMode'));
 }
@@ -104,8 +104,7 @@ export async function renderWallpaper() {
       startScene(host, wp.scene, { still });
     }
   }
-  const dim = store.get('wallpaperDim');
-  if (dim) host.append(h('div.wp-layer', { style: { background: `rgba(0,0,0,${dim / 100})` } }));
+  host.append(h('div.wp-layer.wp-dim', { style: { background: `rgba(0,0,0,${(store.get('wallpaperDim') || 0) / 100})` } }));
   if (!wp.see) host.append(h('div.wp-layer.wp-noise'), h('div.vignette'));
   host.style.opacity = wp.see ? 1 : opacity;
 }
@@ -131,6 +130,9 @@ export function initTheme() {
   renderWallpaper();
   const re = ['fx3d', 'perfMode', 'theme', 'accent', 'blur', 'dockSize', 'reduceMotion', 'focusMode', 'uiScale'];
   re.forEach((k) => store.on(k, () => { applyTheme(); if (k === 'reduceMotion' || k === 'perfMode') renderWallpaper(); }));
-  ['wallpaper', 'wallpaperImage', 'wallpaperDim', 'overlayOpacity', 'animatedWallpaper'].forEach((k) => store.on(k, renderWallpaper));
+  ['wallpaper', 'wallpaperImage', 'animatedWallpaper'].forEach((k) => store.on(k, renderWallpaper));
+  // Schieberegler nur nachführen – die 3D-Szene läuft dabei ungestört weiter
+  store.on('wallpaperDim', () => { const d = document.querySelector('#wallpaper .wp-dim'); if (d) d.style.background = `rgba(0,0,0,${(store.get('wallpaperDim') || 0) / 100})`; else renderWallpaper(); });
+  store.on('overlayOpacity', () => { const host = document.getElementById('wallpaper'); const wp = WALLPAPERS[store.get('wallpaper')]; if (host) host.style.opacity = wp && wp.see ? 1 : store.get('overlayOpacity') / 100; });
   matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => store.get('theme') === 'auto' && applyTheme());
 }

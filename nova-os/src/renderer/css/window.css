@@ -82,11 +82,11 @@
 .side-item .meter { margin-left: auto; width: 40px; }
 
 /* Lichtkante, die dem Mauszeiger folgt */
-.win::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 50;
+.win > .win-edge {
+  display: block; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 50;
   background: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), rgba(var(--accent-rgb), .85), rgba(var(--accent-rgb), .15) 45%, transparent 70%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
   opacity: 0; transition: opacity .35s;
 }
-.win.lit::after { opacity: 1; }
-.win.max::after, :root[data-perf="true"] .win::after { display: none; }
+.win.lit > .win-edge { opacity: 1; }
+.win.max > .win-edge, :root[data-perf="true"] .win > .win-edge { display: none; }

@@ -138,6 +138,7 @@ function renderSwitcher() {
     item.style.transform = `translateX(${off * 150 + Math.sign(off) * 70}px) translateZ(${-abs * 110}px) rotateY(${off === 0 ? 0 : off < 0 ? 52 : -52}deg)`;
     item.style.zIndex = String(100 - abs);
     item.style.opacity = abs > 4 ? '0' : String(1 - abs * 0.12);
+    item.style.visibility = abs > 4 ? 'hidden' : ''; // unsichtbare Karten nicht anklickbar
   });
   const w = sw.list[sw.idx];
   sw.label.textContent = w ? `${w.title}  ·  ${sw.idx + 1} / ${sw.list.length}` : '';
