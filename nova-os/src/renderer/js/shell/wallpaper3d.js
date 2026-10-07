@@ -111,6 +111,16 @@ export function startScene(host, kind, { still = false } = {}) {
   };
 }
 
+/** Standbild einer Szene in ein (kleines) Canvas zeichnen – für Vorschau-Kacheln */
+export function renderThumb(canvas, kind) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const W = canvas.width, H = canvas.height;
+  const scene = kind === 'horizon' ? horizonScene() : kind === 'waves' ? wavesScene() : galaxyScene();
+  ctx.clearRect(0, 0, W, H);
+  scene(ctx, W, H, 12, { x: 0, y: 0, sx: 0, sy: 0, ws: 0 }, accentColors());
+}
+
 /* ---------------------------------------------------------------- Galaxie */
 
 function galaxyScene() {

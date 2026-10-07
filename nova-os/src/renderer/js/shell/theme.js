@@ -3,7 +3,7 @@
 import { store } from '../core/store.js';
 import { api, fileUrl } from '../core/api.js';
 import { h, clear } from '../core/dom.js';
-import { startScene, stopScene } from './wallpaper3d.js';
+import { startScene, stopScene, renderThumb } from './wallpaper3d.js';
 
 export const ACCENTS = [
   { name: 'Nova', color: '#7c5cff', alt: '#4cc9f0' },
@@ -118,7 +118,14 @@ function mimeFor(p) {
 export function wallpaperThumb(key) {
   const wp = WALLPAPERS[key];
   const el = h('div.wp-thumb', { class: wp.scene ? 'is-3d' : '', style: { background: wp.see ? 'repeating-conic-gradient(#555 0 25%, #333 0 50%) 0 0/14px 14px' : wp.bg } });
-  if (wp.scene) el.append(h('b.wp-3d', '3D'));
+  if (wp.scene) {
+    // echtes Standbild der Szene (nach dem Einhängen, damit die Größe stimmt)
+    const cv = h('canvas.wp-thumb-canvas', { width: 240, height: 144 });
+    el.append(cv);
+    requestAnimationFrame(() => { try { renderThumb(cv, wp.scene); } catch (_) { /* Vorschau ist optional */ } });
+    el.append(h('b.wp-3d', '3D'));
+    return el;
+  }
   for (const [color, x, y, size] of wp.blobs) {
     el.append(h('i', { style: { background: color, left: x + '%', top: y + '%', width: size * 1.4 + '%', paddingTop: size * 1.4 + '%' } }));
   }

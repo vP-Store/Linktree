@@ -726,3 +726,6 @@ input[type="date"].input, input[type="time"].input { color-scheme: inherit; }
 @keyframes wxTwinkle { 50% { opacity: .35; } }
 .wx-sky .moon { inset: auto; right: 27%; top: 5%; width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f8fafc, #cbd5e1 60%, #94a3b8); box-shadow: 0 0 60px rgba(226, 232, 240, .35); opacity: .85; }
 :root[data-reduce-motion="true"] .wx-sky i, :root[data-perf="true"] .wx-sky i { animation: none !important; }
+.wp-thumb-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.wp-thumb.is-3d::before { display: none; }
+.wp-thumb .wp-3d { z-index: 1; }
